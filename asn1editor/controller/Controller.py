@@ -128,6 +128,8 @@ class ListController(Controller):
         if not self._optional_interface.get_has_value():
             self._value_interface.set_value('0')
             self.__sync_controllers(0)
+        else:
+            self.event_handler()
 
     def __sync_controllers(self, new_num: int):
         if new_num > len(self._controllers):

@@ -118,6 +118,9 @@ class MainWindow(wx.Frame, PluginInterface):
             view_factory = WxPythonViewFactory.WxPythonViewFactory(self.__main_panel)
             view_factory.freeze()
 
+            if self.__view is not None:
+                self.__view.destroy()
+
             self.__view, self.__controller = self.__asn1_handler.create_mvc_for_type(self.__type_name, view_factory)
             sizer: wx.Sizer = self.__main_panel.GetSizer()
             sizer.Clear()

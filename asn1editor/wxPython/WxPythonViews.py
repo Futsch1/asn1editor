@@ -43,8 +43,7 @@ class WxPythonView(AbstractView, OptionalInterface):
         raise NotImplementedError
 
     def destroy(self):
-        if self._optional_control:
-            self._optional_control.Destroy()
+        self._sizer.Clear(True)
 
 
 class WxPythonValueView(WxPythonView, ValueInterface):
@@ -71,10 +70,6 @@ class WxPythonValueView(WxPythonView, ValueInterface):
     def _enable(self, enabled: bool):
         self._value_control.Enable(enabled)
 
-    def destroy(self):
-        super(WxPythonValueView, self).destroy()
-        self._value_control.Destroy()
-
 
 class WxPythonBooleanView(WxPythonView, ValueInterface):
     def __init__(self, sizer: wx.Sizer, value_control: wx.CheckBox = None,
@@ -100,10 +95,6 @@ class WxPythonBooleanView(WxPythonView, ValueInterface):
     def _enable(self, enabled: bool):
         self._value_control.Enable(enabled)
 
-    def destroy(self):
-        super(WxPythonBooleanView, self).destroy()
-        self._value_control.Destroy()
-
 
 class WxPythonContainerView(WxPythonView, ContainerView):
     def __init__(self, sizer: wx.Sizer, container_sizer: wx.FlexGridSizer, optional_control: Optional[wx.CheckBox] = None):
@@ -114,6 +105,8 @@ class WxPythonContainerView(WxPythonView, ContainerView):
     def add_child(self, view: WxPythonView):
         self._children.append(view._sizer)
         self._container_sizer.Add(view._sizer)
+        if not self.get_has_value():
+            self._sizer.Hide(view._sizer, recursive=True)
 
     def _enable(self, enabled: bool):
         if enabled:
@@ -122,14 +115,14 @@ class WxPythonContainerView(WxPythonView, ContainerView):
         else:
             for child in self._children:
                 self._sizer.Hide(child, recursive=True)
-
-    def destroy(self):
-        super(WxPythonContainerView, self).destroy()
-        self._sizer.Destroy()
+        self._sizer.Layout()
+        containing_window = self._sizer.GetContainingWindow()
+        if containing_window is not None:
+            self._sizer.GetContainingWindow().Layout()
 
 
 class WxPythonListView(WxPythonView, ListView, ValueInterface):
-    def __init__(self, sizer: wx.Sizer, num_control: wx.TextCtrl, optional_control: Optional[wx.CheckBox] = None):
+    def __init__(self, sizer: wx.Sizer, num_control: wx.SpinCtrl, optional_control: Optional[wx.CheckBox] = None):
         super(WxPythonListView, self).__init__(sizer, optional_control)
         self._num_control = num_control
         self._children: List[wx.Sizer] = []
@@ -140,7 +133,7 @@ class WxPythonListView(WxPythonView, ListView, ValueInterface):
             del e
             callback()
 
-        self._num_control.Bind(wx.EVT_TEXT, event_closure)
+        self._num_control.Bind(wx.EVT_SPINCTRL, event_closure)
 
     def get_value(self) -> str:
         return self._num_control.GetValue()
@@ -168,11 +161,6 @@ class WxPythonListView(WxPythonView, ListView, ValueInterface):
         self._sizer.Remove(view._sizer)
         self._sizer.Layout()
 
-    def destroy(self):
-        super(WxPythonListView, self).destroy()
-        self._num_control.Destroy()
-        self._sizer.Destroy()
-
 
 class WxPythonChoiceView(WxPythonView, ChoiceView, ValueInterface):
     def __init__(self, sizer: wx.Sizer, choice_control: wx.ComboBox, optional_control: Optional[wx.CheckBox] = None):
@@ -196,11 +184,6 @@ class WxPythonChoiceView(WxPythonView, ChoiceView, ValueInterface):
 
     def _enable(self, enabled: bool):
         self._choice_control.Enable(enabled)
-
-    def destroy(self):
-        super(WxPythonChoiceView, self).destroy()
-        self._choice_control.Destroy()
-        self._sizer.Destroy()
 
     def set_view(self, view: WxPythonView):
         if self._view is not None:

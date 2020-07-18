@@ -21,7 +21,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         sizer.Add(edit, proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
 
         view = WxPythonValueView(sizer, edit, optional_control)
-        return view, view, view
+        return view, view, view if optional else None
 
     def get_text_view(self, name: str, text: str) -> AbstractView:
         sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -45,7 +45,7 @@ class WxPythonViewFactory(AbstractViewFactory):
 
         view = WxPythonContainerView(sizer, container_sizer, optional_control)
 
-        return view, view
+        return view, view if optional else None
 
     def get_list_view(self, name: str, minimum: int, maximum: int, optional: bool) -> Tuple[ListView, ValueInterface, OptionalInterface]:
         sizer = wx.StaticBoxSizer(wx.VERTICAL, self._window, name)
@@ -57,10 +57,9 @@ class WxPythonViewFactory(AbstractViewFactory):
         num_elements_sizer = wx.BoxSizer(wx.HORIZONTAL)
         num_elements_label = wx.StaticText(self._window, wx.ID_ANY, "Elements:")
         num_elements_sizer.Add(num_elements_label, flag=wx.ALL, border=5)
-        num_elements = wx.lib.masked.numctrl.NumCtrl(self._window)
+        num_elements = wx.SpinCtrl(self._window)
         num_elements.SetMin(minimum)
         num_elements.SetMax(maximum)
-        num_elements.SetAllowNegative(False)
         num_elements.SetToolTip(f"Minimum elements: {minimum}, maximum elements: {maximum}")
         num_elements_sizer.Add(num_elements, flag=wx.ALL, border=5)
 
@@ -71,7 +70,7 @@ class WxPythonViewFactory(AbstractViewFactory):
 
         view = WxPythonListView(sizer, num_elements, optional_control)
 
-        return view, view, view
+        return view, view, view if optional else None
 
     def get_number_view(self, name: str, optional: bool, minimum: Optional[Union[int, float]],
                         maximum: Optional[Union[int, float]], float_: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
@@ -93,7 +92,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         sizer.Add(edit, proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
 
         view = WxPythonValueView(sizer, edit, optional_control)
-        return view, view, view
+        return view, view, view if optional else None
 
     def get_boolean_view(self, name: str, optional: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
         sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -102,7 +101,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         sizer.Add(check_box, proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
 
         view = WxPythonBooleanView(sizer, check_box, optional_control)
-        return view, view, view
+        return view, view, view if optional else None
 
     def get_string_view(self, name: str, optional: bool, minimum: int, maximum: int):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -114,7 +113,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         sizer.Add(edit, proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
 
         view = WxPythonValueView(sizer, edit, optional_control)
-        return view, view, view
+        return view, view, view if optional else None
 
     def get_choice_view(self, name: str, choices: List[str], optional: bool) -> Tuple[ChoiceView, ValueInterface, OptionalInterface]:
         sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -133,7 +132,7 @@ class WxPythonViewFactory(AbstractViewFactory):
 
         view = WxPythonChoiceView(sizer, choice_element, optional_control)
 
-        return view, view, view
+        return view, view, view if optional else None
 
     def update(self):
         self._window.Layout()
@@ -147,6 +146,7 @@ class WxPythonViewFactory(AbstractViewFactory):
     def _add_name_control(self, sizer: wx.Sizer, name: str, optional: bool, suffix: str = '') -> Optional[wx.CheckBox]:
         if optional:
             control = wx.CheckBox(self._window, wx.ID_ANY, name + suffix)
+            control.SetToolTip("Optional element")
         else:
             control = wx.StaticText(self._window, wx.ID_ANY, name + suffix)
         sizer.Add(control, flag=wx.ALL, border=5)
