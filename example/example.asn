@@ -3,17 +3,17 @@ BEGIN
 
 Sequence ::= SEQUENCE
 {
-    example1           SubSequence,
-    example2           SubSequence OPTIONAL,
-    stringList      SEQUENCE (SIZE(3)) OF OCTET STRING(5),
-    boolExample        BOOLEAN,
-    realExample        REAL,
-    enumerated      ENUMERATED { enum1, enum2 },
-    bitString       BIT STRING { a(0), b(1), c(23) } (SIZE(24)),
-    choiceExample      CHOICE {
-        sequence    SubSequence,
-        exampleInt     INTEGER (0..255),
-        exampleList    SEQUENCE(SIZE(4)) OF INTEGER(0..255)
+    example1            SubSequence,
+    example2            SubSequence OPTIONAL,
+    stringList          SEQUENCE (SIZE(3)) OF OCTET STRING(5),
+    boolExample         BOOLEAN,
+    realExample         REAL,
+    enumerated          ENUMERATED { enum1, enum2 },
+    bitString           BIT STRING { a(0), b(1), c(23) } (SIZE(24)),
+    choiceExample       CHOICE {
+        sequence            SubSequence,
+        exampleInt          INTEGER (0..255),
+        exampleList         SEQUENCE(SIZE(4)) OF INTEGER(0..255)
     }
 }
 

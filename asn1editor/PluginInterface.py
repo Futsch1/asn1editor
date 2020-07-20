@@ -5,25 +5,65 @@ import asn1tools
 
 class PluginInterface:
     def load_spec(self, file_name: str, type_name: typing.Optional[str] = None):
+        """
+        Loads an ASN.1 specification in the editor.
+
+        :param file_name: File name of the ASN.1 specification
+        :param type_name: Optional type name indication. Format: [Module name].[Type name]
+        """
         raise NotImplementedError
 
     def show_data(self, data: bytes, codec: str):
+        """
+        Decodes and shows data from an ASN.1 encoded byte stream in the editor.
+
+        :param data: Byte stream with ASN.1 encoded data
+        :param codec: Codec to use for decoding (reference asn1tools which ones are supported)
+        """
         raise NotImplementedError
 
     def encode_data(self, codec: str) -> bytes:
+        """
+        Encodes the data currently edited in the editor window with an ASN.1 codec.
+
+        :param codec: Codec to use for encoding (reference asn1tools which ones are supported)
+        """
         raise NotImplementedError
 
-    def get_spec_filename(self) -> str:
+    def get_spec_filename(self) -> typing.Optional[str]:
+        """
+        Returns the file name of the ASN.1 specification file currently loaded.
+        """
         raise NotImplementedError
 
     def get_spec(self, codec: str) -> asn1tools.compiler.Specification:
+        """
+        Returns the compiled ASN.1 specification as an object defined by asn1tools.
+
+        :param codec: Codec to use (reference asn1tools which ones are supported)
+        """
         raise NotImplementedError
 
-    def get_typename(self) -> str:
+    def get_typename(self) -> typing.Optional[str]:
+        """
+        Returns the name of the currently used type name in the editor.
+        """
         raise NotImplementedError
 
     def file_picker(self, message: str, wildcard: str, open_: bool) -> typing.Optional[str]:
+        """
+        Opens a file picker where the user can choose a file name and returns this chosen name.
+
+        :param message: Message to show in the file picker
+        :param wildcard: Wildcards to offer the user in order to help him choose the correct file types
+        :param open_: Flag if the dialog shall be an open dialog (True) or a save dialog (false)
+        """
         raise NotImplementedError
 
     def dir_picker(self, message: str) -> typing.Optional[str]:
+        """
+        Opens a dir picker where the user can choose a directory name and returns this chosen name.
+
+        :param message: Message to show in the dir picker
+        """
         raise NotImplementedError
