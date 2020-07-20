@@ -1,7 +1,9 @@
-from typing import Union, Optional, Callable, List
+import typing
+from typing import Union, Optional, Callable, List, Tuple
 
 import wx
 
+from asn1editor.interfaces.BitstringInterface import BitstringInterface
 from asn1editor.interfaces.OptionalInterface import OptionalInterface
 from asn1editor.interfaces.ValueInterface import ValueInterface
 from asn1editor.view.AbstractView import AbstractView, ContainerView, ListView, ChoiceView
@@ -192,3 +194,24 @@ class WxPythonChoiceView(WxPythonView, ChoiceView, ValueInterface):
         self._sizer.Add(view._sizer)
         self._view = view
         self._sizer.Layout()
+
+
+class WxPythonBitstringView(WxPythonView, BitstringInterface):
+    def __init__(self, sizer: wx.Sizer, checkboxes: List[Tuple[int, wx.CheckBox]], optional_control: Optional[wx.CheckBox] = None):
+        super(WxPythonBitstringView, self).__init__(sizer, optional_control)
+        self._checkboxes = checkboxes
+
+    def _enable(self, enabled: bool):
+        for _, checkbox in self._checkboxes:
+            checkbox.Enable(enabled)
+
+    def get_values(self) -> typing.List[int]:
+        values = []
+        for bit, checkbox in self._checkboxes:
+            if checkbox.GetValue():
+                values.append(bit)
+        return values
+
+    def set_values(self, values: typing.List[int]):
+        for bit, checkbox in self._checkboxes:
+            checkbox.SetValue(bit in values)

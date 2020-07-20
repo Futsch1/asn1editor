@@ -42,6 +42,9 @@ class ViewControllerFactory(object):
             return self._string(type_, checker, controller)
         elif isinstance(type_, oer.Enumerated):
             return self._enumerated(type_, controller)
+        elif isinstance(type_, oer.BitString) and type_.number_of_bits is not None:
+            # noinspection PyTypeChecker
+            return self._bitstring(type_, controller)
         elif isinstance(type_, oer.Null):
             return self._text(type_, "Null")
         else:
@@ -95,6 +98,14 @@ class ViewControllerFactory(object):
         view, value_interface, optional_interface = self._view_factory.get_string_view(type_.name, type_.optional, checker.minimum, checker.maximum)
 
         ControllerFactory(controller).create_value_controller(type_, value_interface, optional_interface)
+
+        return view
+
+    def _bitstring(self, type_: oer.BitString, controller: Controller):
+        # TODO: Named bits!
+        view, value_interface, optional_interface = self._view_factory.get_bitstring_view(type_.name, type_.number_of_bits, [], type_.optional)
+
+        ControllerFactory(controller).create_bitstring_controller(type_, value_interface, optional_interface)
 
         return view
 

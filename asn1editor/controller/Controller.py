@@ -1,6 +1,7 @@
 from typing import Optional, Any, Dict, List, Tuple, Union
 
 from asn1editor.controller import Converter
+from asn1editor.interfaces.BitstringInterface import BitstringInterface
 from asn1editor.interfaces.OptionalInterface import OptionalInterface
 from asn1editor.interfaces.ValueInterface import ValueInterface
 
@@ -31,7 +32,7 @@ class Controller:
         pass
 
     def _model_to_view_optional(self, model: Dict[str, Any]):
-        has_value = self._name in model or isinstance(self._parent, ListController)
+        has_value = self._name in model or isinstance(self._parent, ListController) or isinstance(self._parent, ChoiceController)
         assert has_value or self._optional_interface
         if self._optional_interface:
             # Notify view if value is there or not
@@ -175,6 +176,40 @@ class ChoiceController(Controller):
         self._choice_instance_factory.create(choice, self)
 
 
+class BitstringController(Controller):
+    def __init__(self, name: str, parent: Optional[Controller], bitstring_interface: BitstringInterface,
+                 optional_interface: Optional[OptionalInterface], number_of_bits: int):
+        super().__init__(name, parent, optional_interface)
+        self._bitstring_interface = bitstring_interface
+        self._number_of_bits = number_of_bits
+
+    def add_controller(self, name: str, other: Controller):
+        raise Exception('ValueController cannot add a controller')
+
+    def model_to_view(self, model: Dict[str, Any]):
+        if self._model_to_view_optional(model):
+            values = []
+            bytes_, num_bits = model[self._name]
+            assert num_bits == self._number_of_bits
+            for bit in range(self._number_of_bits):
+                bit_index = bit % 8
+                byte_index = bit // 8
+                if bytes_[byte_index] & (1 << bit_index):
+                    values.append(bit)
+            self._bitstring_interface.set_values(values)
+
+    def view_to_model(self) -> Optional[Tuple[bytes, int]]:
+        if self._view_to_model_optional():
+            bytes_ = bytearray(b'\x00' * self._number_of_bits)
+            values = self._bitstring_interface.get_values()
+            for bit in values:
+                bit_index = bit % 8
+                byte_index = bit // 8
+                bytes_[byte_index] |= (1 << bit_index)
+
+            return bytes_, self._number_of_bits
+
+
 class ContainerController(Controller):
     def __init__(self, name: str, parent: Optional[Controller], optional_interface: Optional[OptionalInterface]):
         super().__init__(name, parent, optional_interface)
@@ -185,10 +220,10 @@ class ContainerController(Controller):
 
     def model_to_view(self, model: Dict[str, Any]):
         if self._model_to_view_optional(model):
-            if not isinstance(self._parent, ListController):
-                self._model_to_view(model[self._name])
-            else:
+            if isinstance(self._parent, ListController) or isinstance(self._parent, ChoiceController):
                 self._model_to_view(model)
+            else:
+                self._model_to_view(model[self._name])
 
     def view_to_model(self) -> Optional[Dict[str, Any]]:
         if self._view_to_model_optional():
@@ -216,3 +251,4 @@ class RootController(ContainerController):
 
     def view_to_model(self) -> Optional[Dict[str, Any]]:
         return self._view_to_model()
+

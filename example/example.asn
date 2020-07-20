@@ -1,0 +1,27 @@
+EXAMPLE DEFINITIONS AUTOMATIC TAGS ::=
+BEGIN
+
+Sequence ::= SEQUENCE
+{
+    example1           SubSequence,
+    example2           SubSequence OPTIONAL,
+    stringList      SEQUENCE (SIZE(3)) OF OCTET STRING(5),
+    boolExample        BOOLEAN,
+    realExample        REAL,
+    enumerated      ENUMERATED { enum1, enum2 },
+    bitString       BIT STRING { a(0), b(1), c(23) } (SIZE(24)),
+    choiceExample      CHOICE {
+        sequence    SubSequence,
+        exampleInt     INTEGER (0..255),
+        exampleList    SEQUENCE(SIZE(4)) OF INTEGER(0..255)
+    }
+}
+
+SubSequence ::= SEQUENCE
+{
+    member1      INTEGER (0..5000) DEFAULT 1000,
+    member2      INTEGER (-100..300),
+    enumerated   ENUMERATED { enum1, enum2 } OPTIONAL
+}
+
+END

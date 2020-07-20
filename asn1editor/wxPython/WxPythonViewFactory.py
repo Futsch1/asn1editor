@@ -3,11 +3,13 @@ from typing import List, Tuple, Optional, Union
 import wx
 import wx.lib.masked.numctrl
 
+from asn1editor.interfaces.BitstringInterface import BitstringInterface
 from asn1editor.interfaces.OptionalInterface import OptionalInterface
 from asn1editor.interfaces.ValueInterface import ValueInterface
 from asn1editor.view.AbstractView import AbstractView, ContainerView, ListView, ChoiceView
 from asn1editor.view.AbstractViewFactory import AbstractViewFactory
-from asn1editor.wxPython.WxPythonViews import WxPythonValueView, WxPythonView, WxPythonContainerView, WxPythonListView, WxPythonBooleanView, WxPythonChoiceView
+from asn1editor.wxPython.WxPythonViews import WxPythonValueView, WxPythonView, WxPythonContainerView, WxPythonListView, WxPythonBooleanView, WxPythonChoiceView, \
+    WxPythonBitstringView
 
 
 class WxPythonViewFactory(AbstractViewFactory):
@@ -131,6 +133,30 @@ class WxPythonViewFactory(AbstractViewFactory):
         sizer.Add(content)
 
         view = WxPythonChoiceView(sizer, choice_element, optional_control)
+
+        return view, view, view if optional else None
+
+    def get_bitstring_view(self, name: str, number_of_bits: int, named_bits: List[Tuple[int, str]], optional: bool) -> Tuple[AbstractView, BitstringInterface, OptionalInterface]:
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        optional_control = self._add_name_control(sizer, name, optional)
+
+        checkboxes: List[Tuple[int, wx.CheckBox]] = []
+
+        bits_sizer = wx.StaticBoxSizer(wx.VERTICAL, self._window, "Bits")
+        if len(named_bits):
+            for bit, name in named_bits:
+                bit_checkbox = wx.CheckBox(self._window, label=f"{bit}: {name}")
+                bits_sizer.Add(bit_checkbox)
+                checkboxes.append((bit, bit_checkbox))
+        else:
+            for bit in range(number_of_bits):
+                bit_checkbox = wx.CheckBox(self._window, label=str(bit))
+                bits_sizer.Add(bit_checkbox)
+                checkboxes.append((bit, bit_checkbox))
+
+        sizer.Add(bits_sizer)
+
+        view = WxPythonBitstringView(sizer, checkboxes, optional_control)
 
         return view, view, view if optional else None
 

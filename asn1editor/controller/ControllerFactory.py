@@ -3,6 +3,7 @@ from typing import Optional
 from asn1tools.codecs import oer
 
 from asn1editor.controller import Controller, Converter
+from asn1editor.interfaces.BitstringInterface import BitstringInterface
 from asn1editor.interfaces.OptionalInterface import OptionalInterface
 from asn1editor.interfaces.ValueInterface import ValueInterface
 
@@ -66,6 +67,14 @@ class ControllerFactory:
                 default = type_.default
             controller = Controller.ChoiceController(type_.name, self._parent, value_interface, optional_interface, default, choice_instance_factory)
             self.__register_events(controller, value_interface, optional_interface)
+        else:
+            raise Exception(f"Unknown type for ControllerFactory: {type_}")
+
+    def create_bitstring_controller(self, type_: oer.Type, bitstring_interface: BitstringInterface, optional_interface: Optional[OptionalInterface]):
+        if isinstance(type_, oer.BitString):
+            controller = Controller.BitstringController(type_.name, self._parent, bitstring_interface, optional_interface, type_.number_of_bits)
+            if optional_interface is not None:
+                optional_interface.register_optional_event(controller.optional_handler)
         else:
             raise Exception(f"Unknown type for ControllerFactory: {type_}")
 

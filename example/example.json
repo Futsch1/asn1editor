@@ -1,0 +1,22 @@
+{
+  "example1": {
+    "member1": 1000,
+    "member2": 0,
+    "enumerated": "enum2"
+  },
+  "stringList": [
+    "3132333435",
+    "3132333435",
+    "3637383930"
+  ],
+  "boolExample": true,
+  "realExample": 0.0,
+  "enumerated": "enum1",
+  "bitString": "011CC0000000000000000000000000000000000000000000",
+  "choiceExample": {
+    "sequence": {
+      "member1": 1000,
+      "member2": 23
+    }
+  }
+}
