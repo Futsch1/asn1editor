@@ -1,13 +1,14 @@
 from typing import Tuple, Union
 
+from asn1tools.codecs import constraints_checker
+from asn1tools.compiler import oer
+
 from asn1editor.controller.ChoiceInstanceFactory import ChoiceInstanceFactory
 from asn1editor.controller.Controller import Controller, RootController
 from asn1editor.controller.ControllerFactory import ControllerFactory
 from asn1editor.controller.ListInstanceFactory import ListInstanceFactory
 from asn1editor.view.AbstractView import AbstractView
 from asn1editor.view.AbstractViewFactory import AbstractViewFactory
-from asn1tools.codecs import constraints_checker
-from asn1tools.compiler import oer
 
 
 class ViewControllerFactory(object):
@@ -71,7 +72,7 @@ class ViewControllerFactory(object):
         view, value_interface, optional_interface = self._view_factory.get_list_view(type_.name, checker.minimum, checker.maximum, type_.optional)
 
         list_instance_factory = ListInstanceFactory(self._view_factory, view, type_.element_type, checker.element_type)
-        ControllerFactory(controller).create_list_controller(type_, value_interface, optional_interface, list_instance_factory)
+        ControllerFactory(controller).create_list_controller(type_, value_interface, optional_interface, list_instance_factory, checker.minimum)
 
         return view
 

@@ -1,9 +1,10 @@
 from typing import Optional
 
+from asn1tools.codecs import oer
+
 from asn1editor.controller import Controller, Converter
 from asn1editor.interfaces.OptionalInterface import OptionalInterface
 from asn1editor.interfaces.ValueInterface import ValueInterface
-from asn1tools.codecs import oer
 
 
 class ControllerFactory:
@@ -41,9 +42,10 @@ class ControllerFactory:
         else:
             raise Exception(f"Unknown type for ControllerFactory: {type_}")
 
-    def create_list_controller(self, type_: oer.Type, value_interface: ValueInterface, optional_interface: Optional[OptionalInterface], list_instance_factory):
+    def create_list_controller(self, type_: oer.Type, value_interface: ValueInterface, optional_interface: Optional[OptionalInterface], list_instance_factory,
+                               minimum_elements: int):
         if isinstance(type_, oer.SequenceOf):
-            controller = Controller.ListController(type_.name, self._parent, value_interface, optional_interface, list_instance_factory)
+            controller = Controller.ListController(type_.name, self._parent, value_interface, optional_interface, list_instance_factory, minimum_elements)
             self.__register_events(controller, value_interface, optional_interface)
         else:
             raise Exception(f"Unknown type for ControllerFactory: {type_}")
