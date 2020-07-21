@@ -98,7 +98,7 @@ class ListController(Controller):
         self._value_interface = value_interface
         self._controllers = []
         self._list_instance_factory = list_instance_factory
-        if default > 0:
+        if default > 0 and not optional_interface:
             self._value_interface.set_value(str(default))
             self.event_handler()
 
@@ -114,7 +114,6 @@ class ListController(Controller):
                 controller.model_to_view(model[i])
             self._value_interface.set_value(str(new_num))
         else:
-            self._value_interface.set_value('0')
             self.__sync_controllers(0)
 
     def view_to_model(self) -> Optional[List]:
@@ -130,7 +129,6 @@ class ListController(Controller):
 
     def optional_handler(self):
         if not self._optional_interface.get_has_value():
-            self._value_interface.set_value('0')
             self.__sync_controllers(0)
         else:
             self.event_handler()
@@ -164,6 +162,7 @@ class ChoiceController(Controller):
     def model_to_view(self, model: Dict[str, Any]):
         if self._model_to_view_optional(model):
             choice = model[self._name][0]
+            self._value_interface.set_value(choice)
             self._choice_instance_factory.create(choice, self)
             self._controller.model_to_view(model[self._name][1])
 

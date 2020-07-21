@@ -10,6 +10,7 @@ Sequence ::= SEQUENCE
     realExample         REAL,
     enumerated          ENUMERATED { enum1, enum2 },
     bitString           BIT STRING { a(0), b(1), c(23) } (SIZE(24)),
+    optionalSequenceOf  SEQUENCE (SIZE(2)) OF SubSequence OPTIONAL,
     choiceExample       CHOICE {
         sequence            SubSequence,
         exampleInt          INTEGER (0..255),
