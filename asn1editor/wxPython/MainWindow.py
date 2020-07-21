@@ -70,7 +70,8 @@ class MainWindow(wx.Frame, PluginInterface):
                     plugin_menu.AppendSeparator()
                 else:
                     menu_item = plugin_menu.Append(i, menu[0])
-                    self.Bind(wx.EVT_MENU, self.__plugin_menu_event, menu_item)
+                    if menu[1] is not None:
+                        self.Bind(wx.EVT_MENU, self.__plugin_menu_event, menu_item)
 
             menu_bar.Append(plugin_menu, self.__plugin.get_name())
 
@@ -182,6 +183,12 @@ class MainWindow(wx.Frame, PluginInterface):
 
     def get_spec(self, codec: str):
         return self.__asn1_handler.get_compiled(codec)
+
+    def text_entry(self, message: str) -> typing.Optional[str]:
+        with wx.TextEntryDialog(self, message) as text_dialog:
+            if text_dialog.ShowModal() == wx.ID_CANCEL:
+                return
+            return text_dialog.GetValue()
 
     def __exception_handler(self, exc_type, value, trace):
         import traceback

@@ -5,7 +5,7 @@ Sequence ::= SEQUENCE
 {
     example1            SubSequence,
     example2            SubSequence OPTIONAL,
-    stringList          SEQUENCE (SIZE(3)) OF OCTET STRING(5),
+    stringList          SEQUENCE (SIZE(3)) OF OCTET STRING(5) OPTIONAL,
     boolExample         BOOLEAN,
     realExample         REAL,
     enumerated          ENUMERATED { enum1, enum2 },

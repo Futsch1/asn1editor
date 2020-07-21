@@ -67,3 +67,11 @@ class PluginInterface:
         :param message: Message to show in the dir picker
         """
         raise NotImplementedError
+
+    def text_entry(self, message: str) -> typing.Optional[str]:
+        """
+        Queries a text from the user.
+
+        :param message: Message to show to the user
+        """
+        raise NotImplementedError
