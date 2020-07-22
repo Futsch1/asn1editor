@@ -31,9 +31,9 @@ class MainWindow(wx.Frame, PluginInterface):
         self.__main_panel.SetScrollbars(15, 15, 50, 50)
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.__main_panel.SetSizer(sizer)
+        self.__main_panel.SetAutoLayout(True)
 
-        self.__status_bar = self.CreateStatusBar()
-        self.__status_bar.SetStatusText('Test')
+        self._status_bar = self.CreateStatusBar()
 
         self.__create_menu()
         self.__asn1_handler = None
@@ -100,7 +100,7 @@ class MainWindow(wx.Frame, PluginInterface):
         picker = FilePickerHandler(data_load_dialog_constructor, self.load_data_from_file)
         self.Bind(wx.EVT_MENU, picker.on_menu_click, self.__load_data_item)
 
-        picker = FilePickerHandler(data_save_dialog_constructor, self.save_data_to_file)
+        picker = FilePickerHandler(data_save_dialog_constructor, self.save_data_to_file, True)
         self.Bind(wx.EVT_MENU, picker.on_menu_click, self.__save_data_item)
 
         self.Bind(wx.EVT_CLOSE, self.close, self)
@@ -120,7 +120,7 @@ class MainWindow(wx.Frame, PluginInterface):
         else:
             self.__type_name = type_name
         if self.__type_name is not None:
-            self.__status_bar.SetStatusText(f'Loaded {file_name}')
+            self._status_bar.SetStatusText(f'Loaded {file_name}')
             self.__file_name = file_name
 
             view_factory = WxPythonViewFactory.WxPythonViewFactory(self.__main_panel)
@@ -133,10 +133,11 @@ class MainWindow(wx.Frame, PluginInterface):
             sizer: wx.Sizer = self.__main_panel.GetSizer()
             sizer.Clear()
             sizer.Add(self.__view.realize(), 0, wx.ALL | wx.EXPAND, 5)
+            sizer.Layout()
 
             self.__main_panel.SetSizer(sizer)
-            self.__main_panel.Layout()
-            sizer.Layout()
+            self.__main_panel.FitInside()
+            self.__main_panel.AdjustScrollbars()
 
             view_factory.thaw()
 
@@ -145,21 +146,21 @@ class MainWindow(wx.Frame, PluginInterface):
 
     def load_data_from_file(self, file_name: str):
         self.__controller.model_to_view(self.__asn1_handler.load_data_file(file_name))
-        self.__status_bar.SetStatusText(f'Loaded {file_name} for {self.__type_name}')
+        self._status_bar.SetStatusText(f'Loaded {file_name} for {self.__type_name}')
 
     def save_data_to_file(self, file_name: str):
         self.__asn1_handler.save_data_file(file_name, self.__controller.view_to_model())
 
     def show_data(self, data: bytes, codec: str):
         self.__controller.model_to_view(self.__asn1_handler.get_model_from_data(data, codec))
-        self.__status_bar.SetStatusText(f'Loaded data for {self.__type_name}')
+        self._status_bar.SetStatusText(f'Loaded data for {self.__type_name}')
 
     def file_picker(self, message: str, wildcard: str, open_: bool) -> typing.Optional[str]:
         def dialog_constructor() -> wx.FileDialog:
             return wx.FileDialog(self, message, wildcard=wildcard,
                                  style=(wx.FD_OPEN | wx.FD_FILE_MUST_EXIST) if open_ else wx.FD_SAVE)
 
-        picker = FilePickerHandler(dialog_constructor, None)
+        picker = FilePickerHandler(dialog_constructor, None, not open_)
         picker.on_menu_click(wx.EVT_MENU)
         return picker.filename
 
@@ -190,14 +191,23 @@ class MainWindow(wx.Frame, PluginInterface):
                 return
             return text_dialog.GetValue()
 
+    def choice_entry(self, message: str, choices: typing.List[str]) -> typing.Optional[str]:
+        with wx.SingleChoiceDialog(self, message, '', choices=choices) as choice_dialog:
+            if choice_dialog.ShowModal() == wx.ID_CANCEL:
+                return
+            return choice_dialog.GetStringSelection()
+
+    def show_status(self, message: str):
+        self._status_bar.SetStatusText(message)
+
     def __exception_handler(self, exc_type, value, trace):
         import traceback
         trace = ''.join(traceback.format_exception(exc_type, value, trace))
         print(trace)
 
         exception_str = f'{value}\n\n{exc_type}\n\n{trace}'
-        wx.MessageBox(exception_str, 'Error', wx.OK | wx.ICON_ERROR, parent=self)
-        self.__status_bar.SetStatusText(f'Error: {value}')
+        wx.MessageBox(value, 'Error', wx.OK | wx.ICON_ERROR, parent=self)
+        self._status_bar.SetStatusText(f'Error: {value}')
         try:
             with open('error_log.txt', 'a+') as f:
                 import datetime

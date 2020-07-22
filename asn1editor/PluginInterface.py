@@ -75,3 +75,20 @@ class PluginInterface:
         :param message: Message to show to the user
         """
         raise NotImplementedError
+
+    def choice_entry(self, message: str, choices: typing.List[str]) -> typing.Optional[str]:
+        """
+        Queries the user for a choice of values.
+
+        :param message: Message to show to the user
+        :param choices: List of strings for the user to choose from
+        """
+        raise NotImplementedError
+
+    def show_status(self, message: str):
+        """
+        Shows a status message.
+
+        :param message: Message to show to the user
+        """
+        raise NotImplementedError
