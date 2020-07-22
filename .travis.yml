@@ -3,8 +3,7 @@ python:
   - "3.8"
 # command to install dependencies
 install:
-  - pip install -U \
-    -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-16.04 \
+  - pip install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-16.04
     wxPython==4.1.0
   - pip install -r requirements.txt
 # command to run tests
