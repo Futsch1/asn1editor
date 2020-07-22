@@ -3,7 +3,9 @@ python:
   - "3.8"
 # command to install dependencies
 install:
-  - conda install -c conda-forge wxpython
+  - pip install -U \
+    -f https://extras.wxpython.org/wxPython4/extras/linux/gtk2/ubuntu-16.04 \
+    wxPython==4.1.0
   - pip install -r requirements.txt
 # command to run tests
 script:
