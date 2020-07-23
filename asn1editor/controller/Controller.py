@@ -83,9 +83,12 @@ class BoolController(Controller):
     def add_controller(self, name: str, other: Controller):
         raise Exception('ValueController cannot add a controller')
 
-    def model_to_view(self, model: Dict[str, Any]):
-        if self._model_to_view_optional(model):
-            self._value_interface.set_value(str(model[self._name]))
+    def model_to_view(self, model: Union[Dict[str, Any], Any]):
+        if isinstance(model, Dict):
+            if self._model_to_view_optional(model):
+                self._value_interface.set_value(str(model[self._name]))
+        else:
+            self._value_interface.set_value(model)
 
     def view_to_model(self) -> bool:
         if self._view_to_model_optional():

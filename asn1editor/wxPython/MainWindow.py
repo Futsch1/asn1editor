@@ -69,9 +69,11 @@ class MainWindow(wx.Frame, PluginInterface):
                 if not len(menu[0]):
                     plugin_menu.AppendSeparator()
                 else:
-                    menu_item = plugin_menu.Append(i, menu[0])
+                    menu_item: wx.MenuItem = plugin_menu.Append(i, menu[0])
                     if menu[1] is not None:
                         self.Bind(wx.EVT_MENU, self.__plugin_menu_event, menu_item)
+                    else:
+                        menu_item.Enable(False)
 
             menu_bar.Append(plugin_menu, self.__plugin.get_name())
 
