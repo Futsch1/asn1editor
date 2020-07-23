@@ -208,7 +208,7 @@ class MainWindow(wx.Frame, PluginInterface):
         print(trace)
 
         exception_str = f'{value}\n\n{exc_type}\n\n{trace}'
-        wx.MessageBox(value, 'Error', wx.OK | wx.ICON_ERROR, parent=self)
+        wx.MessageBox(str(value), 'Error', wx.OK | wx.ICON_ERROR, parent=self)
         self._status_bar.SetStatusText(f'Error: {value}')
         try:
             with open('error_log.txt', 'a+') as f:

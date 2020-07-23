@@ -1,11 +1,10 @@
 import typing
+from unittest import TestCase
 from unittest.mock import patch
 
 import wx
 
 import asn1editor
-from unittest import TestCase
-
 from asn1editor.wxPython.MainWindow import MainWindow
 
 
