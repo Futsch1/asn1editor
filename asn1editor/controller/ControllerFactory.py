@@ -65,7 +65,7 @@ class ControllerFactory:
                 default = sorted([member.name for member in type_.members])[0]
             else:
                 default = type_.default
-            controller = Controller.ChoiceController(type_.name, self._parent, value_interface, optional_interface, default, choice_instance_factory)
+            controller = Controller.ChoiceController(type_.name, self._parent, value_interface, optional_interface, choice_instance_factory, default)
             self.__register_events(controller, value_interface, optional_interface)
         else:
             raise Exception(f"Unknown type for ControllerFactory: {type_}")

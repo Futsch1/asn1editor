@@ -150,8 +150,8 @@ class ListController(Controller):
 
 
 class ChoiceController(Controller):
-    def __init__(self, name: str, parent: Controller, value_interface: ValueInterface, optional_interface: Optional[OptionalInterface], default: str,
-                 choice_instance_factory):
+    def __init__(self, name: str, parent: Controller, value_interface: ValueInterface, optional_interface: Optional[OptionalInterface], choice_instance_factory,
+                 default: str):
         super().__init__(name, parent, optional_interface)
         self._value_interface = value_interface
         self._controller: Optional[Controller] = None
@@ -202,7 +202,7 @@ class BitstringController(Controller):
 
     def view_to_model(self) -> Optional[Tuple[bytes, int]]:
         if self._view_to_model_optional():
-            bytes_ = bytearray(b'\x00' * self._number_of_bits)
+            bytes_ = bytearray(b'\x00' * -(-self._number_of_bits // 8))
             values = self._bitstring_interface.get_values()
             for bit in values:
                 bit_index = bit % 8
