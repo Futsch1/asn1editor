@@ -96,7 +96,8 @@ class BoolController(Controller):
 
 
 class ListController(Controller):
-    def __init__(self, name: str, parent: Controller, value_interface: ValueInterface, optional_interface: Optional[OptionalInterface], list_instance_factory, default: int):
+    def __init__(self, name: str, parent: Controller, value_interface: ValueInterface, optional_interface: Optional[OptionalInterface], list_instance_factory,
+                 default: int):
         super().__init__(name, parent, optional_interface)
         self._value_interface = value_interface
         self._controllers = []

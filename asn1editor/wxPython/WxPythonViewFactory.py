@@ -8,8 +8,8 @@ from asn1editor.interfaces.OptionalInterface import OptionalInterface
 from asn1editor.interfaces.ValueInterface import ValueInterface
 from asn1editor.view.AbstractView import AbstractView, ContainerView, ListView, ChoiceView
 from asn1editor.view.AbstractViewFactory import AbstractViewFactory
-from asn1editor.wxPython.WxPythonViews import WxPythonValueView, WxPythonView, WxPythonContainerView, WxPythonListView, WxPythonBooleanView, WxPythonChoiceView, \
-    WxPythonBitstringView
+from asn1editor.wxPython.WxPythonViews import WxPythonValueView, WxPythonView, WxPythonContainerView, WxPythonListView, WxPythonBooleanView, \
+    WxPythonChoiceView, WxPythonBitstringView
 
 
 class WxPythonViewFactory(AbstractViewFactory):
@@ -136,7 +136,8 @@ class WxPythonViewFactory(AbstractViewFactory):
 
         return view, view, view if optional else None
 
-    def get_bitstring_view(self, name: str, number_of_bits: int, named_bits: List[Tuple[int, str]], optional: bool) -> Tuple[AbstractView, BitstringInterface, OptionalInterface]:
+    def get_bitstring_view(self, name: str, number_of_bits: int, named_bits: List[Tuple[int, str]], optional: bool) -> Tuple[AbstractView, BitstringInterface,
+                                                                                                                             OptionalInterface]:
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         optional_control = self._add_name_control(sizer, name, optional)
 

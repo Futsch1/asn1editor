@@ -3,6 +3,7 @@ import re
 from typing import List, Tuple, Dict
 
 import asn1tools
+
 from asn1editor.ViewControllerFactory import ViewControllerFactory
 from asn1editor.controller.Controller import Controller
 from asn1editor.view.AbstractView import AbstractView
@@ -52,8 +53,12 @@ class ASN1SpecHandler:
         raise Exception(f'Requested type {load_type} not found in ASN.1 spec')
 
     @staticmethod
+    def get_extensions() -> List[str]:
+        return ['*.json', '*.jer', '*.oer', '*.xml', '*.der', '*.ber', '*.per', '*.uper']
+
+    @staticmethod
     def __get_codec(file_name: str) -> str:
-        extension_to_codec = {'.json': 'jer', '.jer': 'jer', '.oer': 'oer', '.xml': 'xer'}
+        extension_to_codec = {'.json': 'jer', '.jer': 'jer', '.oer': 'oer', '.xml': 'xer', '.der': 'der', '.ber': 'ber', '.per': 'per', '.uper': 'uper'}
         extension = os.path.splitext(file_name)[1]
         if extension not in extension_to_codec:
             raise Exception(f'Unknown extension {extension}: No ASN.1 codec found')
