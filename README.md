@@ -1,4 +1,4 @@
-|buildstatus|_
+[![Build Status](https://travis-ci.org/Futsch1/asn1editor.svg?branch=master)](https://travis-ci.org/Futsch1/asn1editor)
 # asn1editor
 Python based ASN.1 editor
 
