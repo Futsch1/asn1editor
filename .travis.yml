@@ -1,6 +1,11 @@
+dist: xenial
+services:
+  - xvfb
 language: python
 python:
   - "3.8"
+before_install:
+  - sudo apt-get install libsdl2-mixer-2.0-0 libsdl2-image-2.0-0 libsdl2-2.0-0
 # command to install dependencies
 install:
   - pip install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-16.04

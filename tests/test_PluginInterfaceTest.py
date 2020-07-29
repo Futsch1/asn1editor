@@ -86,9 +86,9 @@ class PluginInterfaceTest(TestCase):
         self.assertIsNone(plugin.plugin_interface.get_spec_filename())
         self.assertIsNone(plugin.plugin_interface.get_typename())
 
-        main_window.load_spec('../example/example.asn', 'EXAMPLE.Sequence')
+        main_window.load_spec('example/example.asn', 'EXAMPLE.Sequence')
 
-        self.assertEqual(plugin.plugin_interface.get_spec_filename(), '../example/example.asn')
+        self.assertEqual(plugin.plugin_interface.get_spec_filename(), 'example/example.asn')
         self.assertEqual(plugin.plugin_interface.get_typename(), 'EXAMPLE.Sequence')
 
         app.Destroy()
@@ -98,7 +98,7 @@ class PluginInterfaceTest(TestCase):
         plugin = TestPlugin()
         main_window = MainWindow(plugin)
 
-        main_window.load_spec('../example/example.asn', 'EXAMPLE.Sequence')
+        main_window.load_spec('example/example.asn', 'EXAMPLE.Sequence')
         asn1spec = plugin.plugin_interface.get_spec('jer')
         self.assertIn('EXAMPLE', asn1spec.modules)
 

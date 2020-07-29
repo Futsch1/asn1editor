@@ -88,11 +88,13 @@ class MainWindow(wx.Frame, PluginInterface):
                                  style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
 
         def data_load_dialog_constructor() -> wx.FileDialog:
-            return wx.FileDialog(self, "Data file", wildcard="Data file (*.oer;*.json)|*.oer;*.json",
+            extensions = ';'.join(ASN1SpecHandler.get_extensions())
+            return wx.FileDialog(self, "ASN.1 encoded file", wildcard=f"ASN.1 encoded ({extensions})|{extensions}",
                                  style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
 
         def data_save_dialog_constructor() -> wx.FileDialog:
-            return wx.FileDialog(self, "Data file", wildcard="Data file (*.oer;*.json)|*.oer;*.json", style=wx.FD_SAVE)
+            extensions = ';'.join(ASN1SpecHandler.get_extensions())
+            return wx.FileDialog(self, "ASN.1 encoded file", wildcard=f"ASN.1 encoded ({extensions})|{extensions}", style=wx.FD_SAVE)
 
         self.Bind(wx.EVT_MENU, self.exit, self.__exit_item)
 
