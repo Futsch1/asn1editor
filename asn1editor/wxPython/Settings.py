@@ -1,16 +1,20 @@
 import json
 
+settings = {}
 
-class Settings:
-    def __init__(self):
-        try:
-            with open('settings.json', 'r') as f:
-                self.s = json.load(f)
-        except FileNotFoundError:
-            self.s = {}
-        except json.decoder.JSONDecodeError:
-            self.s = {}
 
-    def save(self):
-        with open('settings.json', 'w+') as f:
-            f.write(json.dumps(self.s))
+def load():
+    global settings
+    try:
+        with open('settings.json', 'r') as f:
+            settings = json.load(f)
+    except FileNotFoundError:
+        settings = {}
+    except json.decoder.JSONDecodeError:
+        settings = {}
+
+
+def save():
+    global settings
+    with open('settings.json', 'w+') as f:
+        f.write(json.dumps(settings))

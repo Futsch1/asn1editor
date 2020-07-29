@@ -3,6 +3,8 @@ from typing import Callable, Optional
 
 import wx
 
+import asn1editor.wxPython.Settings as Settings
+
 
 class FilePickerHandler:
     def __init__(self, file_dialog_factory: Callable, propagator: Optional[Callable], overwrite_question: bool = False):
@@ -15,9 +17,13 @@ class FilePickerHandler:
     def on_menu_click(self, e: wx.Event):
         del e
         with self.__file_dialog_factory() as file_dialog:
+            initial_dir = Settings.settings.get(file_dialog.GetMessage())
+            if initial_dir is not None:
+                file_dialog.SetDirectory(initial_dir)
             if file_dialog.ShowModal() == wx.ID_CANCEL:
                 return
             filename = file_dialog.GetPath()
+            Settings.settings[file_dialog.GetMessage()] = os.path.dirname(filename)
             self.file_selected(filename, file_dialog.GetParent())
 
     def file_selected(self, filename: Optional[str], window: wx.Window):

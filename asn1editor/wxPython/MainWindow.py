@@ -5,12 +5,12 @@ from typing import Optional
 import wx
 
 import asn1editor
+import asn1editor.wxPython.Settings as Settings
 from asn1editor import Plugin
 from asn1editor.ASN1SpecHandler import ASN1SpecHandler
 from asn1editor.PluginInterface import PluginInterface
 from asn1editor.wxPython import WxPythonViewFactory
 from asn1editor.wxPython.FilePickerHandler import FilePickerHandler
-from asn1editor.wxPython.Settings import Settings
 
 
 class MainWindow(wx.Frame, PluginInterface):
@@ -21,11 +21,11 @@ class MainWindow(wx.Frame, PluginInterface):
         if self.__plugin is not None:
             self.__plugin.connect(self)
 
-        self.__settings = Settings()
+        Settings.load()
 
-        self.SetSize(wx.Size(self.__settings.s.get('size', (500, 800))))
-        self.Maximize(self.__settings.s.get('maximized', True))
-        self.SetPosition(wx.Point(self.__settings.s.get('position', (0, 0))))
+        self.SetSize(wx.Size(Settings.settings.get('size', (500, 800))))
+        self.Maximize(Settings.settings.get('maximized', True))
+        self.SetPosition(wx.Point(Settings.settings.get('position', (0, 0))))
 
         self.__main_panel = wx.ScrolledWindow(self, style=wx.HSCROLL | wx.VSCROLL)
         self.__main_panel.SetScrollbars(15, 15, 50, 50)
@@ -224,10 +224,10 @@ class MainWindow(wx.Frame, PluginInterface):
 
     # noinspection PyUnusedLocal
     def close(self, e: wx.Event):
-        self.__settings.s['size'] = (self.GetSize().Get())
-        self.__settings.s['maximized'] = self.IsMaximized()
-        self.__settings.s['position'] = self.GetPosition().Get()
+        Settings.settings['size'] = (self.GetSize().Get())
+        Settings.settings['maximized'] = self.IsMaximized()
+        Settings.settings['position'] = self.GetPosition().Get()
 
-        self.__settings.save()
+        Settings.save()
 
         self.Destroy()
