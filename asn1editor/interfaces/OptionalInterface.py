@@ -1,7 +1,7 @@
 from typing import Callable
 
 
-class OptionalInterface:
+class OptionalInterface:  # pragma: no cover
     def register_optional_event(self, callback: Callable):
         raise NotImplementedError
 

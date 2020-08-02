@@ -3,7 +3,7 @@ import typing
 from asn1editor import PluginInterface
 
 
-class Plugin:
+class Plugin:  # pragma: no cover
     def get_name(self) -> str:
         """
         Returns the name of a plugin - used to name the menu item folder

@@ -15,11 +15,6 @@ class TestChoiceInstanceFactory:
         self.value = TestValueInterface()
         self.instance = Controller.ValueController(member, p, self.value, None, Converter.Str(), None)
 
-    def destroy(self):
-        self.member = None
-        self.value = None
-        self.instance = None
-
 
 class TestListController(TestCase):
     def test_init(self):
