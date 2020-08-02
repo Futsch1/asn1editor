@@ -227,6 +227,8 @@ class ContainerController(Controller):
                 self._model_to_view(model)
             else:
                 self._model_to_view(model[self._name])
+        else:
+            self._model_to_view({})
 
     def view_to_model(self) -> Optional[Dict[str, Any]]:
         if self._view_to_model_optional():

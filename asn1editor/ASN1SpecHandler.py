@@ -54,11 +54,12 @@ class ASN1SpecHandler:
 
     @staticmethod
     def get_extensions() -> List[str]:
-        return ['*.json', '*.jer', '*.oer', '*.xml', '*.der', '*.ber', '*.per', '*.uper']
+        return ['*.json', '*.jer', '*.oer', '*.xml', '*.xer', '*.der', '*.ber', '*.per', '*.uper']
 
     @staticmethod
     def __get_codec(file_name: str) -> str:
-        extension_to_codec = {'.json': 'jer', '.jer': 'jer', '.oer': 'oer', '.xml': 'xer', '.der': 'der', '.ber': 'ber', '.per': 'per', '.uper': 'uper'}
+        extension_to_codec = {'.json': 'jer', '.jer': 'jer', '.oer': 'oer', '.xer': 'xer', '.xml': 'xer', '.der': 'der', '.ber': 'ber', '.per': 'per',
+                              '.uper': 'uper'}
         extension = os.path.splitext(file_name)[1]
         if extension not in extension_to_codec:
             raise Exception(f'Unknown extension {extension}: No ASN.1 codec found')
