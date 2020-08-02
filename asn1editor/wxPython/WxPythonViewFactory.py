@@ -14,7 +14,7 @@ from asn1editor.wxPython.WxPythonViews import WxPythonValueView, WxPythonView, W
 
 
 class WxPythonViewFactory(AbstractViewFactory):
-    def __init__(self, window: wx.Window):
+    def __init__(self, window: wx.ScrolledWindow):
         self._window = window
 
     def get_enumerated_view(self, name: str, choices: List[str], optional: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
@@ -166,6 +166,8 @@ class WxPythonViewFactory(AbstractViewFactory):
 
     def update(self):
         self._window.Layout()
+        self._window.FitInside()
+        self._window.AdjustScrollbars()
 
     def freeze(self):
         self._window.Freeze()
@@ -186,7 +188,7 @@ class WxPythonViewFactory(AbstractViewFactory):
 
     def _add_svg(self, sizer: wx.Sizer, bitmap_name: str):
         # noinspection PyArgumentList
-        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile(str_filename=f'asn1editor/wxPython/icons/{bitmap_name}.svg')
+        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile(f'asn1editor/wxPython/icons/{bitmap_name}.svg')
         bitmap = wx.StaticBitmap(self._window, bitmap=image.ConvertToBitmap(width=16, height=16))
         bitmap.SetToolTip(bitmap_name.upper().replace('_', ' '))
         sizer.Add(bitmap)

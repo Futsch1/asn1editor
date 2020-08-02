@@ -55,23 +55,23 @@ class MainWindow(wx.Frame, PluginInterface):
         file_menu = wx.Menu()
         self.__load_spec_item: wx.MenuItem = file_menu.Append(wx.ID_ANY, 'Open ASN.1 specification')
         # noinspection PyArgumentList
-        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile(str_filename='asn1editor/wxPython/icons/open.svg')
+        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile('asn1editor/wxPython/icons/open.svg')
         self.__load_spec_item.SetBitmap(image.ConvertToBitmap(width=16, height=16))
         file_menu.AppendSeparator()
         self.__load_data_item: wx.MenuItem = file_menu.Append(wx.ID_OPEN, 'Load encoded data')
         # noinspection PyArgumentList
-        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile(str_filename='asn1editor/wxPython/icons/load_encoded.svg')
+        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile('asn1editor/wxPython/icons/load_encoded.svg')
         self.__load_data_item.SetBitmap(image.ConvertToBitmap(width=16, height=16))
         self.__load_data_item.Enable(False)
         self.__save_data_item: wx.MenuItem = file_menu.Append(wx.ID_SAVE, 'Save encoded data')
         # noinspection PyArgumentList
-        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile(str_filename='asn1editor/wxPython/icons/save_encoded.svg')
+        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile('asn1editor/wxPython/icons/save_encoded.svg')
         self.__save_data_item.SetBitmap(image.ConvertToBitmap(width=16, height=16))
         self.__save_data_item.Enable(False)
         file_menu.AppendSeparator()
         self.__exit_item = file_menu.Append(wx.ID_EXIT, 'Exit', 'Exit application')
         # noinspection PyArgumentList
-        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile(str_filename='asn1editor/wxPython/icons/exit.svg')
+        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile('asn1editor/wxPython/icons/exit.svg')
         self.__exit_item.SetBitmap(image.ConvertToBitmap(width=16, height=16))
         menu_bar.Append(file_menu, '&File')
 
@@ -222,8 +222,9 @@ class MainWindow(wx.Frame, PluginInterface):
         trace = ''.join(traceback.format_exception(exc_type, value, trace))
         print(trace)
 
-        exception_str = f'{value}\n\n{exc_type}\n\n{trace}'
-        wx.MessageBox(str(value), 'Error', wx.OK | wx.ICON_ERROR, parent=self)
+        message = f'{value}\n\n{exc_type}'
+        exception_str = f'{message}\n\n{trace}'
+        wx.MessageBox(message, 'Error', wx.OK | wx.ICON_ERROR, parent=self)
         self._status_bar.SetStatusText(f'Error: {value}')
         try:
             with open('error_log.txt', 'a+') as f:

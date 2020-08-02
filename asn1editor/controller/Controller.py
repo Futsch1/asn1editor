@@ -109,9 +109,10 @@ class ListController(Controller):
     def add_controller(self, name: str, other: Controller):
         self._controllers.append(other)
 
-    def model_to_view(self, model: Dict[str, Any]):
+    def model_to_view(self, model: Union[List[Any], Dict[str, Any]]):
         if self._model_to_view_optional(model):
-            model: List = model[self._name]
+            if isinstance(model, Dict):
+                model: List = model[self._name]
             new_num = len(model)
             self.__sync_controllers(new_num)
             for i, controller in enumerate(self._controllers):
@@ -227,8 +228,6 @@ class ContainerController(Controller):
                 self._model_to_view(model)
             else:
                 self._model_to_view(model[self._name])
-        else:
-            self._model_to_view({})
 
     def view_to_model(self) -> Optional[Dict[str, Any]]:
         if self._view_to_model_optional():
