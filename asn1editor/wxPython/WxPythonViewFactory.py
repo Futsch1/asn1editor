@@ -10,7 +10,7 @@ from asn1editor.interfaces.ValueInterface import ValueInterface
 from asn1editor.view.AbstractView import AbstractView, ContainerView, ListView, ChoiceView
 from asn1editor.view.AbstractViewFactory import AbstractViewFactory
 from asn1editor.wxPython.WxPythonViews import WxPythonValueView, WxPythonView, WxPythonContainerView, WxPythonListView, WxPythonBooleanView, \
-    WxPythonChoiceView, WxPythonBitstringView
+    WxPythonChoiceView, WxPythonBitstringView, WxPythonHexStringView
 
 
 class WxPythonViewFactory(AbstractViewFactory):
@@ -120,6 +120,20 @@ class WxPythonViewFactory(AbstractViewFactory):
         view = WxPythonValueView(sizer, edit, optional_control)
         return view, view, view if optional else None
 
+    def get_hex_string_view(self, name: str, optional: bool, minimum: int, maximum: int):
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        optional_control = self._add_name_control(sizer, name, optional, ':', 'string')
+        selector = wx.RadioBox(self._window, name='Edit', choices=['ASCII', 'Hex'])
+        sizer.Add(selector)
+        edit = wx.TextCtrl(self._window)
+        edit.SetToolTip(f"Minimum characters: {minimum}, maximum characters: {maximum}")
+        edit.SetMaxLength(maximum)
+
+        sizer.Add(edit, proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
+
+        view = WxPythonHexStringView(sizer, edit, selector, optional_control)
+        return view, view, view if optional else None
+
     def get_choice_view(self, name: str, choices: List[str], optional: bool) -> Tuple[ChoiceView, ValueInterface, OptionalInterface]:
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         optional_control = self._add_name_control(sizer, name, optional, icon='choice')
@@ -186,7 +200,7 @@ class WxPythonViewFactory(AbstractViewFactory):
 
     def _add_svg(self, sizer: wx.Sizer, bitmap_name: str):
         # noinspection PyArgumentList
-        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile(str_filename=f'asn1editor/wxPython/icons/{bitmap_name}.svg')
+        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile(f'asn1editor/wxPython/icons/{bitmap_name}.svg')
         bitmap = wx.StaticBitmap(self._window, bitmap=image.ConvertToBitmap(width=16, height=16))
         bitmap.SetToolTip(bitmap_name.upper().replace('_', ' '))
         sizer.Add(bitmap)

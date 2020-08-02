@@ -73,6 +73,66 @@ class WxPythonValueView(WxPythonView, ValueInterface):
         self._value_control.Enable(enabled)
 
 
+class WxPythonHexStringView(WxPythonView, ValueInterface):
+    class HexValidator(wx.Validator):
+        def Clone(self):
+            return WxPythonHexStringView.HexValidator()
+
+        def Validate(self, parent):
+            print(type(parent))
+
+    def __init__(self, sizer: wx.Sizer, value_control: wx.TextCtrl, edit_selector: wx.RadioBox,
+                 optional_control: Optional[wx.CheckBox] = None):
+        super(WxPythonHexStringView, self).__init__(sizer, optional_control)
+        self._value_control = value_control
+        self._value_control.SetValidator(self.HexValidator())
+        self._edit_selector = edit_selector
+        self._edit_selector.Bind(wx.EVT_RADIOBOX, self.edit_selector_changed)
+        self._ascii = self._is_ascii()
+
+    def register_change_event(self, callback: Callable):
+        # noinspection PyUnusedLocal
+        def event_closure(e: wx.Event):
+            del e
+            callback()
+
+        if self._value_control is not None:
+            self._value_control.Bind(wx.EVT_TEXT, event_closure)
+
+    # noinspection PyUnusedLocal
+    def edit_selector_changed(self, e: wx.CommandEvent):
+        if self._ascii != self._is_ascii():
+            val: str = self._value_control.GetValue()
+            if self._ascii:
+                val = val.encode('latin_1').hex()
+            else:
+                try:
+                    val = bytes.fromhex(val).decode('latin_1')
+                except ValueError:
+                    e.Skip()
+                    self._value_control.SetBackgroundColour(wx.YELLOW)
+                    self._value_control.Update()
+            self._value_control.SetValue(val)
+            self._ascii = self._is_ascii()
+
+    def get_value(self) -> str:
+        val: str = self._value_control.GetValue()
+        if self._is_ascii():
+            return val
+        else:
+            return bytes.fromhex(val).decode('latin_1')
+
+    def set_value(self, val: str):
+        self._value_control.SetValue(val)
+
+    def _enable(self, enabled: bool):
+        self._value_control.Enable(enabled)
+
+    def _is_ascii(self):
+        selection = self._edit_selector.GetSelection()
+        return self._edit_selector.GetString(selection) == 'ASCII'
+
+
 class WxPythonBooleanView(WxPythonView, ValueInterface):
     def __init__(self, sizer: wx.Sizer, value_control: wx.CheckBox = None,
                  optional_control: Optional[wx.CheckBox] = None):

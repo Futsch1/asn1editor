@@ -25,6 +25,9 @@ class AbstractViewFactory:
     def get_boolean_view(self, name: str, optional: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
         raise NotImplementedError
 
+    def get_hex_string_view(self, name: str, optional: bool, minimum: int, maximum: int) -> Tuple[ChoiceView, ValueInterface, OptionalInterface]:
+        raise NotImplementedError
+
     def get_string_view(self, name: str, optional: bool, minimum: int, maximum: int) -> Tuple[ChoiceView, ValueInterface, OptionalInterface]:
         raise NotImplementedError
 
