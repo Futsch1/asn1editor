@@ -2,6 +2,7 @@ from typing import List, Tuple, Optional, Union
 
 import wx
 import wx.lib.masked.numctrl
+import wx.svg
 
 from asn1editor.interfaces.BitstringInterface import BitstringInterface
 from asn1editor.interfaces.OptionalInterface import OptionalInterface
@@ -18,7 +19,7 @@ class WxPythonViewFactory(AbstractViewFactory):
 
     def get_enumerated_view(self, name: str, choices: List[str], optional: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        optional_control = self._add_name_control(sizer, name, optional, ':')
+        optional_control = self._add_name_control(sizer, name, optional, ':', 'enumerated')
         edit = wx.ComboBox(self._window, style=wx.CB_DROPDOWN, choices=choices)
         sizer.Add(edit, proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
 
@@ -37,6 +38,7 @@ class WxPythonViewFactory(AbstractViewFactory):
 
     def get_container_view(self, name: str, optional: bool) -> Tuple[ContainerView, OptionalInterface]:
         sizer = wx.StaticBoxSizer(wx.VERTICAL, self._window, name)
+        self._add_svg(sizer, 'sequence')
         if optional:
             optional_control = self._add_name_control(sizer, name, optional)
         else:
@@ -51,6 +53,7 @@ class WxPythonViewFactory(AbstractViewFactory):
 
     def get_list_view(self, name: str, minimum: int, maximum: int, optional: bool) -> Tuple[ListView, ValueInterface, OptionalInterface]:
         sizer = wx.StaticBoxSizer(wx.VERTICAL, self._window, name)
+        self._add_svg(sizer, 'sequence_of')
         if optional:
             optional_control = self._add_name_control(sizer, name, optional)
         else:
@@ -77,7 +80,7 @@ class WxPythonViewFactory(AbstractViewFactory):
     def get_number_view(self, name: str, optional: bool, minimum: Optional[Union[int, float]],
                         maximum: Optional[Union[int, float]], float_: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        optional_control = self._add_name_control(sizer, name, optional, ':')
+        optional_control = self._add_name_control(sizer, name, optional, ':', 'float' if float_ else 'integer')
         edit = wx.lib.masked.numctrl.NumCtrl(self._window)
         tool_tip = []
         if isinstance(minimum, int) or isinstance(minimum, float):
@@ -98,7 +101,7 @@ class WxPythonViewFactory(AbstractViewFactory):
 
     def get_boolean_view(self, name: str, optional: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        optional_control = self._add_name_control(sizer, name, optional, ':')
+        optional_control = self._add_name_control(sizer, name, optional, ':', 'bool')
         check_box = wx.CheckBox(self._window)
         sizer.Add(check_box, proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
 
@@ -107,7 +110,7 @@ class WxPythonViewFactory(AbstractViewFactory):
 
     def get_string_view(self, name: str, optional: bool, minimum: int, maximum: int):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        optional_control = self._add_name_control(sizer, name, optional, ':')
+        optional_control = self._add_name_control(sizer, name, optional, ':', 'string')
         edit = wx.TextCtrl(self._window)
         edit.SetToolTip(f"Minimum characters: {minimum}, maximum characters: {maximum}")
         edit.SetMaxLength(maximum)
@@ -119,7 +122,7 @@ class WxPythonViewFactory(AbstractViewFactory):
 
     def get_choice_view(self, name: str, choices: List[str], optional: bool) -> Tuple[ChoiceView, ValueInterface, OptionalInterface]:
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        optional_control = self._add_name_control(sizer, name, optional)
+        optional_control = self._add_name_control(sizer, name, optional, icon='choice')
 
         choice_element_sizer = wx.BoxSizer(wx.HORIZONTAL)
         choice_element_label = wx.StaticText(self._window, wx.ID_ANY)
@@ -139,7 +142,7 @@ class WxPythonViewFactory(AbstractViewFactory):
     def get_bitstring_view(self, name: str, number_of_bits: int, named_bits: List[Tuple[int, str]], optional: bool) -> Tuple[AbstractView, BitstringInterface,
                                                                                                                              OptionalInterface]:
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        optional_control = self._add_name_control(sizer, name, optional)
+        optional_control = self._add_name_control(sizer, name, optional, icon='bitstring')
 
         checkboxes: List[Tuple[int, wx.CheckBox]] = []
 
@@ -170,11 +173,20 @@ class WxPythonViewFactory(AbstractViewFactory):
     def thaw(self):
         self._window.Thaw()
 
-    def _add_name_control(self, sizer: wx.Sizer, name: str, optional: bool, suffix: str = '') -> Optional[wx.CheckBox]:
+    def _add_name_control(self, sizer: wx.Sizer, name: str, optional: bool, suffix: str = '', icon: str = None) -> Optional[wx.CheckBox]:
         if optional:
             control = wx.CheckBox(self._window, wx.ID_ANY, name + suffix)
             control.SetToolTip("Optional element")
         else:
             control = wx.StaticText(self._window, wx.ID_ANY, name + suffix)
+        if icon is not None:
+            self._add_svg(sizer, icon)
         sizer.Add(control, flag=wx.ALL, border=5)
         return control if optional else None
+
+    def _add_svg(self, sizer: wx.Sizer, bitmap_name: str):
+        # noinspection PyArgumentList
+        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile(str_filename=f'asn1editor/wxPython/icons/{bitmap_name}.svg')
+        bitmap = wx.StaticBitmap(self._window, bitmap=image.ConvertToBitmap(width=16, height=16))
+        bitmap.SetToolTip(bitmap_name.upper().replace('_', ' '))
+        sizer.Add(bitmap)

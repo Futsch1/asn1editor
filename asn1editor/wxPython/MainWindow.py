@@ -3,6 +3,7 @@ import typing
 from typing import Optional
 
 import wx
+import wx.svg
 
 import asn1editor
 import asn1editor.wxPython.Settings as Settings
@@ -53,13 +54,25 @@ class MainWindow(wx.Frame, PluginInterface):
         menu_bar = wx.MenuBar()
         file_menu = wx.Menu()
         self.__load_spec_item: wx.MenuItem = file_menu.Append(wx.ID_ANY, 'Open ASN.1 specification')
+        # noinspection PyArgumentList
+        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile(str_filename='asn1editor/wxPython/icons/open.svg')
+        self.__load_spec_item.SetBitmap(image.ConvertToBitmap(width=16, height=16))
         file_menu.AppendSeparator()
         self.__load_data_item: wx.MenuItem = file_menu.Append(wx.ID_OPEN, 'Load encoded data')
+        # noinspection PyArgumentList
+        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile(str_filename='asn1editor/wxPython/icons/load_encoded.svg')
+        self.__load_data_item.SetBitmap(image.ConvertToBitmap(width=16, height=16))
         self.__load_data_item.Enable(False)
         self.__save_data_item: wx.MenuItem = file_menu.Append(wx.ID_SAVE, 'Save encoded data')
+        # noinspection PyArgumentList
+        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile(str_filename='asn1editor/wxPython/icons/save_encoded.svg')
+        self.__save_data_item.SetBitmap(image.ConvertToBitmap(width=16, height=16))
         self.__save_data_item.Enable(False)
         file_menu.AppendSeparator()
         self.__exit_item = file_menu.Append(wx.ID_EXIT, 'Exit', 'Exit application')
+        # noinspection PyArgumentList
+        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile(str_filename='asn1editor/wxPython/icons/exit.svg')
+        self.__exit_item.SetBitmap(image.ConvertToBitmap(width=16, height=16))
         menu_bar.Append(file_menu, '&File')
 
         if self.__plugin is not None:
