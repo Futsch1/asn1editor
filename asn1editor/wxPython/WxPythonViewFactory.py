@@ -9,6 +9,7 @@ from asn1editor.interfaces.OptionalInterface import OptionalInterface
 from asn1editor.interfaces.ValueInterface import ValueInterface
 from asn1editor.view.AbstractView import AbstractView, ContainerView, ListView, ChoiceView
 from asn1editor.view.AbstractViewFactory import AbstractViewFactory
+from asn1editor.wxPython.Resources import resource_path
 from asn1editor.wxPython.WxPythonViews import WxPythonValueView, WxPythonView, WxPythonContainerView, WxPythonListView, WxPythonBooleanView, \
     WxPythonChoiceView, WxPythonBitstringView
 
@@ -188,7 +189,7 @@ class WxPythonViewFactory(AbstractViewFactory):
 
     def _add_svg(self, sizer: wx.Sizer, bitmap_name: str):
         # noinspection PyArgumentList
-        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile(f'asn1editor/wxPython/icons/{bitmap_name}.svg')
+        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile(resource_path(f'icons/{bitmap_name}.svg'))
         bitmap = wx.StaticBitmap(self._window, bitmap=image.ConvertToBitmap(width=16, height=16))
         bitmap.SetToolTip(bitmap_name.upper().replace('_', ' '))
         sizer.Add(bitmap)

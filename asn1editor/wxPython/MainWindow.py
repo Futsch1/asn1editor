@@ -12,6 +12,7 @@ from asn1editor.ASN1SpecHandler import ASN1SpecHandler
 from asn1editor.PluginInterface import PluginInterface
 from asn1editor.wxPython import WxPythonViewFactory
 from asn1editor.wxPython.FilePickerHandler import FilePickerHandler
+from asn1editor.wxPython.Resources import resource_path
 
 
 class MainWindow(wx.Frame, PluginInterface):
@@ -55,23 +56,23 @@ class MainWindow(wx.Frame, PluginInterface):
         file_menu = wx.Menu()
         self.__load_spec_item: wx.MenuItem = file_menu.Append(wx.ID_ANY, 'Open ASN.1 specification')
         # noinspection PyArgumentList
-        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile('asn1editor/wxPython/icons/open.svg')
+        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile(resource_path('icons/open.svg'))
         self.__load_spec_item.SetBitmap(image.ConvertToBitmap(width=16, height=16))
         file_menu.AppendSeparator()
         self.__load_data_item: wx.MenuItem = file_menu.Append(wx.ID_OPEN, 'Load encoded data')
         # noinspection PyArgumentList
-        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile('asn1editor/wxPython/icons/load_encoded.svg')
+        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile(resource_path('icons/load_encoded.svg'))
         self.__load_data_item.SetBitmap(image.ConvertToBitmap(width=16, height=16))
         self.__load_data_item.Enable(False)
         self.__save_data_item: wx.MenuItem = file_menu.Append(wx.ID_SAVE, 'Save encoded data')
         # noinspection PyArgumentList
-        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile('asn1editor/wxPython/icons/save_encoded.svg')
+        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile(resource_path('icons/save_encoded.svg'))
         self.__save_data_item.SetBitmap(image.ConvertToBitmap(width=16, height=16))
         self.__save_data_item.Enable(False)
         file_menu.AppendSeparator()
         self.__exit_item = file_menu.Append(wx.ID_EXIT, 'Exit', 'Exit application')
         # noinspection PyArgumentList
-        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile('asn1editor/wxPython/icons/exit.svg')
+        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile(resource_path('icons/exit.svg'))
         self.__exit_item.SetBitmap(image.ConvertToBitmap(width=16, height=16))
         menu_bar.Append(file_menu, '&File')
 
