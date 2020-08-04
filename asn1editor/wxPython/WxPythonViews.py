@@ -125,10 +125,12 @@ class WxPythonHexStringView(WxPythonView, ValueInterface):
         if self._hex != self._is_hex():
             if not self._hex:
                 # Was ASCII before, now is hex
-                self._maximum *= 2
+                if self._maximum:
+                    self._maximum *= 2
                 self._minimum *= 2
             else:
-                self._maximum //= 2
+                if self._maximum:
+                    self._maximum //= 2
                 self._minimum //= 2
 
             self._update_length()
