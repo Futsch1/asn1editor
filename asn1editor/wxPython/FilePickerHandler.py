@@ -19,7 +19,10 @@ class FilePickerHandler:
         with self.__file_dialog_factory() as file_dialog:
             initial_dir = Settings.settings.get(file_dialog.GetMessage())
             if initial_dir is not None:
-                file_dialog.SetDirectory(initial_dir)
+                if hasattr(file_dialog, 'SetDirectory'):
+                    file_dialog.SetDirectory(initial_dir)
+                if hasattr(file_dialog, 'SetPath'):
+                    file_dialog.SetPath(initial_dir)
             if file_dialog.ShowModal() == wx.ID_CANCEL:
                 return
             filename = file_dialog.GetPath()

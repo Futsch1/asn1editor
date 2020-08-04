@@ -3,11 +3,11 @@ from typing import Any
 
 class Converter:
     @staticmethod
-    def to_str(val: Any) -> str:
+    def to_str(val: Any) -> str:  # pragma: no cover
         raise NotImplementedError
 
     @staticmethod
-    def from_str(val: str) -> Any:
+    def from_str(val: str) -> Any:  # pragma: no cover
         raise NotImplementedError
 
 
