@@ -64,8 +64,14 @@ class WxPythonViewFactory(AbstractViewFactory):
         num_elements_label = wx.StaticText(self._window, wx.ID_ANY, "Elements:")
         num_elements_sizer.Add(num_elements_label, flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL, border=5)
         num_elements = wx.SpinCtrl(self._window)
-        num_elements.SetMin(minimum)
-        num_elements.SetMax(maximum)
+        if minimum is not None:
+            num_elements.SetMin(minimum)
+        else:
+            minimum = 0
+        if maximum is not None:
+            num_elements.SetMax(maximum)
+        else:
+            maximum = 'infinite'
         num_elements.SetToolTip(f"Minimum elements: {minimum}, maximum elements: {maximum}")
         num_elements_sizer.Add(num_elements, flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL, border=5)
 

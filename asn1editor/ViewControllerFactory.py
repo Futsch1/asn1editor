@@ -1,4 +1,4 @@
-from typing import Tuple, Union
+from typing import Tuple, Union, Any
 
 from asn1tools.codecs import constraints_checker
 from asn1tools.compiler import oer
@@ -57,10 +57,10 @@ class ViewControllerFactory(object):
         return self._view_factory.get_text_view(type_.name, text)
 
     def _number(self, type_: Union[oer.Integer, oer.Real], checker: constraints_checker.Type, controller: Controller) -> AbstractView:
-        view, value_interface, optional_interface = self._view_factory.get_number_view(type_.name, type_.optional, checker.minimum, checker.maximum,
-                                                                                       isinstance(type_, oer.Real))
+        view, value_interface, optional_interface = self._view_factory.get_number_view(type_.name, type_.optional, self.__get_limit(checker.minimum),
+                                                                                       self.__get_limit(checker.maximum), isinstance(type_, oer.Real))
 
-        ControllerFactory(controller).create_value_controller(type_, value_interface, optional_interface, checker.minimum)
+        ControllerFactory(controller).create_value_controller(type_, value_interface, optional_interface, self.__get_limit(checker.minimum))
 
         return view
 
@@ -75,10 +75,12 @@ class ViewControllerFactory(object):
         return view
 
     def _sequence_of(self, type_: oer.SequenceOf, checker: constraints_checker.List, controller: Controller) -> AbstractView:
-        view, value_interface, optional_interface = self._view_factory.get_list_view(type_.name, checker.minimum, checker.maximum, type_.optional)
+        view, value_interface, optional_interface = self._view_factory.get_list_view(type_.name, self.__get_limit(checker.minimum),
+                                                                                     self.__get_limit(checker.maximum), type_.optional)
 
         list_instance_factory = ListInstanceFactory(self._view_factory, view, type_.element_type, checker.element_type)
-        ControllerFactory(controller).create_list_controller(type_, value_interface, optional_interface, list_instance_factory, checker.minimum)
+        ControllerFactory(controller).create_list_controller(type_, value_interface, optional_interface, list_instance_factory,
+                                                             self.__get_limit(checker.minimum))
 
         return view
 
@@ -98,16 +100,18 @@ class ViewControllerFactory(object):
         return view
 
     def _string(self, type_: oer.VisibleString, checker: constraints_checker.String, controller: Controller):
-        view, value_interface, optional_interface = self._view_factory.get_string_view(type_.name, type_.optional, checker.minimum, checker.maximum)
+        view, value_interface, optional_interface = self._view_factory.get_string_view(type_.name, type_.optional, self.__get_limit(checker.minimum),
+                                                                                       self.__get_limit(checker.maximum))
 
-        ControllerFactory(controller).create_value_controller(type_, value_interface, optional_interface, checker.minimum)
+        ControllerFactory(controller).create_value_controller(type_, value_interface, optional_interface, self.__get_limit(checker.minimum))
 
         return view
 
     def _hex_string(self, type_: oer.OctetString, checker: constraints_checker.String, controller: Controller):
-        view, value_interface, optional_interface = self._view_factory.get_hex_string_view(type_.name, type_.optional, checker.minimum, checker.maximum)
+        view, value_interface, optional_interface = self._view_factory.get_hex_string_view(type_.name, type_.optional, self.__get_limit(checker.minimum),
+                                                                                           self.__get_limit(checker.maximum))
 
-        ControllerFactory(controller).create_value_controller(type_, value_interface, optional_interface, checker.minimum)
+        ControllerFactory(controller).create_value_controller(type_, value_interface, optional_interface, self.__get_limit(checker.minimum))
 
         return view
 
@@ -135,3 +139,7 @@ class ViewControllerFactory(object):
         for member in checker.members:
             if member.name == name:
                 return member
+
+    @staticmethod
+    def __get_limit(limit: Any):
+        return None if limit in ['MIN', 'MAX'] else limit

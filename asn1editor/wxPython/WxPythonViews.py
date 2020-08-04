@@ -84,6 +84,8 @@ class WxPythonHexStringView(WxPythonView, ValueInterface):
         self._hex_selector.Bind(wx.EVT_CHECKBOX, self.hex_selector_changed)
         self._hex = self._is_hex()
         self._minimum = minimum
+        if self._minimum is None:
+            self._minimum = 0
         self._maximum = maximum
         self._update_length()
 
@@ -148,8 +150,9 @@ class WxPythonHexStringView(WxPythonView, ValueInterface):
         return self._hex_selector.GetValue()
 
     def _update_length(self):
-        self._value_control.SetToolTip(f"Minimum characters: {self._minimum}, maximum characters: {self._maximum}")
-        self._value_control.SetMaxLength(self._maximum)
+        if self._maximum:
+            self._value_control.SetToolTip(f"Minimum characters: {self._minimum}, maximum characters: {self._maximum}")
+            self._value_control.SetMaxLength(self._maximum)
 
 
 class WxPythonBooleanView(WxPythonView, ValueInterface):

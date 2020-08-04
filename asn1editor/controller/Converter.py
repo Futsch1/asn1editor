@@ -5,6 +5,8 @@ class Converter:
     def __init__(self, minimum: typing.Union[int, float, str], default: typing.Optional[typing.Union[str, bytes, int, float]]):
         self._default = default
         self._minimum = minimum
+        if self._minimum is None:
+            self._minimum = 0
 
     @staticmethod
     def to_view(val: typing.Any) -> typing.Union[str, bytes]:  # pragma: no cover
@@ -46,7 +48,7 @@ class Int(Converter):
         return i
 
     def default(self) -> int:
-        if self._minimum == 'MIN':
+        if self._minimum is None:
             self._minimum = 0
         return self._minimum if not self._default else self._default
 
@@ -65,8 +67,6 @@ class Float(Converter):
         return i
 
     def default(self) -> float:
-        if self._minimum == 'MIN':
-            self._minimum = 0
         return self._minimum if not self._default else self._default
 
 

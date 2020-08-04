@@ -102,7 +102,7 @@ class ListController(Controller):
         self._value_interface = value_interface
         self._controllers = []
         self._list_instance_factory = list_instance_factory
-        if default > 0 and not optional_interface:
+        if default is not None and default > 0 and not optional_interface:
             self._value_interface.set_value(str(default))
             self.event_handler()
 
