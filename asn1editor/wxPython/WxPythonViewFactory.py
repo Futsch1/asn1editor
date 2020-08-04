@@ -39,7 +39,7 @@ class WxPythonViewFactory(AbstractViewFactory):
 
     def get_container_view(self, name: str, optional: bool) -> Tuple[ContainerView, OptionalInterface]:
         sizer = wx.StaticBoxSizer(wx.VERTICAL, self._window, name)
-        self._add_svg(sizer, 'sequence')
+        sizer.Add(self._get_svg('sequence'))
         if optional:
             optional_control = self._add_name_control(sizer, name, optional)
         else:
@@ -54,7 +54,7 @@ class WxPythonViewFactory(AbstractViewFactory):
 
     def get_list_view(self, name: str, minimum: int, maximum: int, optional: bool) -> Tuple[ListView, ValueInterface, OptionalInterface]:
         sizer = wx.StaticBoxSizer(wx.VERTICAL, self._window, name)
-        self._add_svg(sizer, 'sequence_of')
+        sizer.Add(self._get_svg('sequence_of'))
         if optional:
             optional_control = self._add_name_control(sizer, name, optional)
         else:
@@ -62,12 +62,12 @@ class WxPythonViewFactory(AbstractViewFactory):
 
         num_elements_sizer = wx.BoxSizer(wx.HORIZONTAL)
         num_elements_label = wx.StaticText(self._window, wx.ID_ANY, "Elements:")
-        num_elements_sizer.Add(num_elements_label, flag=wx.ALL, border=5)
+        num_elements_sizer.Add(num_elements_label, flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL, border=5)
         num_elements = wx.SpinCtrl(self._window)
         num_elements.SetMin(minimum)
         num_elements.SetMax(maximum)
         num_elements.SetToolTip(f"Minimum elements: {minimum}, maximum elements: {maximum}")
-        num_elements_sizer.Add(num_elements, flag=wx.ALL, border=5)
+        num_elements_sizer.Add(num_elements, flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL, border=5)
 
         content = wx.BoxSizer(wx.VERTICAL)
         content.Add(num_elements_sizer)
@@ -125,7 +125,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         optional_control = self._add_name_control(sizer, name, optional, ':', 'string')
         selector = wx.CheckBox(self._window, label='Hex')
-        sizer.Add(selector)
+        sizer.Add(selector, flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL, border=5)
         edit = wx.TextCtrl(self._window)
 
         sizer.Add(edit, proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
@@ -139,14 +139,14 @@ class WxPythonViewFactory(AbstractViewFactory):
 
         choice_element_sizer = wx.BoxSizer(wx.HORIZONTAL)
         choice_element_label = wx.StaticText(self._window, wx.ID_ANY)
-        choice_element_sizer.Add(choice_element_label, flag=wx.ALL, border=5)
+        choice_element_sizer.Add(choice_element_label, flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL, border=5)
         choice_element = wx.ComboBox(self._window, style=wx.CB_DROPDOWN, choices=choices)
-        choice_element_sizer.Add(choice_element, flag=wx.ALL, border=5)
+        choice_element_sizer.Add(choice_element, flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL, border=5)
 
         content = wx.BoxSizer(wx.VERTICAL)
         content.Add(choice_element_sizer)
 
-        sizer.Add(content)
+        sizer.Add(content, flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL)
 
         view = WxPythonChoiceView(sizer, choice_element, optional_control)
 
@@ -160,7 +160,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         checkboxes: List[Tuple[int, wx.CheckBox]] = []
 
         bits_sizer = wx.StaticBoxSizer(wx.VERTICAL, self._window, "Bits")
-        if len(named_bits):
+        if named_bits:
             for bit, name in named_bits:
                 bit_checkbox = wx.CheckBox(self._window, label=f"{bit}: {name}")
                 bits_sizer.Add(bit_checkbox)
@@ -188,20 +188,21 @@ class WxPythonViewFactory(AbstractViewFactory):
     def thaw(self):
         self._window.Thaw()
 
-    def _add_name_control(self, sizer: wx.Sizer, name: str, optional: bool, suffix: str = '', icon: str = None) -> Optional[wx.CheckBox]:
+    def _add_name_control(self, sizer: wx.BoxSizer, name: str, optional: bool, suffix: str = '', icon: str = None) -> Optional[wx.CheckBox]:
+        flags = wx.ALL | (0 if sizer.GetOrientation() == wx.VERTICAL else wx.ALIGN_CENTER_VERTICAL)
         if optional:
             control = wx.CheckBox(self._window, wx.ID_ANY, name + suffix)
             control.SetToolTip("Optional element")
         else:
             control = wx.StaticText(self._window, wx.ID_ANY, name + suffix)
         if icon is not None:
-            self._add_svg(sizer, icon)
-        sizer.Add(control, flag=wx.ALL, border=5)
+            sizer.Add(self._get_svg(icon), flag=flags)
+        sizer.Add(control, flag=flags, border=5)
         return control if optional else None
 
-    def _add_svg(self, sizer: wx.Sizer, bitmap_name: str):
+    def _get_svg(self, bitmap_name: str) -> wx.StaticBitmap:
         # noinspection PyArgumentList
         image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile(resource_path(f'icons/{bitmap_name}.svg'))
         bitmap = wx.StaticBitmap(self._window, bitmap=image.ConvertToBitmap(width=16, height=16))
         bitmap.SetToolTip(bitmap_name.upper().replace('_', ' '))
-        sizer.Add(bitmap)
+        return bitmap
