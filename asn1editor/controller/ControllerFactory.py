@@ -25,8 +25,6 @@ class ControllerFactory:
                 default = type_.default
             controller = Controller.ValueController(type_.name, self._parent, value_interface, optional_interface, Converter.Str(0, default))
         elif type(type_) in [oer.UTF8String, oer.VisibleString, oer.GeneralString]:
-            # noinspection PyTypeChecker
-            # encoding = {oer.OctetString: 'ascii', oer.UTF8String: 'utf-8', oer.VisibleString: 'ascii', oer.GeneralString: 'latin1'}[type(type_)]
             controller = Controller.ValueController(type_.name, self._parent, value_interface, optional_interface, Converter.Str(minimum, type_.default))
         elif isinstance(type_, oer.OctetString):
             controller = Controller.ValueController(type_.name, self._parent, value_interface, optional_interface, Converter.ByteString(minimum, type_.default))

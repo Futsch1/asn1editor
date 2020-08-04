@@ -7,15 +7,15 @@ class Converter:
         self._minimum = minimum
 
     @staticmethod
-    def to_view(val: typing.Any) -> typing.Union[str, bytes]:
+    def to_view(val: typing.Any) -> typing.Union[str, bytes]:  # pragma: no cover
         raise NotImplementedError
 
     @staticmethod
-    def from_view(val: typing.Union[str, bytes]) -> typing.Any:
+    def from_view(val: typing.Union[str, bytes]) -> typing.Any:  # pragma: no cover
         raise NotImplementedError
 
     @staticmethod
-    def default() -> typing.Union[str, bytes, int, float]:
+    def default() -> typing.Union[str, bytes, int, float]:  # pragma: no cover
         raise NotImplementedError
 
 

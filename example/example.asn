@@ -10,7 +10,7 @@ Sequence ::= SEQUENCE
     realExample         REAL,
     enumerated          ENUMERATED { enum1, enum2 },
     bitString           BIT STRING { a(0), b(1), c(23) } (SIZE(24)),
-    octetString         OCTET STRING (SIZE(4)),
+    octetString         OCTET STRING (SIZE(4)) DEFAULT "abcd",
     visibleString       VisibleString (SIZE(5)),
     utf8String          UTF8String (SIZE(1..5)) DEFAULT "äö",
     optionalSequenceOf  SEQUENCE (SIZE(2)) OF SubSequence OPTIONAL,
@@ -18,7 +18,7 @@ Sequence ::= SEQUENCE
         sequence            SubSequence,
         exampleInt          INTEGER (0..255),
         exampleList         SEQUENCE(SIZE(4)) OF INTEGER(0..255)
-    }
+    } DEFAULT exampleList
 }
 
 SubSequence ::= SEQUENCE
