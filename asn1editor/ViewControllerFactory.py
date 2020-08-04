@@ -112,8 +112,7 @@ class ViewControllerFactory(object):
         return view
 
     def _bitstring(self, type_: oer.BitString, controller: Controller):
-        # TODO: Named bits!
-        view, value_interface, optional_interface = self._view_factory.get_bitstring_view(type_.name, type_.number_of_bits, [], type_.optional)
+        view, value_interface, optional_interface = self._view_factory.get_bitstring_view(type_.name, type_.number_of_bits, type_.named_bits, type_.optional)
 
         ControllerFactory(controller).create_bitstring_controller(type_, value_interface, optional_interface)
 
