@@ -3,7 +3,7 @@ import typing
 import asn1tools
 
 
-class PluginInterface:
+class PluginInterface:  # pragma: no cover
     def load_spec(self, file_name: str, type_name: typing.Optional[str] = None):
         """
         Loads an ASN.1 specification in the editor.

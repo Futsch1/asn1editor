@@ -10,7 +10,10 @@ before_install:
 install:
   - pip install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-16.04
     wxPython==4.1.0
+  - pip install coveralls
   - pip install -r requirements.txt
 # command to run tests
 script:
-  - python -m unittest
+  - coverage run --source=asn1editor -m unittest discover
+after_success:
+  - coveralls

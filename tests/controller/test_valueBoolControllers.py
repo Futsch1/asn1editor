@@ -1,4 +1,3 @@
-from typing import Callable
 from unittest import TestCase
 
 from asn1editor.controller import Controller, Converter
@@ -9,10 +8,6 @@ from asn1editor.interfaces.ValueInterface import ValueInterface
 class TestValueInterface(ValueInterface):
     def __init__(self):
         self.val = ''
-        self.callback = None
-
-    def register_change_event(self, callback: Callable):
-        self.callback = callback
 
     def get_value(self) -> str:
         return self.val
@@ -24,10 +19,6 @@ class TestValueInterface(ValueInterface):
 class TestOptionalInterface(OptionalInterface):
     def __init__(self):
         self.val = False
-        self.callback = None
-
-    def register_optional_event(self, callback: Callable):
-        self.callback = callback
 
     def get_has_value(self) -> bool:
         return self.val

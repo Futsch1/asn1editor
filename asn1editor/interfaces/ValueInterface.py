@@ -1,7 +1,7 @@
 import typing
 
 
-class ValueInterface:
+class ValueInterface:  # pragma: no cover
     def register_change_event(self, callback: typing.Callable):
         raise NotImplementedError
 

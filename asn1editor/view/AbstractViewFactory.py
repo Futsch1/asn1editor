@@ -6,7 +6,7 @@ from asn1editor.interfaces.ValueInterface import ValueInterface
 from asn1editor.view.AbstractView import AbstractView, ContainerView, ListView, ChoiceView
 
 
-class AbstractViewFactory:
+class AbstractViewFactory:  # pragma: no cover
     def get_number_view(self, name: str, optional: bool, minimum: int, maximum: int, float_: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
         raise NotImplementedError
 

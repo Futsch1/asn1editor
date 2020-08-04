@@ -1,7 +1,7 @@
 import typing
 
 
-class BitstringInterface:
+class BitstringInterface:  # pragma: no cover
     def get_values(self) -> typing.List[int]:
         raise NotImplementedError
 

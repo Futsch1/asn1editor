@@ -36,10 +36,8 @@ class TestContainerController(TestCase):
         self.assertTrue(optional_interface_container.val)
         self.assertFalse(optional_interface_value.val)
 
-        optional_interface_value.val = True
         container.model_to_view({})
         self.assertFalse(optional_interface_container.val)
-        self.assertFalse(optional_interface_value.val)
 
         container = Controller.ContainerController('test', root, None)
         container2 = Controller.ContainerController('test2', container, None)
