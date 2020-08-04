@@ -11,7 +11,7 @@ from asn1editor.view.AbstractView import AbstractView, ContainerView, ListView, 
 from asn1editor.view.AbstractViewFactory import AbstractViewFactory
 from asn1editor.wxPython.Resources import resource_path
 from asn1editor.wxPython.WxPythonViews import WxPythonValueView, WxPythonView, WxPythonContainerView, WxPythonListView, WxPythonBooleanView, \
-    WxPythonChoiceView, WxPythonBitstringView
+    WxPythonChoiceView, WxPythonBitstringView, WxPythonHexStringView
 
 
 class WxPythonViewFactory(AbstractViewFactory):
@@ -119,6 +119,18 @@ class WxPythonViewFactory(AbstractViewFactory):
         sizer.Add(edit, proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
 
         view = WxPythonValueView(sizer, edit, optional_control)
+        return view, view, view if optional else None
+
+    def get_hex_string_view(self, name: str, optional: bool, minimum: int, maximum: int):
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        optional_control = self._add_name_control(sizer, name, optional, ':', 'string')
+        selector = wx.CheckBox(self._window, label='Hex')
+        sizer.Add(selector)
+        edit = wx.TextCtrl(self._window)
+
+        sizer.Add(edit, proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
+
+        view = WxPythonHexStringView(sizer, edit, selector, minimum, maximum, optional_control)
         return view, view, view if optional else None
 
     def get_choice_view(self, name: str, choices: List[str], optional: bool) -> Tuple[ChoiceView, ValueInterface, OptionalInterface]:

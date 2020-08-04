@@ -13,7 +13,7 @@ class TestChoiceInstanceFactory:
     def create(self, member: str, p: Controller.ListController):
         self.member = member
         self.value = TestValueInterface()
-        self.instance = Controller.ValueController(member, p, self.value, None, Converter.Str(), None)
+        self.instance = Controller.ValueController(member, p, self.value, None, Converter.Str(0, None))
 
 
 class TestListController(TestCase):

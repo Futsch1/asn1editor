@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 
 from asn1tools.codecs import oer
 
@@ -12,22 +12,24 @@ class ControllerFactory:
     def __init__(self, parent: Controller):
         self._parent = parent
 
-    def create_value_controller(self, type_: oer.Type, value_interface: ValueInterface, optional_interface: Optional[OptionalInterface]):
+    def create_value_controller(self, type_: oer.Type, value_interface: ValueInterface, optional_interface: Optional[OptionalInterface],
+                                minimum: Union[str, int, float] = 0):
         if isinstance(type_, oer.Integer):
-            controller = Controller.ValueController(type_.name, self._parent, value_interface, optional_interface, Converter.Int(), type_.default)
+            controller = Controller.ValueController(type_.name, self._parent, value_interface, optional_interface, Converter.Int(minimum, type_.default))
         elif isinstance(type_, oer.Real):
-            controller = Controller.ValueController(type_.name, self._parent, value_interface, optional_interface, Converter.Float(), type_.default)
+            controller = Controller.ValueController(type_.name, self._parent, value_interface, optional_interface, Converter.Float(minimum, type_.default))
         elif isinstance(type_, oer.Enumerated):
             if type_.default is None:
                 default = sorted(type_.value_to_data.values())[0]
             else:
                 default = type_.default
-            controller = Controller.ValueController(type_.name, self._parent, value_interface, optional_interface, Converter.Str(), default)
-        elif type(type_) in [oer.OctetString, oer.UTF8String, oer.VisibleString, oer.GeneralString]:
+            controller = Controller.ValueController(type_.name, self._parent, value_interface, optional_interface, Converter.Str(0, default))
+        elif type(type_) in [oer.UTF8String, oer.VisibleString, oer.GeneralString]:
             # noinspection PyTypeChecker
-            encoding = {oer.OctetString: 'ascii', oer.UTF8String: 'utf-8', oer.VisibleString: 'ascii', oer.GeneralString: 'latin1'}[type(type_)]
-            controller = Controller.ValueController(type_.name, self._parent, value_interface, optional_interface, Converter.ByteString(encoding),
-                                                    type_.default)
+            # encoding = {oer.OctetString: 'ascii', oer.UTF8String: 'utf-8', oer.VisibleString: 'ascii', oer.GeneralString: 'latin1'}[type(type_)]
+            controller = Controller.ValueController(type_.name, self._parent, value_interface, optional_interface, Converter.Str(minimum, type_.default))
+        elif isinstance(type_, oer.OctetString):
+            controller = Controller.ValueController(type_.name, self._parent, value_interface, optional_interface, Converter.ByteString(minimum, type_.default))
         else:
             raise Exception(f"Unknown type for ControllerFactory: {type_}")
 

@@ -22,12 +22,12 @@ class TestContainerController(TestCase):
         optional_interface_value = TestOptionalInterface()
 
         container = Controller.ContainerController('test', root, None)
-        Controller.ValueController('test', container, value_interface, None, Converter.Str(), 'default')
+        Controller.ValueController('test', container, value_interface, None, Converter.Str(0, 'default'))
         container.model_to_view({'test': {'test': 'test'}})
         self.assertEqual(value_interface.val, 'test')
 
         container = Controller.ContainerController('test', root, optional_interface_container)
-        Controller.ValueController('test', container, value_interface, optional_interface_value, Converter.Str(), 'default')
+        Controller.ValueController('test', container, value_interface, optional_interface_value, Converter.Str(0, 'default'))
         container.model_to_view({'test': {'test': 'test'}})
         self.assertTrue(optional_interface_container.val)
         self.assertTrue(optional_interface_value.val)
@@ -41,7 +41,7 @@ class TestContainerController(TestCase):
 
         container = Controller.ContainerController('test', root, None)
         container2 = Controller.ContainerController('test2', container, None)
-        Controller.ValueController('test', container2, value_interface, None, Converter.Str(), 'default')
+        Controller.ValueController('test', container2, value_interface, None, Converter.Str(0, 'default'))
         container.model_to_view({'test': {'test2': {'test': 'test'}}})
         self.assertEqual(value_interface.val, 'test')
 
@@ -63,7 +63,7 @@ class TestContainerController(TestCase):
         self.assertEqual(len(list_instance_factory.instances), 1)
         self.assertEqual(list_instance_factory.values[0].val, 1)
 
-        Controller.ValueController('test_val', container, value_interface, None, Converter.Str(), 'default')
+        Controller.ValueController('test_val', container, value_interface, None, Converter.Str(0, 'default'))
         container.model_to_view({'test': {'test_list': [1], 'test_val': 'test'}})
         self.assertEqual(value_interface.val, 'test')
 
@@ -74,13 +74,13 @@ class TestContainerController(TestCase):
         optional_interface_value = TestOptionalInterface()
 
         container = Controller.ContainerController('test', root, None)
-        Controller.ValueController('test', container, value_interface, None, Converter.Str(), 'default')
+        Controller.ValueController('test', container, value_interface, None, Converter.Str(0, 'default'))
         value_interface.val = 'test'
 
         self.assertEqual(container.view_to_model(), {'test': 'test'})
 
         container = Controller.ContainerController('test', root, optional_interface_container)
-        Controller.ValueController('test', container, value_interface, optional_interface_value, Converter.Str(), 'default')
+        Controller.ValueController('test', container, value_interface, optional_interface_value, Converter.Str(0, 'default'))
 
         optional_interface_value.val = True
         optional_interface_container.val = True
@@ -96,7 +96,7 @@ class TestContainerController(TestCase):
 
         container = Controller.ContainerController('test', root, None)
         container2 = Controller.ContainerController('test2', container, None)
-        Controller.ValueController('test', container2, value_interface, None, Converter.Str(), 'default')
+        Controller.ValueController('test', container2, value_interface, None, Converter.Str(0, 'default'))
 
         value_interface.val = 'test'
         self.assertEqual(container.view_to_model(), {'test2': {'test': 'test'}})
@@ -123,6 +123,6 @@ class TestContainerController(TestCase):
         self.assertEqual(len(list_instance_factory.instances), 1)
         self.assertEqual(list_instance_factory.values[0].val, 1)
 
-        Controller.ValueController('test_val', container, value_interface, None, Converter.Str(), 'default')
+        Controller.ValueController('test_val', container, value_interface, None, Converter.Str(0, 'default'))
         value_interface.val = 'test'
         self.assertEqual(container.view_to_model(), {'test_list': [1], 'test_val': 'test'})

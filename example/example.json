@@ -1,28 +1,16 @@
 {
   "example1": {
-    "member1": 1234,
-    "member2": -60
-  },
-  "example2": {
     "member1": 1000,
-    "member2": 0,
-    "enumerated": "enum2"
+    "member2": -100
   },
-  "stringList": [
-    "6173646667",
-    "6173646667",
-    "3132333435"
-  ],
-  "boolExample": true,
+  "boolExample": false,
   "realExample": 0.0,
-  "enumerated": "enum2",
-  "bitString": "218800",
+  "enumerated": "enum1",
+  "bitString": "000000",
+  "octetString": "20202020",
+  "visibleString": "Super",
+  "utf8String": "\u00e4\u00f6",
   "choiceExample": {
-    "exampleList": [
-      1,
-      2,
-      3,
-      4
-    ]
+    "exampleInt": 0
   }
 }

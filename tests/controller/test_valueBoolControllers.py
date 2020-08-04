@@ -31,28 +31,31 @@ class TestValueController(TestCase):
     def test_add_controller(self):
         with self.assertRaises(Exception):
             root = Controller.RootController('root')
-            controller = Controller.ValueController('test', root, TestValueInterface(), None, Converter.Str(), '')
+            controller = Controller.ValueController('test', root, TestValueInterface(), None, Converter.Str(0, ''))
             controller.add_controller('test', controller)
 
     def test_init(self):
         root = Controller.RootController('root')
         value_interface = TestValueInterface()
 
-        Controller.ValueController('test', root, value_interface, None, Converter.Str(), 'default')
+        Controller.ValueController('test', root, value_interface, None, Converter.Str(0, 'default'))
         self.assertEqual(value_interface.val, 'default')
 
-        Controller.ValueController('test', root, value_interface, None, Converter.Int(), '12')
+        Controller.ValueController('test', root, value_interface, None, Converter.Int(0, 12))
         self.assertEqual(value_interface.val, '12')
 
-        Controller.ValueController('test', root, value_interface, None, Converter.Int(), None)
+        Controller.ValueController('test', root, value_interface, None, Converter.Int(0, None))
         self.assertEqual(value_interface.val, '0')
+
+        Controller.ValueController('test', root, value_interface, None, Converter.Int(12, None))
+        self.assertEqual(value_interface.val, '12')
 
     def test_model_to_view(self):
         root = Controller.RootController('root')
         value_interface = TestValueInterface()
         optional_interface = TestOptionalInterface()
 
-        controller = Controller.ValueController('test', root, value_interface, None, Converter.Str(), 'default')
+        controller = Controller.ValueController('test', root, value_interface, None, Converter.Str(0, 'default'))
         controller.model_to_view({'test': 'new'})
         self.assertEqual(value_interface.val, 'new')
 
@@ -62,7 +65,7 @@ class TestValueController(TestCase):
         with self.assertRaises(AssertionError):
             controller.model_to_view({})
 
-        controller = Controller.ValueController('test', root, value_interface, optional_interface, Converter.Str(), 'default')
+        controller = Controller.ValueController('test', root, value_interface, optional_interface, Converter.Str(0, 'default'))
         controller.model_to_view({'test': 'new'})
         self.assertEqual(value_interface.val, 'new')
         self.assertTrue(optional_interface.val)
@@ -75,7 +78,7 @@ class TestValueController(TestCase):
         value_interface = TestValueInterface()
         optional_interface = TestOptionalInterface()
 
-        controller = Controller.ValueController('test', root, value_interface, optional_interface, Converter.Str(), 'default')
+        controller = Controller.ValueController('test', root, value_interface, optional_interface, Converter.Str(0, 'default'))
         value_interface.val = 'new'
         optional_interface.val = True
         self.assertEqual('new', controller.view_to_model())
@@ -96,10 +99,10 @@ class TestBoolController(TestCase):
         value_interface = TestValueInterface()
 
         Controller.BoolController('test', root, value_interface, None, True)
-        self.assertEqual(value_interface.val, 'True')
+        self.assertTrue(value_interface.val)
 
         Controller.BoolController('test', root, value_interface, None, False)
-        self.assertEqual(value_interface.val, 'False')
+        self.assertFalse(value_interface.val)
 
     def test_model_to_view(self):
         root = Controller.RootController('root')
