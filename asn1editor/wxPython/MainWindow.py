@@ -91,6 +91,11 @@ class MainWindow(wx.Frame, PluginInterface):
 
             menu_bar.Append(plugin_menu, self.__plugin.get_name())
 
+        help_menu = wx.Menu()
+        about_item = help_menu.Append(wx.ID_ABOUT, 'About')
+        self.Bind(wx.EVT_MENU, self.__about_item_event, about_item)
+        menu_bar.Append(help_menu, '&Help')
+
         self.SetMenuBar(menu_bar)
 
     def __plugin_menu_event(self, e):
@@ -233,6 +238,16 @@ class MainWindow(wx.Frame, PluginInterface):
                 f.write(f'{datetime.datetime.now()}: {exception_str}\n\n')
         finally:
             pass
+
+    # noinspection PyUnusedLocal
+    def __about_item_event(self, e):
+        del e
+        dialog = wx.MessageDialog(self, f'''asn1editor {asn1editor.__version__}
+
+Florian Fetz, 2020
+https://github.com/Futsch1/asn1editor
+''', style=wx.ICON_INFORMATION | wx.OK, caption='About')
+        dialog.ShowModal()
 
     # noinspection PyUnusedLocal
     def exit(self, e: wx.Event):
