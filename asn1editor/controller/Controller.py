@@ -48,11 +48,11 @@ class Controller:
 
 class ValueController(Controller):
     def __init__(self, name: str, parent: Controller, value_interface: ValueInterface, optional_interface: Optional[OptionalInterface],
-                 data_converter: Converter.Converter, default: Optional[Any]):
+                 data_converter: Converter.Converter):
         super().__init__(name, parent, optional_interface)
         self._value_interface = value_interface
         self._data_converter = data_converter
-        self._default = default if default is not None else self._data_converter.from_str('')
+        self._default = self._data_converter.default()
         self._set_value(self._default)
 
     def add_controller(self, name: str, other: Controller):
@@ -67,10 +67,10 @@ class ValueController(Controller):
 
     def view_to_model(self) -> Any:
         if self._view_to_model_optional():
-            return self._data_converter.from_str(self._value_interface.get_value())
+            return self._data_converter.from_view(self._value_interface.get_value())
 
     def _set_value(self, value: Any):
-        self._value_interface.set_value(self._data_converter.to_str(value))
+        self._value_interface.set_value(self._data_converter.to_view(value))
 
 
 class BoolController(Controller):
@@ -78,7 +78,7 @@ class BoolController(Controller):
         super().__init__(name, parent, optional_interface)
         self._value_interface = value_interface
         self._default = default if default is not None else False
-        self._value_interface.set_value(str(self._default))
+        self._value_interface.set_value(self._default)
 
     def add_controller(self, name: str, other: Controller):
         raise Exception('ValueController cannot add a controller')
@@ -86,13 +86,13 @@ class BoolController(Controller):
     def model_to_view(self, model: Union[Dict[str, Any], Any]):
         if isinstance(model, Dict):
             if self._model_to_view_optional(model):
-                self._value_interface.set_value(str(model[self._name]))
+                self._value_interface.set_value(model[self._name])
         else:
             self._value_interface.set_value(model)
 
     def view_to_model(self) -> bool:
         if self._view_to_model_optional():
-            return self._value_interface.get_value().lower() in ['true', '1']
+            return self._value_interface.get_value()
 
 
 class ListController(Controller):
@@ -255,4 +255,3 @@ class RootController(ContainerController):
 
     def view_to_model(self) -> Optional[Dict[str, Any]]:
         return self._view_to_model()
-

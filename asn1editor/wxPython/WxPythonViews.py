@@ -73,6 +73,85 @@ class WxPythonValueView(WxPythonView, ValueInterface):
         self._value_control.Enable(enabled)
 
 
+class WxPythonHexStringView(WxPythonView, ValueInterface):
+    def __init__(self, sizer: wx.Sizer, value_control: wx.TextCtrl, hex_selector: wx.CheckBox, minimum: int, maximum: int,
+                 optional_control: Optional[wx.CheckBox] = None):
+        super(WxPythonHexStringView, self).__init__(sizer, optional_control)
+
+        self._value_control = value_control
+        self._real_value = b''
+        self._hex_selector = hex_selector
+        self._hex_selector.Bind(wx.EVT_CHECKBOX, self.hex_selector_changed)
+        self._hex = self._is_hex()
+        self._minimum = minimum
+        self._maximum = maximum
+        self._update_length()
+
+    def register_change_event(self, callback: Callable):
+        # noinspection PyUnusedLocal
+        def event_closure(e: wx.Event):
+            del e
+            self.text_changed()
+            callback()
+
+        if self._value_control is not None:
+            self._value_control.Bind(wx.EVT_TEXT, event_closure)
+
+    # noinspection PyUnusedLocal
+    def hex_selector_changed(self, e: wx.CommandEvent):
+        self._hex_selector_changed()
+
+    def text_changed(self):
+        if self._hex:
+            try:
+                self._real_value = bytes.fromhex(self._value_control.GetValue())
+            except ValueError:
+                pass
+        else:
+            self._real_value = self._value_control.GetValue().encode('latin-1')
+
+    def _update_control(self):
+        if self._hex:
+            val = self._real_value.hex()
+            val = ' '.join(val[i:i + 2] for i in range(0, len(val), 2))
+        else:
+            val = self._real_value.decode('latin-1', errors='replace')
+
+        self._value_control.ChangeValue(val)
+
+    def _hex_selector_changed(self):
+        if self._hex != self._is_hex():
+            if not self._hex:
+                # Was ASCII before, now is hex
+                self._maximum *= 2
+                self._minimum *= 2
+            else:
+                self._maximum //= 2
+                self._minimum //= 2
+
+            self._update_length()
+            self._hex = self._is_hex()
+            self._update_control()
+
+    def get_value(self) -> bytes:
+        return self._real_value
+
+    def set_value(self, val: bytes):
+        assert isinstance(val, bytes)
+        self._real_value = val
+        self._update_control()
+
+    def _enable(self, enabled: bool):
+        self._value_control.Enable(enabled)
+
+    def _is_hex(self) -> bool:
+        return self._hex_selector.GetValue()
+
+    def _update_length(self):
+        self._value_control.SetToolTip(f"Minimum characters: {self._minimum}, maximum characters: {self._maximum}")
+        self._value_control.SetMaxLength(self._maximum)
+
+
 class WxPythonBooleanView(WxPythonView, ValueInterface):
     def __init__(self, sizer: wx.Sizer, value_control: wx.CheckBox = None,
                  optional_control: Optional[wx.CheckBox] = None):
@@ -88,11 +167,11 @@ class WxPythonBooleanView(WxPythonView, ValueInterface):
         if self._value_control is not None:
             self._value_control.Bind(wx.EVT_CHECKBOX, event_closure)
 
-    def get_value(self) -> str:
-        return str(self._value_control.GetValue())
+    def get_value(self) -> bool:
+        return self._value_control.GetValue()
 
-    def set_value(self, val: str):
-        self._value_control.SetValue(val.lower() in ['true', '1'])
+    def set_value(self, val: bool):
+        self._value_control.SetValue(val)
 
     def _enable(self, enabled: bool):
         self._value_control.Enable(enabled)

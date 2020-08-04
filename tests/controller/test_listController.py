@@ -11,7 +11,7 @@ class TestListInstanceFactory:
 
     def create(self, i, p: Controller.ListController):
         self.values[i] = TestValueInterface()
-        self.instances[i] = Controller.ValueController(str(i), p, self.values[i], None, Converter.Str(), None)
+        self.instances[i] = Controller.ValueController(str(i), p, self.values[i], None, Converter.Str(0, None))
 
     def destroy(self, i):
         del self.values[i]

@@ -37,7 +37,10 @@ class ViewControllerFactory(object):
         elif isinstance(type_, oer.Choice):
             # noinspection PyTypeChecker
             return self._choice(type_, checker, controller)
-        elif type(type_) in [oer.OctetString, oer.UTF8String, oer.VisibleString, oer.GeneralString]:
+        elif isinstance(type_, oer.OctetString):
+            # noinspection PyTypeChecker
+            return self._hex_string(type_, checker, controller)
+        elif type(type_) in [oer.UTF8String, oer.VisibleString, oer.GeneralString, oer.IA5String]:
             # noinspection PyTypeChecker
             return self._string(type_, checker, controller)
         elif isinstance(type_, oer.Enumerated):
@@ -57,7 +60,7 @@ class ViewControllerFactory(object):
         view, value_interface, optional_interface = self._view_factory.get_number_view(type_.name, type_.optional, checker.minimum, checker.maximum,
                                                                                        isinstance(type_, oer.Real))
 
-        ControllerFactory(controller).create_value_controller(type_, value_interface, optional_interface)
+        ControllerFactory(controller).create_value_controller(type_, value_interface, optional_interface, checker.minimum)
 
         return view
 
@@ -94,10 +97,17 @@ class ViewControllerFactory(object):
 
         return view
 
-    def _string(self, type_: oer.OctetString, checker: constraints_checker.String, controller: Controller):
+    def _string(self, type_: oer.VisibleString, checker: constraints_checker.String, controller: Controller):
         view, value_interface, optional_interface = self._view_factory.get_string_view(type_.name, type_.optional, checker.minimum, checker.maximum)
 
-        ControllerFactory(controller).create_value_controller(type_, value_interface, optional_interface)
+        ControllerFactory(controller).create_value_controller(type_, value_interface, optional_interface, checker.minimum)
+
+        return view
+
+    def _hex_string(self, type_: oer.OctetString, checker: constraints_checker.String, controller: Controller):
+        view, value_interface, optional_interface = self._view_factory.get_hex_string_view(type_.name, type_.optional, checker.minimum, checker.maximum)
+
+        ControllerFactory(controller).create_value_controller(type_, value_interface, optional_interface, checker.minimum)
 
         return view
 
