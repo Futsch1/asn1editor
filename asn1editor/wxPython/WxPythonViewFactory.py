@@ -123,15 +123,13 @@ class WxPythonViewFactory(AbstractViewFactory):
     def get_hex_string_view(self, name: str, optional: bool, minimum: int, maximum: int):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         optional_control = self._add_name_control(sizer, name, optional, ':', 'string')
-        selector = wx.RadioBox(self._window, name='Edit', choices=['ASCII', 'Hex'])
+        selector = wx.CheckBox(self._window, label='Hex')
         sizer.Add(selector)
         edit = wx.TextCtrl(self._window)
-        edit.SetToolTip(f"Minimum characters: {minimum}, maximum characters: {maximum}")
-        edit.SetMaxLength(maximum)
 
         sizer.Add(edit, proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
 
-        view = WxPythonHexStringView(sizer, edit, selector, optional_control)
+        view = WxPythonHexStringView(sizer, edit, selector, minimum, maximum, optional_control)
         return view, view, view if optional else None
 
     def get_choice_view(self, name: str, choices: List[str], optional: bool) -> Tuple[ChoiceView, ValueInterface, OptionalInterface]:
