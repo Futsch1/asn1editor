@@ -24,7 +24,7 @@ class ControllerFactory:
             else:
                 default = type_.default
             controller = Controller.ValueController(type_.name, self._parent, value_interface, optional_interface, Converter.Str(0, default))
-        elif type(type_) in [oer.UTF8String, oer.VisibleString, oer.GeneralString]:
+        elif type(type_) in [oer.UTF8String, oer.VisibleString, oer.GeneralString, oer.ObjectIdentifier]:
             controller = Controller.ValueController(type_.name, self._parent, value_interface, optional_interface, Converter.Str(minimum, type_.default))
         elif isinstance(type_, oer.OctetString):
             controller = Controller.ValueController(type_.name, self._parent, value_interface, optional_interface, Converter.ByteString(minimum, type_.default))
@@ -45,7 +45,7 @@ class ControllerFactory:
 
     def create_list_controller(self, type_: oer.Type, value_interface: ValueInterface, optional_interface: Optional[OptionalInterface], list_instance_factory,
                                minimum_elements: int):
-        if isinstance(type_, oer.SequenceOf):
+        if isinstance(type_, oer.SequenceOf) or isinstance(type_, oer.SetOf):
             controller = Controller.ListController(type_.name, self._parent, value_interface, optional_interface, list_instance_factory, minimum_elements)
             self.__register_events(controller, value_interface, optional_interface)
         else:
@@ -75,6 +75,12 @@ class ControllerFactory:
             controller = Controller.BitstringController(type_.name, self._parent, bitstring_interface, optional_interface, type_.number_of_bits)
             if optional_interface is not None:
                 optional_interface.register_optional_event(controller.optional_handler)
+        else:
+            raise Exception(f"Unknown type for ControllerFactory: {type_}")
+
+    def create_null_controller(self, type_: oer.Type):
+        if isinstance(type_, oer.Null):
+            Controller.NullController(type_.name, self._parent, None)
         else:
             raise Exception(f"Unknown type for ControllerFactory: {type_}")
 

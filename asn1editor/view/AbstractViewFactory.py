@@ -28,7 +28,7 @@ class AbstractViewFactory:  # pragma: no cover
     def get_hex_string_view(self, name: str, optional: bool, minimum: int, maximum: int) -> Tuple[ChoiceView, ValueInterface, OptionalInterface]:
         raise NotImplementedError
 
-    def get_string_view(self, name: str, optional: bool, minimum: int, maximum: int) -> Tuple[ChoiceView, ValueInterface, OptionalInterface]:
+    def get_string_view(self, name: str, string_type: str, optional: bool, minimum: int, maximum: int) -> Tuple[ChoiceView, ValueInterface, OptionalInterface]:
         raise NotImplementedError
 
     def get_choice_view(self, name: str, choices: List[str], optional: bool) -> Tuple[ChoiceView, ValueInterface, OptionalInterface]:

@@ -241,9 +241,21 @@ class ContainerController(Controller):
         model = {}
         for name, controller in self._controllers.items():
             sub_model = controller.view_to_model()
-            if sub_model is not None:
+            if sub_model is not None or isinstance(controller, NullController):
                 model[name] = sub_model
         return model
+
+
+class NullController(Controller):
+
+    def add_controller(self, name: str, other: 'Controller'):
+        raise Exception('NullController cannot add a controller')
+
+    def model_to_view(self, model: Dict[str, Any]):
+        pass
+
+    def view_to_model(self) -> Optional:
+        return None
 
 
 class RootController(ContainerController):

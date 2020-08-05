@@ -104,7 +104,7 @@ class MainWindow(wx.Frame, PluginInterface):
     def bind_events(self):
         def schema_dialog_constructor() -> wx.FileDialog:
             return wx.FileDialog(self, "ASN.1 schema", wildcard="ASN.1 files (*.asn)|*.asn",
-                                 style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+                                 style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST | wx.FD_MULTIPLE)
 
         def data_load_dialog_constructor() -> wx.FileDialog:
             extensions = ';'.join(ASN1SpecHandler.get_extensions())
@@ -228,7 +228,7 @@ class MainWindow(wx.Frame, PluginInterface):
         trace = ''.join(traceback.format_exception(exc_type, value, trace))
         print(trace)
 
-        message = f'{value}\n\n{exc_type}'
+        message = f'{value}\n\n{str(exc_type)}'
         exception_str = f'{message}\n\n{trace}'
         wx.MessageBox(message, 'Error', wx.OK | wx.ICON_ERROR, parent=self)
         self._status_bar.SetStatusText(f'Error: {value}')

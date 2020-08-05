@@ -1,5 +1,5 @@
 import os
-from typing import Callable, Optional
+from typing import Callable, Optional, List, Union
 
 import wx
 
@@ -25,21 +25,21 @@ class FilePickerHandler:
                     file_dialog.SetPath(initial_dir)
             if file_dialog.ShowModal() == wx.ID_CANCEL:
                 return
-            filename = file_dialog.GetPath()
-            Settings.settings[file_dialog.GetMessage()] = os.path.dirname(filename)
-            self.file_selected(filename, file_dialog.GetParent())
+            filenames = file_dialog.GetPaths()
+            Settings.settings[file_dialog.GetMessage()] = os.path.dirname(filenames[0])
+            filenames = filenames if len(filenames) > 1 else filenames[0]
+            self.file_selected(filenames, file_dialog.GetParent())
 
-    def file_selected(self, filename: Optional[str], window: wx.Window):
-        if filename is not None:
-            use_filename = True
-            if self.__overwrite_question and os.path.exists(filename):
-                use_filename = False
-                with wx.MessageDialog(window, f'File {os.path.basename(filename)} already exists.\n\nDo you want to replace it?',
-                                      style=wx.YES | wx.NO | wx.NO_DEFAULT | wx.ICON_WARNING) as question_dialog:
-                    if question_dialog.ShowModal() == wx.ID_YES:
-                        use_filename = True
+    def file_selected(self, filename: Union[str, List[str]], window: wx.Window):
+        use_filename = True
+        if self.__overwrite_question and os.path.exists(filename):
+            use_filename = False
+            with wx.MessageDialog(window, f'File {os.path.basename(filename)} already exists.\n\nDo you want to replace it?',
+                                  style=wx.YES | wx.NO | wx.NO_DEFAULT | wx.ICON_WARNING) as question_dialog:
+                if question_dialog.ShowModal() == wx.ID_YES:
+                    use_filename = True
 
-            if use_filename:
-                self.filename = filename
-                if self.__propagator is not None:
-                    self.__propagator(filename)
+        if use_filename:
+            self.filename = filename
+            if self.__propagator is not None:
+                self.__propagator(filename)

@@ -3,6 +3,7 @@ BEGIN
 
 Sequence ::= SEQUENCE
 {
+    null                NULL,
     example1            SubSequence,
     example2            SubSequence OPTIONAL,
     stringList          SEQUENCE (SIZE(3)) OF OCTET STRING(5) OPTIONAL,

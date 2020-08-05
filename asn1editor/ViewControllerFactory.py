@@ -31,7 +31,7 @@ class ViewControllerFactory(object):
         elif isinstance(type_, oer.Sequence):
             # noinspection PyTypeChecker
             return self._sequence(type_, checker, controller)
-        elif isinstance(type_, oer.SequenceOf):
+        elif isinstance(type_, oer.SequenceOf) or isinstance(type_, oer.SetOf):
             # noinspection PyTypeChecker
             return self._sequence_of(type_, checker, controller)
         elif isinstance(type_, oer.Choice):
@@ -40,7 +40,7 @@ class ViewControllerFactory(object):
         elif isinstance(type_, oer.OctetString):
             # noinspection PyTypeChecker
             return self._hex_string(type_, checker, controller)
-        elif type(type_) in [oer.UTF8String, oer.VisibleString, oer.GeneralString, oer.IA5String]:
+        elif type(type_) in [oer.UTF8String, oer.VisibleString, oer.GeneralString, oer.IA5String, oer.ObjectIdentifier]:
             # noinspection PyTypeChecker
             return self._string(type_, checker, controller)
         elif isinstance(type_, oer.Enumerated):
@@ -49,12 +49,16 @@ class ViewControllerFactory(object):
             # noinspection PyTypeChecker
             return self._bitstring(type_, controller)
         elif isinstance(type_, oer.Null):
-            return self._text(type_, "Null")
+            return self._null(type_, controller)
         else:
-            return self._text(type_, "Not implemented")
+            return self._text(type_, f'ASN.1 type {type_.name} {type_.type_name} not supported')
 
     def _text(self, type_: oer.Type, text: str) -> AbstractView:
         return self._view_factory.get_text_view(type_.name, text)
+
+    def _null(self, type_: oer.Type, controller: Controller) -> AbstractView:
+        ControllerFactory(controller).create_null_controller(type_)
+        return self._view_factory.get_text_view(type_.name, "NULL")
 
     def _number(self, type_: Union[oer.Integer, oer.Real], checker: constraints_checker.Type, controller: Controller) -> AbstractView:
         view, value_interface, optional_interface = self._view_factory.get_number_view(type_.name, type_.optional, self.__get_limit(checker.minimum),
@@ -100,8 +104,8 @@ class ViewControllerFactory(object):
         return view
 
     def _string(self, type_: oer.VisibleString, checker: constraints_checker.String, controller: Controller):
-        view, value_interface, optional_interface = self._view_factory.get_string_view(type_.name, type_.optional, self.__get_limit(checker.minimum),
-                                                                                       self.__get_limit(checker.maximum))
+        view, value_interface, optional_interface = self._view_factory.get_string_view(type_.name, type_.type_name, type_.optional,
+                                                                                       self.__get_limit(checker.minimum), self.__get_limit(checker.maximum))
 
         ControllerFactory(controller).create_value_controller(type_, value_interface, optional_interface, self.__get_limit(checker.minimum))
 

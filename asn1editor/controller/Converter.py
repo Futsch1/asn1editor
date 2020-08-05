@@ -50,7 +50,7 @@ class Int(Converter):
     def default(self) -> int:
         if self._minimum is None:
             self._minimum = 0
-        return self._minimum if not self._default else self._default
+        return self._minimum if not self._default else self.from_view(self._default)
 
 
 class Float(Converter):

@@ -1,7 +1,7 @@
 import glob
 import os
 import re
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Union
 
 import asn1tools
 
@@ -14,26 +14,28 @@ from asn1editor.view.AbstractViewFactory import AbstractViewFactory
 class ASN1SpecHandler:
     IMPORTS_REGEX = re.compile(r'IMPORTS\s*[\S,\s]*\s*FROM\s*(\S*);', flags=re.MULTILINE)
 
-    def __init__(self, file_name: str):
-        import_names = []
-        # Pre process for import statements to automatically resolve other files
-        my_path = os.path.split(os.path.abspath(file_name))[0]
-        with open(file_name, 'r') as f:
-            content = f.read()
-            matches = re.finditer(self.IMPORTS_REGEX, content)
-            for match in matches:
-                import_type = match.group(1).lower()
-                dir_files = glob.glob(os.path.join(my_path, '*.asn'))
-                for dir_file in dir_files:
-                    dir_file_name = os.path.splitext(os.path.basename(dir_file))[0].lower()
-                    if import_type in dir_file_name or dir_file_name in import_type:
-                        import_names.append(dir_file)
-
-        self.__file_name = [file_name] + import_names
+    def __init__(self, file_name: Union[str, List[str]]):
+        if isinstance(file_name, str):
+            import_names = []
+            # Pre process for import statements to automatically resolve other files
+            my_path = os.path.split(os.path.abspath(file_name))[0]
+            with open(file_name, 'r') as f:
+                content = f.read()
+                matches = re.finditer(self.IMPORTS_REGEX, content)
+                for match in matches:
+                    import_type = match.group(1).lower()
+                    dir_files = glob.glob(os.path.join(my_path, '*.asn'))
+                    for dir_file in dir_files:
+                        dir_file_name = os.path.splitext(os.path.basename(dir_file))[0].lower()
+                        if import_type in dir_file_name or dir_file_name in import_type:
+                            import_names.append(dir_file)
+            self.__file_name = [file_name] + import_names
+        else:
+            self.__file_name = file_name
         self.__compiled = {}
         self.__type_name = None
 
-    def get_types(self,) -> List[str]:
+    def get_types(self, ) -> List[str]:
         types = []
         compiled = self.get_compiled('oer')
         for module_name, module in compiled.modules.items():
