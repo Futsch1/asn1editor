@@ -74,7 +74,7 @@ class WxPythonValueView(WxPythonView, ValueInterface):
 
 
 class WxPythonHexStringView(WxPythonView, ValueInterface):
-    def __init__(self, sizer: wx.Sizer, value_control: wx.TextCtrl, hex_selector: wx.CheckBox, minimum: int, maximum: int,
+    def __init__(self, sizer: wx.Sizer, value_control: wx.TextCtrl, hex_selector: wx.CheckBox, minimum: Optional[int], maximum: Optional[int],
                  optional_control: Optional[wx.CheckBox] = None):
         super(WxPythonHexStringView, self).__init__(sizer, optional_control)
 

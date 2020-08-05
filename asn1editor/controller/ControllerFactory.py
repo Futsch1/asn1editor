@@ -13,7 +13,7 @@ class ControllerFactory:
         self._parent = parent
 
     def create_value_controller(self, type_: oer.Type, value_interface: ValueInterface, optional_interface: Optional[OptionalInterface],
-                                minimum: Union[str, int, float] = 0):
+                                minimum: Optional[Union[str, int, float]] = 0):
         if isinstance(type_, oer.Integer):
             controller = Controller.ValueController(type_.name, self._parent, value_interface, optional_interface, Converter.Int(minimum, type_.default))
         elif isinstance(type_, oer.Real):
@@ -26,7 +26,7 @@ class ControllerFactory:
             controller = Controller.ValueController(type_.name, self._parent, value_interface, optional_interface, Converter.Str(0, default))
         elif type(type_) in [oer.UTF8String, oer.VisibleString, oer.GeneralString, oer.ObjectIdentifier]:
             controller = Controller.ValueController(type_.name, self._parent, value_interface, optional_interface, Converter.Str(minimum, type_.default))
-        elif isinstance(type_, oer.OctetString):
+        elif isinstance(type_, oer.OctetString) or isinstance(type_, oer.BitString):
             controller = Controller.ValueController(type_.name, self._parent, value_interface, optional_interface, Converter.ByteString(minimum, type_.default))
         else:
             raise Exception(f"Unknown type for ControllerFactory: {type_}")
@@ -60,9 +60,20 @@ class ControllerFactory:
 
     def create_choice_controller(self, type_: oer.Type, value_interface: ValueInterface, optional_interface: Optional[OptionalInterface],
                                  choice_instance_factory):
+        def has_no_recursive_member(m):
+            if isinstance(m, oer.Recursive):
+                return False
+            elif type(m) in [oer.Set, oer.Sequence]:
+                return not any(isinstance(m, oer.Recursive) for m in m.root_members)
+            elif type(m) in [oer.SequenceOf, oer.SetOf]:
+                return not isinstance(m.element_type, oer.Recursive)
+            return True
+
         if isinstance(type_, oer.Choice):
             if type_.default is None:
-                default = sorted([member.name for member in type_.members])[0]
+                # Do not use recursive types as default
+                candidates = list(filter(has_no_recursive_member, type_.members))
+                default = sorted([member.name for member in candidates])[0]
             else:
                 default = type_.default
             controller = Controller.ChoiceController(type_.name, self._parent, value_interface, optional_interface, choice_instance_factory, default)

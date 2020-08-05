@@ -1,4 +1,4 @@
-from typing import Tuple, List
+from typing import Tuple, List, Optional
 
 from asn1editor.interfaces.BitstringInterface import BitstringInterface
 from asn1editor.interfaces.OptionalInterface import OptionalInterface
@@ -25,7 +25,8 @@ class AbstractViewFactory:  # pragma: no cover
     def get_boolean_view(self, name: str, optional: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
         raise NotImplementedError
 
-    def get_hex_string_view(self, name: str, optional: bool, minimum: int, maximum: int) -> Tuple[ChoiceView, ValueInterface, OptionalInterface]:
+    def get_hex_string_view(self, name: str, optional: bool, minimum: Optional[int], maximum: Optional[int]) -> \
+            Tuple[ChoiceView, ValueInterface, OptionalInterface]:
         raise NotImplementedError
 
     def get_string_view(self, name: str, string_type: str, optional: bool, minimum: int, maximum: int) -> Tuple[ChoiceView, ValueInterface, OptionalInterface]:

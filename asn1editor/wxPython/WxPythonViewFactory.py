@@ -132,7 +132,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         view = WxPythonValueView(sizer, edit, optional_control)
         return view, view, view if optional else None
 
-    def get_hex_string_view(self, name: str, optional: bool, minimum: int, maximum: int):
+    def get_hex_string_view(self, name: str, optional: bool, minimum: Optional[int], maximum: Optional[int]):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         optional_control = self._add_name_control(sizer, name, optional, ':', 'string', 'OCTET STRING')
         selector = wx.CheckBox(self._window, label='Hex')

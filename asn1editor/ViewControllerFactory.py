@@ -45,11 +45,14 @@ class ViewControllerFactory(object):
             return self._string(type_, checker, controller)
         elif isinstance(type_, oer.Enumerated):
             return self._enumerated(type_, controller)
-        elif isinstance(type_, oer.BitString) and type_.number_of_bits is not None:
+        elif isinstance(type_, oer.BitString):
             # noinspection PyTypeChecker
             return self._bitstring(type_, controller)
         elif isinstance(type_, oer.Null):
             return self._null(type_, controller)
+        elif isinstance(type_, oer.Recursive):
+            # noinspection PyUnresolvedReferences
+            return self.create_view_and_controller(type_.inner, checker.inner, controller)
         else:
             return self._text(type_, f'ASN.1 type {type_.name} {type_.type_name} not supported')
 
@@ -120,9 +123,15 @@ class ViewControllerFactory(object):
         return view
 
     def _bitstring(self, type_: oer.BitString, controller: Controller):
-        view, value_interface, optional_interface = self._view_factory.get_bitstring_view(type_.name, type_.number_of_bits, type_.named_bits, type_.optional)
+        if type_.number_of_bits is None:
+            view, value_interface, optional_interface = self._view_factory.get_hex_string_view(type_.name, type_.optional, None, None)
 
-        ControllerFactory(controller).create_bitstring_controller(type_, value_interface, optional_interface)
+            ControllerFactory(controller).create_value_controller(type_, value_interface, optional_interface, None)
+        else:
+            view, value_interface, optional_interface = self._view_factory.get_bitstring_view(type_.name, type_.number_of_bits, type_.named_bits,
+                                                                                              type_.optional)
+
+            ControllerFactory(controller).create_bitstring_controller(type_, value_interface, optional_interface)
 
         return view
 
