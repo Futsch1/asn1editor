@@ -80,6 +80,10 @@ class PluginInterfaceTest(TestCase):
         plugin.plugin_interface.show_status("Test status bar")
         self.assertEqual(main_window._status_bar.GetStatusText(), 'Test status bar')
 
+        with patch('wx.MessageBox') as MessageBox:
+            plugin.plugin_interface.show_message('Test', asn1editor.PluginInterface.MessageType.ERROR)
+            MessageBox.assert_called_once()
+
         app.Destroy()
 
     def test_spec_interfaces(self):
@@ -108,5 +112,27 @@ class PluginInterfaceTest(TestCase):
 
         jer_encoded = plugin.plugin_interface.encode_data('jer')
         plugin.plugin_interface.show_data(jer_encoded, 'jer')
+
+        app.Destroy()
+
+    def test_settings(self):
+        app = wx.App()
+        plugin = TestPlugin()
+        main_window = MainWindow(plugin)
+
+        plugin.plugin_interface.get_settings()['Test'] = 1
+
+        main_window.close(wx.KeyEvent())
+
+        main_window = MainWindow(plugin)
+
+        self.assertEqual(plugin.plugin_interface.get_settings()['Test'], 1)
+        plugin.plugin_interface.get_settings()['Test'] = 0
+
+        main_window.close(wx.KeyEvent())
+
+        main_window = MainWindow(plugin)
+
+        self.assertEqual(plugin.plugin_interface.get_settings()['Test'], 0)
 
         app.Destroy()

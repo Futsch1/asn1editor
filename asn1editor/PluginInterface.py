@@ -1,9 +1,16 @@
+import enum
 import typing
 
 import asn1tools
 
 
 class PluginInterface:  # pragma: no cover
+
+    class MessageType(enum.Enum):
+        INFO = 1
+        WARNING = 2
+        ERROR = 3
+
     def load_spec(self, file_name: str, type_name: typing.Optional[str] = None):
         """
         Loads an ASN.1 specification in the editor.
@@ -85,10 +92,27 @@ class PluginInterface:  # pragma: no cover
         """
         raise NotImplementedError
 
+    def show_message(self, message: str, message_type: MessageType):
+        """
+        Shows a status message.
+
+        :param message: Message to show to the user
+        :param message_type: Type of message box
+        """
+        raise NotImplementedError
+
     def show_status(self, message: str):
         """
         Shows a status message.
 
         :param message: Message to show to the user
+        """
+        raise NotImplementedError
+
+    def get_settings(self) -> dict:
+        """
+        Get a settings dictionary for a plugin to store persistent data
+
+        :return: Settings dict
         """
         raise NotImplementedError

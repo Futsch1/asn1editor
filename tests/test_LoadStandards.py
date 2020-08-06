@@ -20,3 +20,5 @@ class LoadStandardsTest(TestCase):
                 main_window.load_spec(file, type_)
                 self.assertEqual(main_window.get_spec_filename(), file)
                 self.assertEqual(main_window.get_typename(), type_)
+
+        app.Destroy()

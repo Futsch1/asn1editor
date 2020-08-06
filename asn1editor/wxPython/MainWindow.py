@@ -224,6 +224,14 @@ class MainWindow(wx.Frame, PluginInterface):
     def show_status(self, message: str):
         self._status_bar.SetStatusText(message)
 
+    def show_message(self, message: str, message_type: PluginInterface.MessageType):
+        style = wx.OK | wx.CENTER | {PluginInterface.MessageType.WARNING: wx.ICON_WARNING, PluginInterface.MessageType.INFO: wx.ICON_INFORMATION,
+                                     PluginInterface.MessageType.ERROR: wx.ICON_ERROR}[message_type]
+        wx.MessageBox(message, 'Plugin', style=style)
+
+    def get_settings(self) -> dict:
+        return Settings.settings.setdefault('Plugin', {})
+
     def __exception_handler(self, exc_type, value, trace):
         import traceback
         trace = ''.join(traceback.format_exception(exc_type, value, trace))
