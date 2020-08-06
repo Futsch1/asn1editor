@@ -6,10 +6,10 @@ import wx
 import wx.svg
 
 import asn1editor
-import asn1editor.wxPython.Settings as Settings
-from asn1editor import Plugin
 from asn1editor.ASN1SpecHandler import ASN1SpecHandler
+from asn1editor.Plugin import Plugin
 from asn1editor.PluginInterface import PluginInterface
+from asn1editor.wxPython import Settings as Settings
 from asn1editor.wxPython import WxPythonViewFactory
 from asn1editor.wxPython.FilePickerHandler import FilePickerHandler
 from asn1editor.wxPython.Resources import resource_path
