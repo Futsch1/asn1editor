@@ -35,6 +35,9 @@ class ASN1SpecHandler:
         self.__compiled = {}
         self.__type_name = None
 
+    def get_filename(self) -> List[str]:
+        return self.__file_name
+
     def get_types(self, ) -> List[str]:
         types = []
         compiled = self.get_compiled('oer')

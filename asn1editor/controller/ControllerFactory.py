@@ -24,7 +24,7 @@ class ControllerFactory:
             else:
                 default = type_.default
             controller = Controller.ValueController(type_.name, self._parent, value_interface, optional_interface, Converter.Str(0, default))
-        elif type(type_) in [oer.UTF8String, oer.VisibleString, oer.GeneralString, oer.ObjectIdentifier]:
+        elif type(type_) in [oer.UTF8String, oer.VisibleString, oer.GeneralString, oer.ObjectIdentifier, oer.IA5String]:
             controller = Controller.ValueController(type_.name, self._parent, value_interface, optional_interface, Converter.Str(minimum, type_.default))
         elif isinstance(type_, oer.OctetString) or isinstance(type_, oer.BitString):
             controller = Controller.ValueController(type_.name, self._parent, value_interface, optional_interface, Converter.ByteString(minimum, type_.default))

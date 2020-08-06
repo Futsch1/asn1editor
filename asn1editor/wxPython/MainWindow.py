@@ -130,7 +130,8 @@ class MainWindow(wx.Frame, PluginInterface):
 
     def load_spec(self, file_name: str, type_name: Optional[str] = None):
         # Spec file loaded, compile it to show a selection of type names
-        self.__asn1_handler = ASN1SpecHandler(file_name)
+        if not self.__asn1_handler or file_name not in self.__asn1_handler.get_filename():
+            self.__asn1_handler = ASN1SpecHandler(file_name)
 
         if type_name is None:
             types = self.__asn1_handler.get_types()
