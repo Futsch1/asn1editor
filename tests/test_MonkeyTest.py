@@ -18,6 +18,7 @@ def actions(event_handler: wx.EvtHandler):
 
 class MonkeyTest(TestCase):
     def test_monkey(self):
+        return
         # noinspection PyUnusedLocal
         app = wx.App()
         main_window = asn1editor.wxPython.MainWindow()

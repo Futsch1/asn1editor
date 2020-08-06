@@ -135,4 +135,5 @@ class PluginInterfaceTest(TestCase):
 
         self.assertEqual(plugin.plugin_interface.get_settings()['Test'], 0)
 
+        main_window.close(wx.KeyEvent())
         app.Destroy()
