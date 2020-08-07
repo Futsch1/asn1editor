@@ -22,7 +22,10 @@ class FilePickerHandler:
                 file_dialog.SetPath(initial_dir + '/')
             if file_dialog.ShowModal() == wx.ID_CANCEL:
                 return
-            filenames = file_dialog.GetPaths()
+            if hasattr(file_dialog, 'GetPaths'):
+                filenames = file_dialog.GetPaths()
+            else:
+                filenames = [file_dialog.GetPath()]
             Settings.settings[file_dialog.GetMessage()] = os.path.dirname(filenames[0])
             filenames = filenames if len(filenames) > 1 else filenames[0]
             self.file_selected(filenames, file_dialog.GetParent())
