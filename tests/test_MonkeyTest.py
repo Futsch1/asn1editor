@@ -1,3 +1,4 @@
+import os
 import random
 import threading
 from time import sleep
@@ -22,27 +23,29 @@ def actions(main_window: asn1editor.wxPython.MainWindow):
 
     sleep(1)
 
-    children = get_children(main_window)
-    key_codes = [wx.WXK_TAB, wx.WXK_DOWN, wx.WXK_UP, wx.WXK_LEFT, wx.WXK_RIGHT, wx.WXK_SPACE, wx.WXK_SELECT] + [c for c in range(ord('1'), ord('9'))]
+    main_window.SetFocus()
 
-    for i in range(10000):
-        key_event = wx.KeyEvent(wx.EVT_CHAR.typeId)
-        key_event.SetKeyCode(random.choice(key_codes))
+    key_codes = [wx.WXK_TAB, wx.WXK_DOWN, wx.WXK_UP, wx.WXK_LEFT, wx.WXK_RIGHT, wx.WXK_SPACE] + [c for c in range(ord('1'), ord('9'))]
 
-        child = random.choice(children)
-        event_handler = child.GetEventHandler()
-        wx.PostEvent(event_handler, key_event)
+    ui_sim = wx.UIActionSimulator()
+
+    for _ in range(1000):
+        key_code = random.choice(key_codes)
+        ui_sim.KeyDown(key_code)
+        ui_sim.KeyUp(key_code)
     try:
         main_window.save_data_to_file('test.json')
     except asn1tools.ConstraintsError:
         pass
 
     main_window.Close(True)
+    wx.GetApp().ExitMainLoop()
 
 
 class MonkeyTest(TestCase):
     def test_monkey(self):
-        return
+        if os.getenv('TRAVIS') is not None:
+            return
         # noinspection PyUnusedLocal
         app = wx.App()
         main_window = asn1editor.wxPython.MainWindow()
@@ -57,4 +60,3 @@ class MonkeyTest(TestCase):
             app.MainLoop()
             action_thread.join(timeout=0.0)
 
-        app.Destroy()
