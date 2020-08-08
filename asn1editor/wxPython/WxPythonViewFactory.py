@@ -11,7 +11,7 @@ from asn1editor.view.AbstractView import AbstractView, ContainerView, ListView, 
 from asn1editor.view.AbstractViewFactory import AbstractViewFactory
 from asn1editor.wxPython.Resources import resource_path
 from asn1editor.wxPython.WxPythonViews import WxPythonValueView, WxPythonView, WxPythonContainerView, WxPythonListView, WxPythonBooleanView, \
-    WxPythonChoiceView, WxPythonBitstringView, WxPythonHexStringView
+    WxPythonChoiceView, WxPythonBitstringView, WxPythonHexStringView, WxPythonValueSelectionView
 
 
 class WxPythonViewFactory(AbstractViewFactory):
@@ -21,10 +21,10 @@ class WxPythonViewFactory(AbstractViewFactory):
     def get_enumerated_view(self, name: str, choices: List[str], optional: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         optional_control = self._add_name_control(sizer, name, optional, ':', 'enumerated')
-        edit = wx.ComboBox(self._window, style=wx.CB_DROPDOWN, choices=choices)
+        edit = wx.Choice(self._window, choices=choices)
         sizer.Add(edit, proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
 
-        view = WxPythonValueView(sizer, edit, optional_control)
+        view = WxPythonValueSelectionView(sizer, edit, optional_control)
         return view, view, view if optional else None
 
     def get_text_view(self, name: str, text: str) -> AbstractView:
@@ -151,7 +151,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         choice_element_sizer = wx.BoxSizer(wx.HORIZONTAL)
         choice_element_label = wx.StaticText(self._window, wx.ID_ANY)
         choice_element_sizer.Add(choice_element_label, flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL, border=5)
-        choice_element = wx.ComboBox(self._window, style=wx.CB_DROPDOWN, choices=choices)
+        choice_element = wx.Choice(self._window, choices=choices)
         choice_element_sizer.Add(choice_element, flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL, border=5)
 
         content = wx.BoxSizer(wx.VERTICAL)

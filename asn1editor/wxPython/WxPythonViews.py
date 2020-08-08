@@ -1,5 +1,5 @@
 import typing
-from typing import Union, Optional, Callable, List, Tuple
+from typing import Optional, Callable, List, Tuple
 
 import wx
 
@@ -49,7 +49,7 @@ class WxPythonView(AbstractView, OptionalInterface):
 
 
 class WxPythonValueView(WxPythonView, ValueInterface):
-    def __init__(self, sizer: wx.Sizer, value_control: Optional[Union[wx.TextCtrl, wx.ComboBox]] = None,
+    def __init__(self, sizer: wx.Sizer, value_control: Optional[wx.TextCtrl] = None,
                  optional_control: Optional[wx.CheckBox] = None):
         super(WxPythonValueView, self).__init__(sizer, optional_control)
         self._value_control = value_control
@@ -68,6 +68,31 @@ class WxPythonValueView(WxPythonView, ValueInterface):
 
     def set_value(self, val: str):
         self._value_control.SetValue(val)
+
+    def _enable(self, enabled: bool):
+        self._value_control.Enable(enabled)
+
+
+class WxPythonValueSelectionView(WxPythonView, ValueInterface):
+    def __init__(self, sizer: wx.Sizer, value_control: Optional[wx.Choice] = None,
+                 optional_control: Optional[wx.CheckBox] = None):
+        super(WxPythonValueSelectionView, self).__init__(sizer, optional_control)
+        self._value_control = value_control
+
+    def register_change_event(self, callback: Callable):
+        # noinspection PyUnusedLocal
+        def event_closure(e: wx.Event):
+            del e
+            callback()
+
+        if self._value_control is not None:
+            self._value_control.Bind(wx.EVT_CHOICE, event_closure)
+
+    def get_value(self) -> str:
+        return self._value_control.GetStringSelection()
+
+    def set_value(self, val: str):
+        self._value_control.SetStringSelection(val)
 
     def _enable(self, enabled: bool):
         self._value_control.Enable(enabled)
@@ -249,7 +274,7 @@ class WxPythonListView(WxPythonView, ListView, ValueInterface):
 
 
 class WxPythonChoiceView(WxPythonView, ChoiceView, ValueInterface):
-    def __init__(self, sizer: wx.Sizer, choice_control: wx.ComboBox, optional_control: Optional[wx.CheckBox] = None):
+    def __init__(self, sizer: wx.Sizer, choice_control: wx.Choice, optional_control: Optional[wx.CheckBox] = None):
         super(WxPythonChoiceView, self).__init__(sizer, optional_control)
         self._choice_control = choice_control
         self._view = None
@@ -260,13 +285,13 @@ class WxPythonChoiceView(WxPythonView, ChoiceView, ValueInterface):
             del e
             callback()
 
-        self._choice_control.Bind(wx.EVT_TEXT, event_closure)
+        self._choice_control.Bind(wx.EVT_CHOICE, event_closure)
 
     def get_value(self) -> str:
-        return self._choice_control.GetValue()
+        return self._choice_control.GetStringSelection()
 
     def set_value(self, val: str):
-        self._choice_control.SetValue(val)
+        self._choice_control.SetStringSelection(val)
 
     def _enable(self, enabled: bool):
         self._choice_control.Enable(enabled)
