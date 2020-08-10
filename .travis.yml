@@ -17,3 +17,10 @@ script:
   - coverage run --source=asn1editor -m unittest discover
 after_success:
   - coveralls
+deploy:
+  provider: pypi
+  username: futsch1
+  password:
+    secure: RPHHtKUEUWNK+9wE1lit/lVmV+TQUOUn3aQNDEV6UAfB9loKkQUavM5PHr7RgoNcN8PxpTtkiM9qRkG8FId03jeqZRDVZZKZ8OPCuCwNLP+W0PfdquQ61HAvBIYnebfVusVguHQAKWgO/xAW4H4fZqWNzeavuC8PpyhfH+ZFNBpxGk3gbZndvCFxfagQXNxXOMDRhfK7Nfa0iHAnNYyCE2GMXe+TrIoS1e3Patd1t15V5mus4aBWNtIOLa6+y6nbsZwYMKrMw80WJQoa0hooJ7vQHKQ8MvWde5OQCAl3p7T2gByVru4w5awx+BUtQymns3fh00AWTLGUEKEtOe4zPGfgG4tWUFxuObRIqWd/WtYZa2RyUrSctYOqfkaS5qZ2Fm8Qq6ULn+wkeiokQUtkslTfZGimo7OfLFM8cftZHc9dPOBxTRSCTXWslJxlzQVdbcquMpA68Jjk60yoftDbPu8H8kT7++el312NxVuM8HvXPws6pPHc0mf2VQ/uXHTTXNaENCVrdq5BJGVfeNiIsmkj5gfEwacY6OYbQkxlscZ4CFtAZ6Iciw6+rblO/Ny4iWKdxXQrvIu9WnGKzGIraU2ahYWTsVWU8/BAV3LeD+t+xMHSBjLvtUO7wFaZgxwd0mke8CpCZRyacRtkHJrTWQ11e7eFYry9/cZK+ikzbDE=
+  on:
+    tags: true

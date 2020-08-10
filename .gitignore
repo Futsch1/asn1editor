@@ -1,3 +1,6 @@
 /error_log.txt
 /settings.json
 /.coverage
+/dist/
+/build/
+/asn1editor.egg-info/
