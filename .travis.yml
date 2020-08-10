@@ -1,26 +1,24 @@
 dist: xenial
 services:
-  - xvfb
+- xvfb
 language: python
 python:
-  - "3.8"
+- '3.8'
 before_install:
-  - sudo apt-get install libsdl2-mixer-2.0-0 libsdl2-image-2.0-0 libsdl2-2.0-0
-# command to install dependencies
+- sudo apt-get install libsdl2-mixer-2.0-0 libsdl2-image-2.0-0 libsdl2-2.0-0
 install:
-  - pip install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-16.04
-    wxPython==4.1.0
-  - pip install coveralls
-  - pip install -r requirements.txt
-# command to run tests
+- pip install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-16.04
+  wxPython==4.1.0
+- pip install coveralls
+- pip install -r requirements.txt
 script:
-  - coverage run --source=asn1editor -m unittest discover
+- coverage run --source=asn1editor -m unittest discover
 after_success:
-  - coveralls
+- coveralls
 deploy:
   provider: pypi
   username: futsch1
   password:
-    secure: RPHHtKUEUWNK+9wE1lit/lVmV+TQUOUn3aQNDEV6UAfB9loKkQUavM5PHr7RgoNcN8PxpTtkiM9qRkG8FId03jeqZRDVZZKZ8OPCuCwNLP+W0PfdquQ61HAvBIYnebfVusVguHQAKWgO/xAW4H4fZqWNzeavuC8PpyhfH+ZFNBpxGk3gbZndvCFxfagQXNxXOMDRhfK7Nfa0iHAnNYyCE2GMXe+TrIoS1e3Patd1t15V5mus4aBWNtIOLa6+y6nbsZwYMKrMw80WJQoa0hooJ7vQHKQ8MvWde5OQCAl3p7T2gByVru4w5awx+BUtQymns3fh00AWTLGUEKEtOe4zPGfgG4tWUFxuObRIqWd/WtYZa2RyUrSctYOqfkaS5qZ2Fm8Qq6ULn+wkeiokQUtkslTfZGimo7OfLFM8cftZHc9dPOBxTRSCTXWslJxlzQVdbcquMpA68Jjk60yoftDbPu8H8kT7++el312NxVuM8HvXPws6pPHc0mf2VQ/uXHTTXNaENCVrdq5BJGVfeNiIsmkj5gfEwacY6OYbQkxlscZ4CFtAZ6Iciw6+rblO/Ny4iWKdxXQrvIu9WnGKzGIraU2ahYWTsVWU8/BAV3LeD+t+xMHSBjLvtUO7wFaZgxwd0mke8CpCZRyacRtkHJrTWQ11e7eFYry9/cZK+ikzbDE=
+    secure: mFGZvmK8MZrRfRy9Y8URcH17p0yax7NUFr59v/sHkhZZui5TM/XyXGHXh1y4tQJJ7A7R8/+qqY6bmHWSQHBz8Al+iLIbM4e0svxoP/2VWHCm95U+BVJcT+icLKW0aNmpD14ri8Mml5kiaPBHuXixM9XHVXPnQfn7fX84yYzJJoMB6Jb4wPkrOkY9s0jtbGHlUbAxWamwr18NV2rKhq8TY/LMyJ1LOC3ZzuO0S6PmA9ZFaYOYSa8pBEelfiZoRtY5RkgwcnFNZ0rj3M+nh9C6iARwEo8hmqg1Y/l83RcYmNKTUNUH+APJMQPGVp65f8GZifwU09U0vUBJHAfG4RJMRp5RBjQ3BKBRvdsxMI6KnqtYATcts7bv33Mg9V4/O9/L5i/oz0xgLMpsSn4+iFxsPaCotMworHeXEVH8dJA0UFkOOgDRBBbwttdGeXw3u2+8oJqPoobvhjbJZZajaK7p4M2Fec2KtM+xYVxLPfVu3S1nR+XeqlOsJFUy794shC1IqV1VGwFjHU6+RQ5Np51XVXM0X7E7mlaluby3Gi7xrkrxOITTQo8ZeV02m0s1Xgb8VndktJ2jZHU91Upnx/dxvyT60JTkzvBzLRXGJpaZFQWof8VNxpkDzbyEtSOKyzk/02ftLaKVeDA7m42nKCEJgyfA+y84EHss1lKhpgxgiM8=
   on:
     tags: true
