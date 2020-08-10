@@ -2,6 +2,7 @@ import sys
 import typing
 from typing import Optional
 
+import asn1tools
 import wx
 import wx.svg
 
@@ -253,8 +254,13 @@ class MainWindow(wx.Frame, PluginInterface):
         del e
         dialog = wx.MessageDialog(self, f'''asn1editor {asn1editor.__version__}
 
-Florian Fetz, 2020
+Published under MIT License
+
+Copyright (c) 2020 Florian Fetz
 https://github.com/Futsch1/asn1editor
+
+Based on eerimoq's asn1tools, used in {asn1tools.version.__version__}
+https://github.com/eerimoq/asn1tools
 ''', style=wx.ICON_INFORMATION | wx.OK, caption='About')
         dialog.ShowModal()
 

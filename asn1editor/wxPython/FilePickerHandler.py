@@ -3,7 +3,7 @@ from typing import Callable, Optional, List, Union
 
 import wx
 
-import asn1editor.wxPython.Settings as Settings
+from . import Settings
 
 
 class FilePickerHandler:
