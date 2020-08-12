@@ -45,7 +45,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         else:
             optional_control = None
 
-        container_sizer = wx.FlexGridSizer(2, 5, 5)
+        container_sizer = wx.FlexGridSizer(cols=2, vgap=8, hgap=8)
         sizer.Add(container_sizer)
 
         view = WxPythonContainerView(sizer, container_sizer, optional_control)
