@@ -10,7 +10,7 @@ import asn1editor
 from asn1editor.ASN1SpecHandler import ASN1SpecHandler
 from asn1editor.Plugin import Plugin
 from asn1editor.PluginInterface import PluginInterface
-from asn1editor.wxPython import Settings as Settings
+from asn1editor.wxPython import Environment
 from asn1editor.wxPython import WxPythonViewFactory
 from asn1editor.wxPython.FilePickerHandler import FilePickerHandler
 from asn1editor.wxPython.Resources import resource_path
@@ -20,15 +20,15 @@ class MainWindow(wx.Frame, PluginInterface):
     def __init__(self, plugin: Optional[Plugin] = None, title='ASN.1 editor'):
         super(MainWindow, self).__init__(None, title=f'{title} {asn1editor.__version__}', size=(500, 800))
 
-        Settings.load()
+        Environment.load()
 
         self.__plugin = plugin
         if self.__plugin is not None:
             self.__plugin.connect(self)
 
-        self.SetSize(wx.Size(Settings.settings.get('size', (500, 800))))
-        self.Maximize(Settings.settings.get('maximized', True))
-        self.SetPosition(wx.Point(Settings.settings.get('position', (0, 0))))
+        self.SetSize(wx.Size(Environment.settings.get('size', (500, 800))))
+        self.Maximize(Environment.settings.get('maximized', True))
+        self.SetPosition(wx.Point(Environment.settings.get('position', (0, 0))))
 
         self.__main_panel = wx.ScrolledWindow(self, style=wx.HSCROLL | wx.VSCROLL)
         self.__main_panel.SetScrollbars(15, 15, 50, 50)
@@ -251,7 +251,7 @@ class MainWindow(wx.Frame, PluginInterface):
             self.__progress_window = None
 
     def get_settings(self) -> dict:
-        return Settings.settings.setdefault('Plugin', {})
+        return Environment.settings.setdefault('Plugin', {})
 
     def __exception_handler(self, exc_type, value, trace):
         import traceback
@@ -262,12 +262,7 @@ class MainWindow(wx.Frame, PluginInterface):
         exception_str = f'{message}\n\n{trace}'
         wx.MessageBox(message, 'Error', wx.OK | wx.ICON_ERROR, parent=self)
         self._status_bar.SetStatusText(f'Error: {value}')
-        try:
-            with open('error_log.txt', 'a+') as f:
-                import datetime
-                f.write(f'{datetime.datetime.now()}: {exception_str}\n\n')
-        finally:
-            pass
+        Environment.log_error(exception_str)
 
     # noinspection PyUnusedLocal
     def __about_item_event(self, e):
@@ -291,10 +286,10 @@ https://github.com/eerimoq/asn1tools
 
     # noinspection PyUnusedLocal
     def close(self, e: wx.Event):
-        Settings.settings['size'] = (self.GetSize().Get())
-        Settings.settings['maximized'] = self.IsMaximized()
-        Settings.settings['position'] = self.GetPosition().Get()
+        Environment.settings['size'] = (self.GetSize().Get())
+        Environment.settings['maximized'] = self.IsMaximized()
+        Environment.settings['position'] = self.GetPosition().Get()
 
-        Settings.save()
+        Environment.save()
 
         self.Destroy()

@@ -3,7 +3,7 @@ from typing import Callable, Optional, List, Union
 
 import wx
 
-from . import Settings
+from . import Environment
 
 
 class FilePickerHandler:
@@ -17,7 +17,7 @@ class FilePickerHandler:
     def on_menu_click(self, e: wx.Event):
         del e
         with self.__file_dialog_factory() as file_dialog:
-            initial_dir = Settings.settings.get(file_dialog.GetMessage())
+            initial_dir = Environment.settings.get(file_dialog.GetMessage())
             if initial_dir is not None:
                 file_dialog.SetPath(initial_dir + '/')
             if file_dialog.ShowModal() == wx.ID_CANCEL:
@@ -26,7 +26,7 @@ class FilePickerHandler:
                 filenames = file_dialog.GetPaths()
             else:
                 filenames = [file_dialog.GetPath()]
-            Settings.settings[file_dialog.GetMessage()] = os.path.dirname(filenames[0])
+            Environment.settings[file_dialog.GetMessage()] = os.path.dirname(filenames[0])
             filenames = filenames if len(filenames) > 1 else filenames[0]
             self.file_selected(filenames, file_dialog.GetParent())
 
