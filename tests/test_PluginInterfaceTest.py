@@ -91,13 +91,13 @@ class PluginInterfaceTest(TestCase):
             plugin.plugin_interface.show_progress('Test', 100)
             ProgressDialog.assert_called_once()
 
-            plugin.plugin_interface.update_progress(False, 3)
-            instance.Update.assert_called_once_with(3)
+            plugin.plugin_interface.update_progress(None, False, 3)
+            instance.Update.assert_called_once_with(3, newmsg=None)
 
-            plugin.plugin_interface.update_progress(False)
+            plugin.plugin_interface.update_progress(None, False)
             instance.Pulse.assert_called_once()
 
-            plugin.plugin_interface.update_progress(True)
+            plugin.plugin_interface.update_progress(None, True)
             instance.Close.assert_called_once()
 
         app.Destroy()

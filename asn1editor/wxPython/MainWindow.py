@@ -240,10 +240,10 @@ class MainWindow(wx.Frame, PluginInterface):
         self.__progress_window = wx.ProgressDialog(self.__plugin.get_name(), message, maximum=max_progress)
         self.__progress_window.ShowModal()
 
-    def update_progress(self, close: bool, progress: typing.Optional[int] = None):
+    def update_progress(self, message: typing.Optional[str] = None, close: bool = False, progress: typing.Optional[int] = None):
         if self.__progress_window:
             if progress is not None:
-                self.__progress_window.Update(progress)
+                self.__progress_window.Update(progress, newmsg=message)
             else:
                 self.__progress_window.Pulse()
         if close:
