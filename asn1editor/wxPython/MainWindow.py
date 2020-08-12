@@ -20,11 +20,11 @@ class MainWindow(wx.Frame, PluginInterface):
     def __init__(self, plugin: Optional[Plugin] = None, title='ASN.1 editor'):
         super(MainWindow, self).__init__(None, title=f'{title} {asn1editor.__version__}', size=(500, 800))
 
+        Settings.load()
+
         self.__plugin = plugin
         if self.__plugin is not None:
             self.__plugin.connect(self)
-
-        Settings.load()
 
         self.SetSize(wx.Size(Settings.settings.get('size', (500, 800))))
         self.Maximize(Settings.settings.get('maximized', True))
