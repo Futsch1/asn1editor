@@ -223,7 +223,10 @@ class MainWindow(wx.Frame, PluginInterface):
     def choice_entry(self, message: str, choices: typing.List[str], default: typing.Optional[str] = None) -> typing.Optional[str]:
         with wx.SingleChoiceDialog(self, message, self.__plugin.get_name(), choices=choices) as choice_dialog:
             if default is not None:
-                choice_dialog.SetSelection(choices.index(default))
+                try:
+                    choice_dialog.SetSelection(choices.index(default))
+                except ValueError:
+                    pass
             if choice_dialog.ShowModal() == wx.ID_CANCEL:
                 return
             return choice_dialog.GetStringSelection()

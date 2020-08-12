@@ -46,10 +46,10 @@ class PluginInterfaceTest(TestCase):
             instance.__enter__.return_value = instance
 
             instance.ShowModal.return_value = wx.ID_OK
-            self.assertEqual('Test', plugin.plugin_interface.choice_entry("Test my entry", ["Test", "Test2"]))
+            self.assertEqual('Test', plugin.plugin_interface.choice_entry("Test my entry", ["Test", "Test2"], "Test2"))
 
             instance.ShowModal.return_value = wx.ID_CANCEL
-            self.assertIsNone(plugin.plugin_interface.choice_entry("Test my entry", ["Test", "Test2"], "Test2"))
+            self.assertIsNone(plugin.plugin_interface.choice_entry("Test my entry", ["Test", "Test2"], "NotThere"))
 
         with patch('wx.FileDialog') as FileDialogMock:
             instance = FileDialogMock.return_value
