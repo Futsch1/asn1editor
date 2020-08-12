@@ -38,7 +38,7 @@ class PluginInterfaceTest(TestCase):
             self.assertEqual('Test', plugin.plugin_interface.text_entry("Test my entry"))
 
             instance.ShowModal.return_value = wx.ID_CANCEL
-            self.assertIsNone(plugin.plugin_interface.text_entry("Test my entry"))
+            self.assertIsNone(plugin.plugin_interface.text_entry("Test my entry", "Default"))
 
         with patch('wx.SingleChoiceDialog') as SingleChoiceDialogMock:
             instance = SingleChoiceDialogMock.return_value
@@ -49,7 +49,7 @@ class PluginInterfaceTest(TestCase):
             self.assertEqual('Test', plugin.plugin_interface.choice_entry("Test my entry", ["Test", "Test2"]))
 
             instance.ShowModal.return_value = wx.ID_CANCEL
-            self.assertIsNone(plugin.plugin_interface.choice_entry("Test my entry", ["Test", "Test2"]))
+            self.assertIsNone(plugin.plugin_interface.choice_entry("Test my entry", ["Test", "Test2"], "Test2"))
 
         with patch('wx.FileDialog') as FileDialogMock:
             instance = FileDialogMock.return_value
@@ -83,6 +83,22 @@ class PluginInterfaceTest(TestCase):
         with patch('wx.MessageBox') as MessageBox:
             plugin.plugin_interface.show_message('Test', asn1editor.PluginInterface.MessageType.ERROR)
             MessageBox.assert_called_once()
+
+        with patch('wx.ProgressDialog') as ProgressDialog:
+            instance = ProgressDialog.return_value
+            instance.__enter__.return_value = instance
+
+            plugin.plugin_interface.show_progress('Test', 100)
+            ProgressDialog.assert_called_once()
+
+            plugin.plugin_interface.update_progress(False, 3)
+            instance.Update.assert_called_once_with(3)
+
+            plugin.plugin_interface.update_progress(False)
+            instance.Pulse.assert_called_once()
+
+            plugin.plugin_interface.update_progress(True)
+            instance.Close.assert_called_once()
 
         app.Destroy()
 

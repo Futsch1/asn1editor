@@ -75,20 +75,22 @@ class PluginInterface:  # pragma: no cover
         """
         raise NotImplementedError
 
-    def text_entry(self, message: str) -> typing.Optional[str]:
+    def text_entry(self, message: str, default: typing.Optional[str] = None) -> typing.Optional[str]:
         """
         Queries a text from the user.
 
         :param message: Message to show to the user
+        :param default: Default value for the text entry
         """
         raise NotImplementedError
 
-    def choice_entry(self, message: str, choices: typing.List[str]) -> typing.Optional[str]:
+    def choice_entry(self, message: str, choices: typing.List[str], default: typing.Optional[str] = None) -> typing.Optional[str]:
         """
         Queries the user for a choice of values.
 
         :param message: Message to show to the user
         :param choices: List of strings for the user to choose from
+        :param default: Default selection
         """
         raise NotImplementedError
 
@@ -114,5 +116,23 @@ class PluginInterface:  # pragma: no cover
         Get a settings dictionary for a plugin to store persistent data
 
         :return: Settings dict
+        """
+        raise NotImplementedError
+
+    def show_progress(self, message: str, max_progress: typing.Optional[int] = None):
+        """
+        Shows a progress window
+
+        :param message: Message to show to the user
+        :param max_progress: Maximum progress value
+        """
+        raise NotImplementedError
+
+    def update_progress(self, close: bool, progress: typing.Optional[int] = None):
+        """
+        Updates a shown progress window
+
+        :param close: If set, window is closed
+        :param progress: Progress to show, if none, an indeterminate process is shown
         """
         raise NotImplementedError

@@ -47,6 +47,8 @@ class MainWindow(wx.Frame, PluginInterface):
         self.__type_name = None
         self.__file_name = None
 
+        self.__progress_window = None
+
         self.bind_events()
 
         # noinspection SpellCheckingInspection
@@ -210,14 +212,18 @@ class MainWindow(wx.Frame, PluginInterface):
     def get_spec(self, codec: str):
         return self.__asn1_handler.get_compiled(codec)
 
-    def text_entry(self, message: str) -> typing.Optional[str]:
+    def text_entry(self, message: str, default: typing.Optional[str] = None) -> typing.Optional[str]:
         with wx.TextEntryDialog(self, message) as text_dialog:
+            if default is not None:
+                text_dialog.SetValue(default)
             if text_dialog.ShowModal() == wx.ID_CANCEL:
                 return
             return text_dialog.GetValue()
 
-    def choice_entry(self, message: str, choices: typing.List[str]) -> typing.Optional[str]:
-        with wx.SingleChoiceDialog(self, message, '', choices=choices) as choice_dialog:
+    def choice_entry(self, message: str, choices: typing.List[str], default: typing.Optional[str] = None) -> typing.Optional[str]:
+        with wx.SingleChoiceDialog(self, message, self.__plugin.get_name(), choices=choices) as choice_dialog:
+            if default is not None:
+                choice_dialog.SetSelection(choices.index(default))
             if choice_dialog.ShowModal() == wx.ID_CANCEL:
                 return
             return choice_dialog.GetStringSelection()
@@ -228,7 +234,21 @@ class MainWindow(wx.Frame, PluginInterface):
     def show_message(self, message: str, message_type: PluginInterface.MessageType):
         style = wx.OK | wx.CENTER | {PluginInterface.MessageType.WARNING: wx.ICON_WARNING, PluginInterface.MessageType.INFO: wx.ICON_INFORMATION,
                                      PluginInterface.MessageType.ERROR: wx.ICON_ERROR}[message_type]
-        wx.MessageBox(message, 'Plugin', style=style)
+        wx.MessageBox(message, self.__plugin.get_name(), style=style)
+
+    def show_progress(self, message: str, max_progress: typing.Optional[int] = None):
+        self.__progress_window = wx.ProgressDialog(self.__plugin.get_name(), message, maximum=max_progress)
+        self.__progress_window.ShowModal()
+
+    def update_progress(self, close: bool, progress: typing.Optional[int] = None):
+        if self.__progress_window:
+            if progress is not None:
+                self.__progress_window.Update(progress)
+            else:
+                self.__progress_window.Pulse()
+        if close:
+            self.__progress_window.Close()
+            self.__progress_window = None
 
     def get_settings(self) -> dict:
         return Settings.settings.setdefault('Plugin', {})
