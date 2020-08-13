@@ -17,8 +17,8 @@ from asn1editor.wxPython.Resources import resource_path
 
 
 class MainWindow(wx.Frame, PluginInterface):
-    def __init__(self, plugin: Optional[Plugin] = None, title='ASN.1 editor'):
-        super(MainWindow, self).__init__(None, title=f'{title} {asn1editor.__version__}', size=(500, 800))
+    def __init__(self, plugin: Optional[Plugin] = None, title=f'ASN.1 editor {asn1editor.__version__}'):
+        super(MainWindow, self).__init__(None, title=title, size=(500, 800))
 
         Environment.load()
 
