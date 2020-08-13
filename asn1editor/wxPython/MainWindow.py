@@ -240,8 +240,7 @@ class MainWindow(wx.Frame, PluginInterface):
         wx.MessageBox(message, self.__plugin.get_name(), style=style)
 
     def show_progress(self, message: str, max_progress: typing.Optional[int] = None):
-        self.__progress_window = wx.ProgressDialog(self.__plugin.get_name(), message, maximum=max_progress)
-        self.__progress_window.ShowModal()
+        self.__progress_window = wx.ProgressDialog(self.__plugin.get_name(), message, maximum=max_progress if max_progress else 100)
 
     def update_progress(self, message: typing.Optional[str] = None, close: bool = False, progress: typing.Optional[int] = None):
         if self.__progress_window:
