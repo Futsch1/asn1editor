@@ -128,12 +128,13 @@ class PluginInterface:  # pragma: no cover
         """
         raise NotImplementedError
 
-    def update_progress(self, message: typing.Optional[str] = None, close: bool = False, progress: typing.Optional[int] = None):
+    def update_progress(self, message: typing.Optional[str] = None, close: bool = False, progress: typing.Optional[int] = None) -> bool:
         """
         Updates a shown progress window
 
         :param message: Updated message to show to the user, optional
         :param close: If set, window is closed, optional
         :param progress: Progress to show, if none, an indeterminate process is shown, optional
+        :return: False if progress window has been canceled, otherwise false
         """
         raise NotImplementedError

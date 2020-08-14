@@ -47,7 +47,7 @@ class MainWindow(wx.Frame, PluginInterface):
         self.__type_name = None
         self.__file_name = None
 
-        self.__progress_window = None
+        self.__progress_window: typing.Optional[wx.ProgressDialog] = None
 
         self.bind_events()
 
@@ -240,17 +240,20 @@ class MainWindow(wx.Frame, PluginInterface):
         wx.MessageBox(message, self.__plugin.get_name(), style=style)
 
     def show_progress(self, message: str, max_progress: typing.Optional[int] = None):
-        self.__progress_window = wx.ProgressDialog(self.__plugin.get_name(), message, maximum=max_progress if max_progress else 100)
+        self.__progress_window = wx.ProgressDialog(self.__plugin.get_name(), message, maximum=max_progress if max_progress else 100, style=wx.PD_APP_MODAL | wx.PD_CAN_ABORT)
 
-    def update_progress(self, message: typing.Optional[str] = None, close: bool = False, progress: typing.Optional[int] = None):
+    def update_progress(self, message: typing.Optional[str] = None, close: bool = False, progress: typing.Optional[int] = None) -> bool:
+        running = False
         if self.__progress_window:
             if progress is not None:
-                self.__progress_window.Update(progress, newmsg=message)
+                running = self.__progress_window.Update(progress, newmsg=message)[0]
             else:
-                self.__progress_window.Pulse()
+                running = self.__progress_window.Pulse()[0]
         if close:
             self.__progress_window.Close()
             self.__progress_window = None
+
+        return running
 
     def get_settings(self) -> dict:
         return Environment.settings.setdefault('Plugin', {})

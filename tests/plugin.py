@@ -46,6 +46,17 @@ class TestPlugin(Plugin):
         self.plugin_interface.show_progress('Test', 10)
         for i in range(10):
             time.sleep(0.5)
-            self.plugin_interface.update_progress(f'Test {i}', progress=i)
+            running = self.plugin_interface.update_progress(f'Test {i}', progress=i)
+            if not running:
+                self.plugin_interface.show_status('Closed')
+
+        self.plugin_interface.update_progress('Done', close=True)
+
+        self.plugin_interface.show_progress('Test2')
+        for i in range(10):
+            time.sleep(0.5)
+            running = self.plugin_interface.update_progress(f'Test2 {i}')
+            if not running:
+                self.plugin_interface.show_status('Closed2')
 
         self.plugin_interface.update_progress('Done', close=True)

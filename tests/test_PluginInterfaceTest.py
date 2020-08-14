@@ -87,14 +87,16 @@ class PluginInterfaceTest(TestCase):
         with patch('wx.ProgressDialog') as ProgressDialog:
             instance = ProgressDialog.return_value
             instance.__enter__.return_value = instance
+            instance.Update.return_value = (True, False)
+            instance.Pulse.return_value = (False, True)
 
             plugin.plugin_interface.show_progress('Test', 100)
             ProgressDialog.assert_called_once()
 
-            plugin.plugin_interface.update_progress(None, False, 3)
+            self.assertTrue(plugin.plugin_interface.update_progress(None, False, 3))
             instance.Update.assert_called_once_with(3, newmsg=None)
 
-            plugin.plugin_interface.update_progress(None, False)
+            self.assertFalse(plugin.plugin_interface.update_progress(None, False))
             instance.Pulse.assert_called_once()
 
             plugin.plugin_interface.update_progress(None, True)
