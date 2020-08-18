@@ -16,7 +16,8 @@ class TestPlugin(Plugin):
                 ('DirDialog', self.__open_dir_dialog),
                 ('TextEntry', self.__open_text_entry),
                 ('ChoiceEntry', self.__open_choice_entry),
-                ('ProgressDialog', self.__open_progress_dialog)]
+                ('ProgressDialog', self.__open_progress_dialog),
+                ('Question', self.__open_question)]
 
     def connect(self, plugin_interface: PluginInterface):
         self.plugin_interface = plugin_interface
@@ -60,3 +61,6 @@ class TestPlugin(Plugin):
                 self.plugin_interface.show_status('Closed2')
 
         self.plugin_interface.update_progress('Done', close=True)
+
+    def __open_question(self):
+        self.plugin_interface.show_status(str(self.plugin_interface.show_message('Test?', PluginInterface.MessageType.QUESTION)))

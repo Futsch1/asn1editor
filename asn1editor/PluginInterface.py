@@ -10,6 +10,7 @@ class PluginInterface:  # pragma: no cover
         INFO = 1
         WARNING = 2
         ERROR = 3
+        QUESTION = 4
 
     def load_spec(self, file_name: str, type_name: typing.Optional[str] = None):
         """
@@ -34,26 +35,28 @@ class PluginInterface:  # pragma: no cover
         Encodes the data currently edited in the editor window with an ASN.1 codec.
 
         :param codec: Codec to use for encoding (reference asn1tools which ones are supported)
+
+        :return: Encoded data
         """
         raise NotImplementedError
 
     def get_spec_filename(self) -> typing.Optional[str]:
         """
-        Returns the file name of the ASN.1 specification file currently loaded.
+        :return: The file name of the ASN.1 specification file currently loaded.
         """
         raise NotImplementedError
 
     def get_spec(self, codec: str) -> asn1tools.compiler.Specification:
         """
-        Returns the compiled ASN.1 specification as an object defined by asn1tools.
-
         :param codec: Codec to use (reference asn1tools which ones are supported)
+
+        :return: The compiled ASN.1 specification as an object defined by asn1tools.
         """
         raise NotImplementedError
 
     def get_typename(self) -> typing.Optional[str]:
         """
-        Returns the name of the currently used type name in the editor.
+        :return: The name of the currently used type name in the editor.
         """
         raise NotImplementedError
 
@@ -64,6 +67,8 @@ class PluginInterface:  # pragma: no cover
         :param message: Message to show in the file picker
         :param wildcard: Wildcards to offer the user in order to help him choose the correct file types
         :param open_: Flag if the dialog shall be an open dialog (True) or a save dialog (false)
+
+        :return: Selected file, None if cancelled
         """
         raise NotImplementedError
 
@@ -72,6 +77,8 @@ class PluginInterface:  # pragma: no cover
         Opens a dir picker where the user can choose a directory name and returns this chosen name.
 
         :param message: Message to show in the dir picker
+
+        :return: Selected directory, None if cancelled
         """
         raise NotImplementedError
 
@@ -81,6 +88,8 @@ class PluginInterface:  # pragma: no cover
 
         :param message: Message to show to the user
         :param default: Default value for the text entry
+
+        :return: Entered text, None if cancelled
         """
         raise NotImplementedError
 
@@ -91,15 +100,19 @@ class PluginInterface:  # pragma: no cover
         :param message: Message to show to the user
         :param choices: List of strings for the user to choose from
         :param default: Default selection
+
+        :return: Selected string, None if cancelled
         """
         raise NotImplementedError
 
-    def show_message(self, message: str, message_type: MessageType):
+    def show_message(self, message: str, message_type: MessageType) -> bool:
         """
         Shows a status message.
 
         :param message: Message to show to the user
         :param message_type: Type of message box
+
+        :return: If type is a question, True means yes and False means No
         """
         raise NotImplementedError
 
@@ -135,6 +148,7 @@ class PluginInterface:  # pragma: no cover
         :param message: Updated message to show to the user, optional
         :param close: If set, window is closed, optional
         :param progress: Progress to show, if none, an indeterminate process is shown, optional
-        :return: False if progress window has been canceled, otherwise false
+
+        :return: False if progress window has been canceled, otherwise True
         """
         raise NotImplementedError

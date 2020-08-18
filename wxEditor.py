@@ -2,7 +2,7 @@ import argparse
 
 import wx
 
-import tests.plugin
+import tests.TestPlugin
 from asn1editor.wxPython.MainWindow import MainWindow
 
 if __name__ == "__main__":
@@ -17,7 +17,7 @@ if __name__ == "__main__":
     app = wx.App()
 
     if args.test:
-        frame = MainWindow(tests.plugin.TestPlugin())
+        frame = MainWindow(tests.TestPlugin.TestPlugin())
     else:
         frame = MainWindow()
     if args.asn1spec is not None:

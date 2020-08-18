@@ -84,6 +84,13 @@ class PluginInterfaceTest(TestCase):
             plugin.plugin_interface.show_message('Test', asn1editor.PluginInterface.MessageType.ERROR)
             MessageBox.assert_called_once()
 
+        with patch('wx.MessageBox') as MessageBox:
+            MessageBox.return_value = wx.YES
+            self.assertTrue(plugin.plugin_interface.show_message('Question', asn1editor.PluginInterface.MessageType.QUESTION))
+
+            MessageBox.return_value = wx.NO
+            self.assertFalse(plugin.plugin_interface.show_message('Question', asn1editor.PluginInterface.MessageType.QUESTION))
+
         with patch('wx.ProgressDialog') as ProgressDialog:
             instance = ProgressDialog.return_value
             instance.__enter__.return_value = instance

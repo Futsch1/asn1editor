@@ -234,10 +234,13 @@ class MainWindow(wx.Frame, PluginInterface):
     def show_status(self, message: str):
         self._status_bar.SetStatusText(message)
 
-    def show_message(self, message: str, message_type: PluginInterface.MessageType):
-        style = wx.OK | wx.CENTER | {PluginInterface.MessageType.WARNING: wx.ICON_WARNING, PluginInterface.MessageType.INFO: wx.ICON_INFORMATION,
-                                     PluginInterface.MessageType.ERROR: wx.ICON_ERROR}[message_type]
-        wx.MessageBox(message, self.__plugin.get_name(), style=style)
+    def show_message(self, message: str, message_type: PluginInterface.MessageType) -> bool:
+        style = wx.CENTER | {PluginInterface.MessageType.WARNING: wx.OK | wx.ICON_WARNING,
+                             PluginInterface.MessageType.INFO: wx.OK | wx.ICON_INFORMATION,
+                             PluginInterface.MessageType.ERROR: wx.OK | wx.ICON_ERROR,
+                             PluginInterface.MessageType.QUESTION: wx.YES_NO | wx.ICON_QUESTION}[message_type]
+        ret = wx.MessageBox(message, self.__plugin.get_name(), style=style)
+        return True if message_type != PluginInterface.MessageType.QUESTION else wx.YES == ret
 
     def show_progress(self, message: str, max_progress: typing.Optional[int] = None):
         self.__progress_window = wx.ProgressDialog(self.__plugin.get_name(), message, maximum=max_progress if max_progress else 100, style=wx.PD_APP_MODAL | wx.PD_CAN_ABORT)
