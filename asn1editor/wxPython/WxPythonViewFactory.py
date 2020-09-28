@@ -163,7 +163,7 @@ class WxPythonViewFactory(AbstractViewFactory):
 
         return view, view, view if optional else None
 
-    def get_bitstring_view(self, name: str, number_of_bits: int, named_bits: List[Tuple[int, str]], optional: bool) -> Tuple[AbstractView, BitstringInterface,
+    def get_bitstring_view(self, name: str, number_of_bits: int, named_bits: List[Tuple[str, int]], optional: bool) -> Tuple[AbstractView, BitstringInterface,
                                                                                                                              OptionalInterface]:
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         optional_control = self._add_name_control(sizer, name, optional, icon='bitstring')
@@ -172,7 +172,7 @@ class WxPythonViewFactory(AbstractViewFactory):
 
         bits_sizer = wx.StaticBoxSizer(wx.VERTICAL, self._window, "Bits")
         if named_bits:
-            for bit, name in named_bits:
+            for name, bit in named_bits:
                 bit_checkbox = wx.CheckBox(self._window, label=f"{bit}: {name}")
                 bits_sizer.Add(bit_checkbox)
                 checkboxes.append((bit, bit_checkbox))
