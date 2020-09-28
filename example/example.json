@@ -1,16 +1,22 @@
 {
-  "example1": {
-    "member1": 1000,
-    "member2": -100
-  },
-  "boolExample": false,
-  "realExample": 0.0,
-  "enumerated": "enum1",
-  "bitString": "000000",
-  "octetString": "20202020",
-  "visibleString": "Super",
-  "utf8String": "\u00e4\u00f6",
-  "choiceExample": {
-    "exampleInt": 0
-  }
+    "null": null,
+    "example1": {
+        "member1": 1000,
+        "member2": -100
+    },
+    "boolExample": false,
+    "realExample": 0.0,
+    "enumerated": "enum1",
+    "bitString": "000000",
+    "octetString": "61626364",
+    "visibleString": "     ",
+    "utf8String": "\u00e4\u00f6",
+    "choiceExample": {
+        "exampleList": [
+            0,
+            0,
+            0,
+            0
+        ]
+    }
 }

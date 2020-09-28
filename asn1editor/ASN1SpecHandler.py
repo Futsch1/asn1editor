@@ -1,6 +1,8 @@
 import glob
+import json
 import os
 import re
+import xml
 from typing import List, Tuple, Dict, Union
 
 import asn1tools
@@ -81,7 +83,14 @@ class ASN1SpecHandler:
             return self.get_model_from_data(f.read(), self.__get_codec(file_name))
 
     def save_data_file(self, file_name: str, model: Dict):
-        data = self.get_data_from_model(model, self.__get_codec(file_name))
+        codec = self.__get_codec(file_name)
+        data = self.get_data_from_model(model, codec)
+        # Pretty printing of JSON or XML files
+        if codec == 'jer':
+            data = json.dumps(json.loads(data), indent=4).encode()
+        if codec == 'xer':
+            dom = xml.dom.minidom.parseString(data)
+            data = dom.toprettyxml().encode()
         with open(file_name, 'wb') as f:
             f.write(data)
 
