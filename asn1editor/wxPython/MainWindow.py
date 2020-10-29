@@ -1,6 +1,5 @@
 import sys
 import typing
-from typing import Optional
 
 import asn1tools
 import wx
@@ -17,14 +16,15 @@ from asn1editor.wxPython.Resources import resource_path
 
 
 class MainWindow(wx.Frame, PluginInterface):
-    def __init__(self, plugin: Optional[Plugin] = None, title=f'ASN.1 editor {asn1editor.__version__}'):
+    def __init__(self, plugins: typing.Optional[typing.List[Plugin]] = None, title=f'ASN.1 editor {asn1editor.__version__}'):
         super(MainWindow, self).__init__(None, title=title, size=(500, 800))
 
         Environment.load()
 
-        self.__plugin = plugin
-        if self.__plugin is not None:
-            self.__plugin.connect(self)
+        self.__plugins = plugins
+        if self.__plugins is not None:
+            for plugin in self.__plugins:
+                plugin.connect(self)
 
         self.SetSize(wx.Size(Environment.settings.get('size', (500, 800))))
         self.Maximize(Environment.settings.get('maximized', True))
@@ -79,20 +79,22 @@ class MainWindow(wx.Frame, PluginInterface):
         self.__exit_item.SetBitmap(image.ConvertToBitmap(width=16, height=16))
         menu_bar.Append(file_menu, '&File')
 
-        if self.__plugin is not None:
-            plugin_menu = wx.Menu()
-            menus = self.__plugin.get_menus()
-            for i, menu in enumerate(menus):
-                if not len(menu[0]):
-                    plugin_menu.AppendSeparator()
-                else:
-                    menu_item: wx.MenuItem = plugin_menu.Append(i, menu[0])
-                    if menu[1] is not None:
-                        self.Bind(wx.EVT_MENU, self.__plugin_menu_event, menu_item)
-                    else:
-                        menu_item.Enable(False)
+        if self.__plugins is not None:
 
-            menu_bar.Append(plugin_menu, self.__plugin.get_name())
+            for plugin_index, plugin in enumerate(self.__plugins):
+                plugin_menu = wx.Menu()
+                menus = plugin.get_menus()
+                for i, menu in enumerate(menus):
+                    if not len(menu[0]):
+                        plugin_menu.AppendSeparator()
+                    else:
+                        menu_item: wx.MenuItem = plugin_menu.Append(plugin_index * 1000 + i, menu[0])
+                        if menu[1] is not None:
+                            self.Bind(wx.EVT_MENU, self.__plugin_menu_event, menu_item)
+                        else:
+                            menu_item.Enable(False)
+
+                menu_bar.Append(plugin_menu, plugin.get_name())
 
         help_menu = wx.Menu()
         about_item = help_menu.Append(wx.ID_ABOUT, 'About')
@@ -102,7 +104,8 @@ class MainWindow(wx.Frame, PluginInterface):
         self.SetMenuBar(menu_bar)
 
     def __plugin_menu_event(self, e):
-        self.__plugin.get_menus()[e.GetId()][1]()
+        plugin_index = e.GetId() // 1000
+        self.__plugins[plugin_index].get_menus()[e.GetId() % 1000][1]()
 
     def bind_events(self):
         def schema_dialog_constructor() -> wx.FileDialog:
@@ -131,7 +134,7 @@ class MainWindow(wx.Frame, PluginInterface):
 
         self.Bind(wx.EVT_CLOSE, self.close, self)
 
-    def load_spec(self, file_name: str, type_name: Optional[str] = None):
+    def load_spec(self, file_name: str, type_name: typing.Optional[str] = None):
         # Spec file loaded, compile it to show a selection of type names
         if not self.__asn1_handler or file_name not in self.__asn1_handler.get_filename():
             self.__asn1_handler = ASN1SpecHandler(file_name)
@@ -220,8 +223,8 @@ class MainWindow(wx.Frame, PluginInterface):
                 return
             return text_dialog.GetValue()
 
-    def choice_entry(self, message: str, choices: typing.List[str], default: typing.Optional[str] = None) -> typing.Optional[str]:
-        with wx.SingleChoiceDialog(self, message, self.__plugin.get_name(), choices=choices) as choice_dialog:
+    def choice_entry(self, message: str, caption: str, choices: typing.List[str], default: typing.Optional[str] = None) -> typing.Optional[str]:
+        with wx.SingleChoiceDialog(self, message, caption, choices=choices) as choice_dialog:
             if default is not None:
                 try:
                     choice_dialog.SetSelection(choices.index(default))
@@ -234,16 +237,16 @@ class MainWindow(wx.Frame, PluginInterface):
     def show_status(self, message: str):
         self._status_bar.SetStatusText(message)
 
-    def show_message(self, message: str, message_type: PluginInterface.MessageType) -> bool:
+    def show_message(self, message: str, caption: str, message_type: PluginInterface.MessageType) -> bool:
         style = wx.CENTER | {PluginInterface.MessageType.WARNING: wx.OK | wx.ICON_WARNING,
                              PluginInterface.MessageType.INFO: wx.OK | wx.ICON_INFORMATION,
                              PluginInterface.MessageType.ERROR: wx.OK | wx.ICON_ERROR,
                              PluginInterface.MessageType.QUESTION: wx.YES_NO | wx.ICON_QUESTION}[message_type]
-        ret = wx.MessageBox(message, self.__plugin.get_name(), style=style)
+        ret = wx.MessageBox(message, caption, style=style)
         return True if message_type != PluginInterface.MessageType.QUESTION else wx.YES == ret
 
-    def show_progress(self, message: str, max_progress: typing.Optional[int] = None):
-        self.__progress_window = wx.ProgressDialog(self.__plugin.get_name(), message, maximum=max_progress if max_progress else 100, style=wx.PD_APP_MODAL | wx.PD_CAN_ABORT)
+    def show_progress(self, message: str, caption: str, max_progress: typing.Optional[int] = None):
+        self.__progress_window = wx.ProgressDialog(caption, message, maximum=max_progress if max_progress else 100, style=wx.PD_APP_MODAL | wx.PD_CAN_ABORT)
 
     def update_progress(self, message: typing.Optional[str] = None, close: bool = False, progress: typing.Optional[int] = None) -> bool:
         running = False

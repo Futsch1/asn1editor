@@ -17,7 +17,7 @@ if __name__ == "__main__":
     app = wx.App()
 
     if args.test:
-        frame = MainWindow(tests.TestPlugin.TestPlugin())
+        frame = MainWindow([tests.TestPlugin.TestPlugin(), tests.TestPlugin.TestPlugin(" 2")])
     else:
         frame = MainWindow()
     if args.asn1spec is not None:

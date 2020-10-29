@@ -5,11 +5,12 @@ from asn1editor import Plugin, PluginInterface
 
 
 class TestPlugin(Plugin):
-    def __init__(self):
+    def __init__(self, instance=''):
         self.plugin_interface: typing.Optional[PluginInterface] = None
+        self.instance = instance
 
     def get_name(self) -> str:
-        return 'Test'
+        return 'Test' + self.instance
 
     def get_menus(self) -> typing.List[typing.Tuple[str, typing.Callable]]:
         return [('FileDialog', self.__open_file_dialog),
@@ -37,14 +38,14 @@ class TestPlugin(Plugin):
         self.plugin_interface.show_status(str(ret))
 
     def __open_choice_entry(self):
-        ret = self.plugin_interface.choice_entry('Test', ['1', '2', '3'], '2')
+        ret = self.plugin_interface.choice_entry('Test', 'TestC', ['1', '2', '3'], '2')
         self.plugin_interface.show_status(str(ret))
 
-        ret = self.plugin_interface.choice_entry('Test', ['1', '2', '3'], '4')
+        ret = self.plugin_interface.choice_entry('Test', 'TestC', ['1', '2', '3'], '4')
         self.plugin_interface.show_status(str(ret))
 
     def __open_progress_dialog(self):
-        self.plugin_interface.show_progress('Test', 10)
+        self.plugin_interface.show_progress('Test', 'TestC', 10)
         for i in range(10):
             time.sleep(0.5)
             running = self.plugin_interface.update_progress(f'Test {i}', progress=i)
@@ -53,7 +54,7 @@ class TestPlugin(Plugin):
 
         self.plugin_interface.update_progress('Done', close=True)
 
-        self.plugin_interface.show_progress('Test2')
+        self.plugin_interface.show_progress('Test2', 'TestC')
         for i in range(10):
             time.sleep(0.5)
             running = self.plugin_interface.update_progress(f'Test2 {i}')
@@ -63,4 +64,4 @@ class TestPlugin(Plugin):
         self.plugin_interface.update_progress('Done', close=True)
 
     def __open_question(self):
-        self.plugin_interface.show_status(str(self.plugin_interface.show_message('Test?', PluginInterface.MessageType.QUESTION)))
+        self.plugin_interface.show_status(str(self.plugin_interface.show_message('Test?', 'TestC', PluginInterface.MessageType.QUESTION)))

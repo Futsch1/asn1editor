@@ -93,11 +93,12 @@ class PluginInterface:  # pragma: no cover
         """
         raise NotImplementedError
 
-    def choice_entry(self, message: str, choices: typing.List[str], default: typing.Optional[str] = None) -> typing.Optional[str]:
+    def choice_entry(self, message: str, caption: str, choices: typing.List[str], default: typing.Optional[str] = None) -> typing.Optional[str]:
         """
         Queries the user for a choice of values.
 
         :param message: Message to show to the user
+        :param caption: Message box caption
         :param choices: List of strings for the user to choose from
         :param default: Default selection
 
@@ -105,11 +106,12 @@ class PluginInterface:  # pragma: no cover
         """
         raise NotImplementedError
 
-    def show_message(self, message: str, message_type: MessageType) -> bool:
+    def show_message(self, message: str, caption: str, message_type: MessageType) -> bool:
         """
         Shows a status message.
 
         :param message: Message to show to the user
+        :param caption: Message box caption
         :param message_type: Type of message box
 
         :return: If type is a question, True means yes and False means No
@@ -132,11 +134,12 @@ class PluginInterface:  # pragma: no cover
         """
         raise NotImplementedError
 
-    def show_progress(self, message: str, max_progress: typing.Optional[int] = None):
+    def show_progress(self, message: str, caption: str, max_progress: typing.Optional[int] = None):
         """
         Shows a progress window
 
         :param message: Message to show to the user
+        :param caption: Message box caption
         :param max_progress: Maximum progress value
         """
         raise NotImplementedError
