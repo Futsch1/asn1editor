@@ -14,6 +14,7 @@ from asn1editor.wxPython import Environment
 from asn1editor.wxPython import WxPythonViewFactory
 from asn1editor.wxPython.FilePickerHandler import FilePickerHandler
 from asn1editor.wxPython.Resources import resource_path
+from asn1editor.wxPython.SingleFileDropTarget import SingleFileDropTarget
 from asn1editor.wxPython.Styler import Styler
 
 
@@ -52,6 +53,8 @@ class MainWindow(wx.Frame, PluginInterface):
         self.__progress_window: typing.Optional[wx.ProgressDialog] = None
 
         self.bind_events()
+
+        self.SetDropTarget(SingleFileDropTarget(self.__file_dropped))
 
         # noinspection SpellCheckingInspection
         sys.excepthook = self.__exception_handler
@@ -108,6 +111,12 @@ class MainWindow(wx.Frame, PluginInterface):
     def __plugin_menu_event(self, e):
         plugin_index = e.GetId() // 1000
         self.__plugins[plugin_index].get_menus()[e.GetId() % 1000][1]()
+
+    def __file_dropped(self, file_name: str):
+        if self.__asn1_handler is not None:
+            self.load_data_from_file(file_name)
+        else:
+            self.load_spec(file_name)
 
     def bind_events(self):
         def schema_dialog_constructor() -> wx.FileDialog:
