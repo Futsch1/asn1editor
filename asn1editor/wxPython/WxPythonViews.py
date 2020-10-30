@@ -58,6 +58,7 @@ class WxPythonValueView(WxPythonView, ValueInterface):
         # noinspection PyUnusedLocal
         def event_closure(e: wx.Event):
             del e
+            self.__update_tooltip()
             callback()
 
         if self._value_control is not None:
@@ -68,9 +69,16 @@ class WxPythonValueView(WxPythonView, ValueInterface):
 
     def set_value(self, val: str):
         self._value_control.SetValue(val)
+        self.__update_tooltip()
 
     def enable(self, enabled: bool):
         self._value_control.Enable(enabled)
+
+    def __update_tooltip(self):
+        if isinstance(self.get_value(), str) and len(self.get_value()) > 10:
+            previous_tooltip = self._value_control.GetToolTip().GetTip().split('\n')
+            previous_tooltip = previous_tooltip[-1]
+            self._value_control.SetToolTip('\n'.join([self.get_value(), previous_tooltip]))
 
 
 class WxPythonValueSelectionView(WxPythonView, ValueInterface):
