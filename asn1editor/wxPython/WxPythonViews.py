@@ -176,7 +176,7 @@ class WxPythonHexStringView(WxPythonView, ValueInterface):
         if len(self.get_value()) > 10:
             previous_tooltip = self._value_control.GetToolTip().GetTip().split('\n')
             previous_tooltip = previous_tooltip[-1]
-            self._value_control.SetToolTip('\n'.join([self.get_value(), previous_tooltip]))
+            self._value_control.SetToolTip('\n'.join([str(self.get_value()), previous_tooltip]))
 
     def get_value(self) -> bytes:
         return self._real_value
