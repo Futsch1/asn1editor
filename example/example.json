@@ -18,5 +18,8 @@
             0,
             0
         ]
+    },
+    "optionalChoice": {
+        "exampleInt2": 22
     }
 }

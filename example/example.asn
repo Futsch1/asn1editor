@@ -19,7 +19,11 @@ Sequence ::= SEQUENCE
         sequence            SubSequence,
         exampleInt          INTEGER (0..255),
         exampleList         SEQUENCE(SIZE(4)) OF INTEGER(0..255)
-    } DEFAULT exampleList
+    } DEFAULT exampleList,
+    optionalChoice      CHOICE {
+        exampleInt1         INTEGER (0..255),
+        exampleInt2         INTEGER (0..255)
+    } OPTIONAL
 }
 
 SubSequence ::= SEQUENCE

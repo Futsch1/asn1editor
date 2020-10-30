@@ -2,7 +2,7 @@ import glob
 import json
 import os
 import re
-import xml
+import xml.dom.minidom
 from typing import List, Tuple, Dict, Union
 
 import asn1tools

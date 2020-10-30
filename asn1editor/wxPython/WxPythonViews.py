@@ -19,7 +19,7 @@ class WxPythonView(AbstractView, OptionalInterface):
         def event_closure(e: wx.Event):
             del e
             callback()
-            self._enable(self.get_has_value())
+            self.enable(self.get_has_value())
 
         if self._optional_control is not None:
             self._optional_control.Bind(wx.EVT_CHECKBOX, event_closure)
@@ -36,12 +36,12 @@ class WxPythonView(AbstractView, OptionalInterface):
     def set_has_value(self, val: bool):
         if self._optional_control:
             self._optional_control.SetValue(val)
-            self._enable(val)
+            self.enable(val)
 
     def realize(self) -> wx.Sizer:
         return self._sizer
 
-    def _enable(self, enabled: bool):
+    def enable(self, enabled: bool):
         raise NotImplementedError
 
     def destroy(self):
@@ -69,7 +69,7 @@ class WxPythonValueView(WxPythonView, ValueInterface):
     def set_value(self, val: str):
         self._value_control.SetValue(val)
 
-    def _enable(self, enabled: bool):
+    def enable(self, enabled: bool):
         self._value_control.Enable(enabled)
 
 
@@ -94,7 +94,7 @@ class WxPythonValueSelectionView(WxPythonView, ValueInterface):
     def set_value(self, val: str):
         self._value_control.SetStringSelection(val)
 
-    def _enable(self, enabled: bool):
+    def enable(self, enabled: bool):
         self._value_control.Enable(enabled)
 
 
@@ -170,7 +170,7 @@ class WxPythonHexStringView(WxPythonView, ValueInterface):
         self._real_value = val
         self._update_control()
 
-    def _enable(self, enabled: bool):
+    def enable(self, enabled: bool):
         self._value_control.Enable(enabled)
 
     def _is_hex(self) -> bool:
@@ -203,7 +203,7 @@ class WxPythonBooleanView(WxPythonView, ValueInterface):
     def set_value(self, val: bool):
         self._value_control.SetValue(val)
 
-    def _enable(self, enabled: bool):
+    def enable(self, enabled: bool):
         self._value_control.Enable(enabled)
 
 
@@ -219,7 +219,7 @@ class WxPythonContainerView(WxPythonView, ContainerView):
         if not self.get_has_value():
             self._sizer.Hide(view._sizer, recursive=True)
 
-    def _enable(self, enabled: bool):
+    def enable(self, enabled: bool):
         if enabled:
             for child in self._children:
                 self._sizer.Show(child, recursive=True)
@@ -252,7 +252,7 @@ class WxPythonListView(WxPythonView, ListView, ValueInterface):
     def set_value(self, val: str):
         self._num_control.SetValue(val)
 
-    def _enable(self, enabled: bool):
+    def enable(self, enabled: bool):
         self._num_control.Enable(enabled)
         if enabled:
             for child in self._children:
@@ -293,8 +293,10 @@ class WxPythonChoiceView(WxPythonView, ChoiceView, ValueInterface):
     def set_value(self, val: str):
         self._choice_control.SetStringSelection(val)
 
-    def _enable(self, enabled: bool):
+    def enable(self, enabled: bool):
         self._choice_control.Enable(enabled)
+        if self._view is not None:
+            self._view.enable(enabled)
 
     def set_view(self, view: WxPythonView):
         if self._view is not None:
@@ -304,13 +306,16 @@ class WxPythonChoiceView(WxPythonView, ChoiceView, ValueInterface):
         self._view = view
         self._sizer.Layout()
 
+        if not self._choice_control.Enabled:
+            self._view.enable(False)
+
 
 class WxPythonBitstringView(WxPythonView, BitstringInterface):
     def __init__(self, sizer: wx.Sizer, checkboxes: List[Tuple[int, wx.CheckBox]], optional_control: Optional[wx.CheckBox] = None):
         super(WxPythonBitstringView, self).__init__(sizer, optional_control)
         self._checkboxes = checkboxes
 
-    def _enable(self, enabled: bool):
+    def enable(self, enabled: bool):
         for _, checkbox in self._checkboxes:
             checkbox.Enable(enabled)
 
