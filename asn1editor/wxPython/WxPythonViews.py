@@ -42,7 +42,7 @@ class WxPythonView(AbstractView, OptionalInterface):
         return self._sizer
 
     def enable(self, enabled: bool):
-        raise NotImplementedError
+        return
 
     def destroy(self):
         self._sizer.Clear(True)
