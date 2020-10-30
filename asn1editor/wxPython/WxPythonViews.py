@@ -76,8 +76,12 @@ class WxPythonValueView(WxPythonView, ValueInterface):
 
     def __update_tooltip(self):
         if isinstance(self.get_value(), str) and len(self.get_value()) > 10:
-            previous_tooltip = self._value_control.GetToolTip().GetTip().split('\n')
-            previous_tooltip = previous_tooltip[-1]
+            tool_tip = self._value_control.GetToolTip()
+            if tool_tip is not None:
+                previous_tooltip = self._value_control.GetToolTip().GetTip().split('\n')
+                previous_tooltip = previous_tooltip[-1]
+            else:
+                previous_tooltip = ''
             self._value_control.SetToolTip('\n'.join([self.get_value(), previous_tooltip]))
 
 
@@ -174,8 +178,12 @@ class WxPythonHexStringView(WxPythonView, ValueInterface):
 
     def __update_tooltip(self):
         if len(self.get_value()) > 10:
-            previous_tooltip = self._value_control.GetToolTip().GetTip().split('\n')
-            previous_tooltip = previous_tooltip[-1]
+            tool_tip = self._value_control.GetToolTip()
+            if tool_tip is not None:
+                previous_tooltip = self._value_control.GetToolTip().GetTip().split('\n')
+                previous_tooltip = previous_tooltip[-1]
+            else:
+                previous_tooltip = ''
             self._value_control.SetToolTip('\n'.join([str(self.get_value()), previous_tooltip]))
 
     def get_value(self) -> bytes:
