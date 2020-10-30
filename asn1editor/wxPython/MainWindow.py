@@ -1,3 +1,4 @@
+import os
 import sys
 import typing
 
@@ -13,6 +14,7 @@ from asn1editor.wxPython import Environment
 from asn1editor.wxPython import WxPythonViewFactory
 from asn1editor.wxPython.FilePickerHandler import FilePickerHandler
 from asn1editor.wxPython.Resources import resource_path
+from asn1editor.wxPython.Styler import Styler
 
 
 class MainWindow(wx.Frame, PluginInterface):
@@ -153,7 +155,8 @@ class MainWindow(wx.Frame, PluginInterface):
             self._status_bar.SetStatusText(f'Loaded {file_name}')
             self.__file_name = file_name
 
-            view_factory = WxPythonViewFactory.WxPythonViewFactory(self.__main_panel)
+            styler = Styler(os.path.splitext(file_name)[0] + '.style')
+            view_factory = WxPythonViewFactory.WxPythonViewFactory(self.__main_panel, styler)
             view_factory.freeze()
 
             if self.__view is not None:

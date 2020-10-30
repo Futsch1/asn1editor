@@ -10,19 +10,27 @@ from asn1editor.interfaces.ValueInterface import ValueInterface
 from asn1editor.view.AbstractView import AbstractView, ContainerView, ListView, ChoiceView
 from asn1editor.view.AbstractViewFactory import AbstractViewFactory
 from asn1editor.wxPython.Resources import resource_path
+from asn1editor.wxPython.Styler import Styler
 from asn1editor.wxPython.WxPythonViews import WxPythonValueView, WxPythonView, WxPythonContainerView, WxPythonListView, WxPythonBooleanView, \
     WxPythonChoiceView, WxPythonBitstringView, WxPythonHexStringView, WxPythonValueSelectionView
 
 
 class WxPythonViewFactory(AbstractViewFactory):
-    def __init__(self, window: wx.ScrolledWindow):
+    def __init__(self, window: wx.ScrolledWindow, styler: Styler):
         self._window = window
+        self._styler = styler
 
     def get_enumerated_view(self, name: str, choices: List[str], optional: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         optional_control = self._add_name_control(sizer, name, optional, ':', 'enumerated')
         edit = wx.Choice(self._window, choices=choices)
         sizer.Add(edit, proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
+
+        style = self._styler.get_style(name)
+        if style == 'read_only':
+            edit.Enabled(False)
+        if style == 'hidden':
+            sizer.ShowItems(False)
 
         view = WxPythonValueSelectionView(sizer, edit, optional_control)
         return view, view, view if optional else None
@@ -47,6 +55,10 @@ class WxPythonViewFactory(AbstractViewFactory):
 
         container_sizer = wx.FlexGridSizer(cols=2, vgap=8, hgap=8)
         sizer.Add(container_sizer)
+
+        style = self._styler.get_style(name)
+        if style == 'hidden':
+            sizer.ShowItems(False)
 
         view = WxPythonContainerView(sizer, container_sizer, optional_control)
 
@@ -80,6 +92,12 @@ class WxPythonViewFactory(AbstractViewFactory):
 
         sizer.Add(content)
 
+        style = self._styler.get_style(name)
+        if style == 'read_only':
+            num_elements.Enabled(False)
+        if style == 'hidden':
+            sizer.ShowItems(False)
+
         view = WxPythonListView(sizer, num_elements, optional_control)
 
         return view, view, view if optional else None
@@ -87,6 +105,7 @@ class WxPythonViewFactory(AbstractViewFactory):
     def get_number_view(self, name: str, optional: bool, minimum: Optional[Union[int, float]],
                         maximum: Optional[Union[int, float]], float_: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
         sizer = wx.BoxSizer(wx.HORIZONTAL)
+
         optional_control = self._add_name_control(sizer, name, optional, ':', 'float' if float_ else 'integer')
         edit = wx.lib.masked.numctrl.NumCtrl(self._window)
         tool_tip = []
@@ -101,7 +120,14 @@ class WxPythonViewFactory(AbstractViewFactory):
             edit.SetFractionWidth(6)
         if len(tool_tip):
             edit.SetToolTip(', '.join(tool_tip))
+
         sizer.Add(edit, proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
+
+        style = self._styler.get_style(name)
+        if style == 'read_only':
+            edit.SetEditable(False)
+        if style == 'hidden':
+            sizer.ShowItems(False)
 
         view = WxPythonValueView(sizer, edit, optional_control)
         return view, view, view if optional else None
@@ -111,6 +137,12 @@ class WxPythonViewFactory(AbstractViewFactory):
         optional_control = self._add_name_control(sizer, name, optional, ':', 'bool')
         check_box = wx.CheckBox(self._window)
         sizer.Add(check_box, proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
+
+        style = self._styler.get_style(name)
+        if style == 'read_only':
+            check_box.Enable(False)
+        if style == 'hidden':
+            sizer.ShowItems(False)
 
         view = WxPythonBooleanView(sizer, check_box, optional_control)
         return view, view, view if optional else None
@@ -129,6 +161,12 @@ class WxPythonViewFactory(AbstractViewFactory):
 
         sizer.Add(edit, proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
 
+        style = self._styler.get_style(name)
+        if style == 'read_only':
+            edit.SetEditable(False)
+        if style == 'hidden':
+            sizer.ShowItems(False)
+
         view = WxPythonValueView(sizer, edit, optional_control)
         return view, view, view if optional else None
 
@@ -140,6 +178,12 @@ class WxPythonViewFactory(AbstractViewFactory):
         edit = wx.TextCtrl(self._window)
 
         sizer.Add(edit, proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
+
+        style = self._styler.get_style(name)
+        if style == 'read_only':
+            edit.SetEditable(False)
+        if style == 'hidden':
+            sizer.ShowItems(False)
 
         view = WxPythonHexStringView(sizer, edit, selector, minimum, maximum, optional_control)
         return view, view, view if optional else None
@@ -159,6 +203,12 @@ class WxPythonViewFactory(AbstractViewFactory):
 
         sizer.Add(content, flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL)
 
+        style = self._styler.get_style(name)
+        if style == 'read_only':
+            choice_element.Enable(False)
+        if style == 'hidden':
+            sizer.ShowItems(False)
+
         view = WxPythonChoiceView(sizer, choice_element, optional_control)
 
         return view, view, view if optional else None
@@ -170,19 +220,28 @@ class WxPythonViewFactory(AbstractViewFactory):
 
         checkboxes: List[Tuple[int, wx.CheckBox]] = []
 
+        style = self._styler.get_style(name)
+
         bits_sizer = wx.StaticBoxSizer(wx.VERTICAL, self._window, "Bits")
         if named_bits:
             for name, bit in named_bits:
                 bit_checkbox = wx.CheckBox(self._window, label=f"{bit}: {name}")
                 bits_sizer.Add(bit_checkbox)
+                if style == 'read_only':
+                    bit_checkbox.Enable(False)
                 checkboxes.append((bit, bit_checkbox))
         else:
             for bit in range(number_of_bits):
                 bit_checkbox = wx.CheckBox(self._window, label=str(bit))
                 bits_sizer.Add(bit_checkbox)
+                if style == 'read_only':
+                    bit_checkbox.Enable(False)
                 checkboxes.append((bit, bit_checkbox))
 
         sizer.Add(bits_sizer)
+
+        if style == 'hidden':
+            sizer.ShowItems(False)
 
         view = WxPythonBitstringView(sizer, checkboxes, optional_control)
 
