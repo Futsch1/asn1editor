@@ -1,4 +1,4 @@
-__version__ = "0.2.2"
+__version__ = "0.2.3"
 # noinspection SpellCheckingInspection
 __author__ = "Florian Fetz"
 
