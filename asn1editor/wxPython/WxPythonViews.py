@@ -154,6 +154,8 @@ class WxPythonHexStringView(WxPythonView, ValueInterface):
 
         self._value_control.ChangeValue(val)
 
+        self.__update_tooltip()
+
     def _hex_selector_changed(self):
         if self._hex != self._is_hex():
             if not self._hex:
@@ -169,6 +171,12 @@ class WxPythonHexStringView(WxPythonView, ValueInterface):
             self._update_length()
             self._hex = self._is_hex()
             self._update_control()
+
+    def __update_tooltip(self):
+        if len(self.get_value()) > 10:
+            previous_tooltip = self._value_control.GetToolTip().GetTip().split('\n')
+            previous_tooltip = previous_tooltip[-1]
+            self._value_control.SetToolTip('\n'.join([self.get_value(), previous_tooltip]))
 
     def get_value(self) -> bytes:
         return self._real_value
@@ -222,10 +230,11 @@ class WxPythonContainerView(WxPythonView, ContainerView):
         self._children: List[wx.Sizer] = []
 
     def add_child(self, view: WxPythonView):
-        self._children.append(view._sizer)
-        self._container_sizer.Add(view._sizer)
-        if not self.get_has_value():
-            self._sizer.Hide(view._sizer, recursive=True)
+        if self.any_shown(view._sizer):
+            self._children.append(view._sizer)
+            self._container_sizer.Add(view._sizer)
+            if not self.get_has_value():
+                self._sizer.Hide(view._sizer, recursive=True)
 
     def enable(self, enabled: bool):
         if enabled:
@@ -238,6 +247,10 @@ class WxPythonContainerView(WxPythonView, ContainerView):
         containing_window = self._sizer.GetContainingWindow()
         if containing_window is not None:
             self._sizer.GetContainingWindow().Layout()
+
+    @staticmethod
+    def any_shown(sizer: wx.Sizer) -> bool:
+        return any([child.IsShown() for child in sizer.GetChildren()])
 
 
 class WxPythonListView(WxPythonView, ListView, ValueInterface):
