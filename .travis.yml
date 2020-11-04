@@ -16,6 +16,7 @@ script:
   - coverage run --source=asn1editor -m unittest discover
 after_success:
   - coveralls
+  - python setup.py sdist bdist_wheel
 deploy:
   provider: pypi
   username: __token__
