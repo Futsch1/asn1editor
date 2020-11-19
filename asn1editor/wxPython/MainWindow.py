@@ -16,6 +16,7 @@ from asn1editor.wxPython.FilePickerHandler import FilePickerHandler
 from asn1editor.wxPython.Resources import resource_path
 from asn1editor.wxPython.SingleFileDropTarget import SingleFileDropTarget
 from asn1editor.wxPython.Styler import Styler
+from asn1editor.wxPython.treeView.TreeView import TreeView
 
 
 class MainWindow(wx.Frame, PluginInterface):
@@ -174,7 +175,12 @@ class MainWindow(wx.Frame, PluginInterface):
             self.__view, self.__controller = self.__asn1_handler.create_mvc_for_type(self.__type_name, view_factory)
             sizer: wx.Sizer = self.__main_panel.GetSizer()
             sizer.Clear()
-            sizer.Add(self.__view.realize(), 0, wx.ALL | wx.EXPAND, 5)
+            if False:
+                sizer.Add(self.__view.realize().get_sizer(), 0, wx.ALL | wx.EXPAND, 5)
+            else:
+                tree_ctrl = TreeView.get_ctrl(self.__main_panel, self.__view.realize(), type_name)
+                sizer.Add(tree_ctrl, 0, wx.ALL | wx.EXPAND, 5)
+
             sizer.Layout()
 
             self.__main_panel.SetSizer(sizer)

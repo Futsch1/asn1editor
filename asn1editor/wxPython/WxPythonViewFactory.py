@@ -32,7 +32,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         if style == 'hidden':
             sizer.ShowItems(False)
 
-        view = WxPythonValueSelectionView(sizer, edit, optional_control)
+        view = WxPythonValueSelectionView(name, sizer, edit, optional_control)
         return view, view, view if optional else None
 
     def get_text_view(self, name: str, text: str) -> AbstractView:
@@ -41,7 +41,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         self._add_name_control(sizer, name, False)
         sizer.Add(dummy_text, flag=wx.ALL, border=5)
 
-        view = WxPythonView(sizer, None)
+        view = WxPythonView(name, sizer, None)
 
         return view
 
@@ -60,7 +60,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         if style == 'hidden':
             sizer.ShowItems(False)
 
-        view = WxPythonContainerView(sizer, container_sizer, optional_control)
+        view = WxPythonContainerView(name, sizer, container_sizer, optional_control)
 
         return view, view if optional else None
 
@@ -98,7 +98,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         if style == 'hidden':
             sizer.ShowItems(False)
 
-        view = WxPythonListView(sizer, num_elements, optional_control)
+        view = WxPythonListView(name, sizer, num_elements, optional_control)
 
         return view, view, view if optional else None
 
@@ -129,7 +129,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         if style == 'hidden':
             sizer.ShowItems(False)
 
-        view = WxPythonValueView(sizer, edit, optional_control)
+        view = WxPythonValueView(name, sizer, edit, optional_control)
         return view, view, view if optional else None
 
     def get_boolean_view(self, name: str, optional: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
@@ -144,7 +144,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         if style == 'hidden':
             sizer.ShowItems(False)
 
-        view = WxPythonBooleanView(sizer, check_box, optional_control)
+        view = WxPythonBooleanView(name, sizer, check_box, optional_control)
         return view, view, view if optional else None
 
     def get_string_view(self, name: str, string_type: str, optional: bool, minimum: Optional[int], maximum: Optional[int]):
@@ -167,7 +167,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         if style == 'hidden':
             sizer.ShowItems(False)
 
-        view = WxPythonValueView(sizer, edit, optional_control)
+        view = WxPythonValueView(name, sizer, edit, optional_control)
         return view, view, view if optional else None
 
     def get_hex_string_view(self, name: str, optional: bool, minimum: Optional[int], maximum: Optional[int]):
@@ -185,7 +185,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         if style == 'hidden':
             sizer.ShowItems(False)
 
-        view = WxPythonHexStringView(sizer, edit, selector, minimum, maximum, optional_control)
+        view = WxPythonHexStringView(name, sizer, edit, selector, minimum, maximum, optional_control)
         return view, view, view if optional else None
 
     def get_choice_view(self, name: str, choices: List[str], optional: bool) -> Tuple[ChoiceView, ValueInterface, OptionalInterface]:
@@ -209,7 +209,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         if style == 'hidden':
             sizer.ShowItems(False)
 
-        view = WxPythonChoiceView(sizer, choice_element, optional_control)
+        view = WxPythonChoiceView(name, sizer, choice_element, optional_control)
 
         return view, view, view if optional else None
 
@@ -243,7 +243,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         if style == 'hidden':
             sizer.ShowItems(False)
 
-        view = WxPythonBitstringView(sizer, checkboxes, optional_control)
+        view = WxPythonBitstringView(name, sizer, checkboxes, optional_control)
 
         return view, view, view if optional else None
 
