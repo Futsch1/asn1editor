@@ -85,6 +85,13 @@ class MainWindow(wx.Frame, PluginInterface):
         self.__exit_item.SetBitmap(image.ConvertToBitmap(width=16, height=16))
         menu_bar.Append(file_menu, '&File')
 
+        view_menu = wx.Menu()
+        self.__auto_view: wx.MenuItem = view_menu.Append(1, 'Automatic', kind=wx.ITEM_CHECK)
+        self.__auto_view.Check(True)
+        self.__group_view: wx.MenuItem = view_menu.Append(2, 'Groups', kind=wx.ITEM_CHECK)
+        self.__tree_view: wx.MenuItem = view_menu.Append(3, 'Tree', kind=wx.ITEM_CHECK)
+        menu_bar.Append(view_menu, '&View')
+
         if self.__plugins is not None:
 
             for plugin_index, plugin in enumerate(self.__plugins):
