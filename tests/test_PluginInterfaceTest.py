@@ -13,12 +13,16 @@ class TestPlugin(asn1editor.Plugin):
         self.plugin_interface: typing.Optional[asn1editor.PluginInterface] = None
         self.name = "Test"
         self.menus = []
+        self.tools = []
 
     def get_name(self) -> str:
         return self.name
 
     def get_menus(self) -> typing.List[typing.Tuple[str, typing.Callable]]:
         return self.menus
+
+    def get_tools(self) -> typing.List[typing.Tuple[str, str, str, typing.Callable]]:
+        return self.tools
 
     def connect(self, plugin_interface: asn1editor.PluginInterface):
         self.plugin_interface = plugin_interface
