@@ -84,8 +84,9 @@ class MainWindow(wx.Frame, PluginInterface):
         self.__exit_item.SetBitmap(image.ConvertToBitmap(width=16, height=16))
         menu_bar.Append(file_menu, '&File')
 
-        if self.__plugins is not None:
+        toolbar: typing.Optional[wx.ToolBar] = None
 
+        if self.__plugins is not None:
             for plugin_index, plugin in enumerate(self.__plugins):
                 plugin_menu = wx.Menu()
                 menus = plugin.get_menus()
@@ -101,6 +102,24 @@ class MainWindow(wx.Frame, PluginInterface):
 
                 menu_bar.Append(plugin_menu, plugin.get_name())
 
+                tools = plugin.get_tools()
+                if len(tools):
+                    if toolbar is None:
+                        toolbar = wx.ToolBar(self)
+                        self.Bind(wx.EVT_TOOL, self.__plugin_menu_event, toolbar)
+                    else:
+                        toolbar.AddSeparator()
+
+                    for i, tool in enumerate(tools):
+                        if not len(tool[0]):
+                            toolbar.AddSeparator()
+                        else:
+                            bitmap = wx.Bitmap(tool[2])
+                            toolbar.AddTool(toolId=100000 + (plugin_index * 1000 + i), label=tool[0], bitmap=bitmap, shortHelp=tool[1])
+
+        if toolbar is not None:
+            toolbar.Realize()
+
         help_menu = wx.Menu()
         about_item = help_menu.Append(wx.ID_ABOUT, 'About')
         self.Bind(wx.EVT_MENU, self.__about_item_event, about_item)
@@ -109,8 +128,14 @@ class MainWindow(wx.Frame, PluginInterface):
         self.SetMenuBar(menu_bar)
 
     def __plugin_menu_event(self, e):
-        plugin_index = e.GetId() // 1000
-        self.__plugins[plugin_index].get_menus()[e.GetId() % 1000][1]()
+        menu_id = e.GetId()
+        if menu_id > 100000:
+            menu_id -= 100000
+            plugin_index = menu_id // 1000
+            self.__plugins[plugin_index].get_tools()[menu_id % 1000][3]()
+        else:
+            plugin_index = menu_id // 1000
+            self.__plugins[plugin_index].get_menus()[menu_id % 1000][1]()
 
     def __file_dropped(self, file_name: str):
         if self.__asn1_handler is not None:
