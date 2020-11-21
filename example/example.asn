@@ -26,7 +26,7 @@ Sequence ::= SEQUENCE
     } OPTIONAL
 }
 
-SubSequence ::= SEQUENCE
+SubSequence ::= SET
 {
     member1      INTEGER (0..5000) DEFAULT 1000,
     member2      INTEGER (-100..300),

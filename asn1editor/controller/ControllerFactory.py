@@ -34,7 +34,7 @@ class ControllerFactory:
         self.__register_events(controller, value_interface, optional_interface)
 
     def create_container_controller(self, type_: oer.Type, optional_interface: Optional[OptionalInterface]) -> Controller.ContainerController:
-        if isinstance(type_, oer.Sequence):
+        if isinstance(type_, oer.Sequence) or isinstance(type_, oer.Set):
             controller = Controller.ContainerController(type_.name, self._parent, optional_interface)
             if optional_interface is not None:
                 optional_interface.register_optional_event(controller.optional_handler)
