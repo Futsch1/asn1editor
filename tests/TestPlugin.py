@@ -20,6 +20,9 @@ class TestPlugin(Plugin):
                 ('ProgressDialog', self.__open_progress_dialog),
                 ('Question', self.__open_question)]
 
+    def get_tools(self) -> typing.List[typing.Tuple[str, str, str, typing.Callable]]:
+        return [('Toolbar', 'Toolbar tooltip', 'tests/test.png', self.__open_tooltip)]
+
     def connect(self, plugin_interface: PluginInterface):
         self.plugin_interface = plugin_interface
 
@@ -65,3 +68,6 @@ class TestPlugin(Plugin):
 
     def __open_question(self):
         self.plugin_interface.show_status(str(self.plugin_interface.show_message('Test?', 'TestC', PluginInterface.MessageType.QUESTION)))
+
+    def __open_tooltip(self):
+        self.plugin_interface.show_message('Tooltip', 'Tooltip was clicked', PluginInterface.MessageType.INFO)

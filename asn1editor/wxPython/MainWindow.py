@@ -20,7 +20,7 @@ from asn1editor.wxPython.Styler import Styler
 
 class MainWindow(wx.Frame, PluginInterface):
     def __init__(self, plugins: typing.Optional[typing.List[Plugin]] = None, title=f'ASN.1 editor {asn1editor.__version__}'):
-        super(MainWindow, self).__init__(None, title=title, size=(500, 800))
+        super(MainWindow, self).__init__(None, title=title)
 
         Environment.load()
 
@@ -29,19 +29,19 @@ class MainWindow(wx.Frame, PluginInterface):
             for plugin in self.__plugins:
                 plugin.connect(self)
 
+        self._status_bar = self.CreateStatusBar()
+
+        self.__create_menu()
+
         self.SetSize(wx.Size(Environment.settings.get('size', (500, 800))))
         self.Maximize(Environment.settings.get('maximized', True))
         self.SetPosition(wx.Point(Environment.settings.get('position', (0, 0))))
 
         self.__main_panel = wx.ScrolledWindow(self, style=wx.HSCROLL | wx.VSCROLL)
         self.__main_panel.SetScrollbars(15, 15, 50, 50)
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        self.__main_panel.SetSizer(sizer)
+        self.__main_panel.SetSizer(wx.BoxSizer(wx.VERTICAL))
         self.__main_panel.SetAutoLayout(True)
 
-        self._status_bar = self.CreateStatusBar()
-
-        self.__create_menu()
         self.__asn1_handler = None
 
         self.__model = None
@@ -84,8 +84,16 @@ class MainWindow(wx.Frame, PluginInterface):
         self.__exit_item.SetBitmap(image.ConvertToBitmap(width=16, height=16))
         menu_bar.Append(file_menu, '&File')
 
-        if self.__plugins is not None:
+        help_menu = wx.Menu()
+        about_item = help_menu.Append(wx.ID_ABOUT, 'About')
+        self.Bind(wx.EVT_MENU, self.__about_item_event, about_item)
+        menu_bar.Append(help_menu, '&Help')
 
+        self.SetMenuBar(menu_bar)
+
+        toolbar: typing.Optional[wx.ToolBar] = None
+
+        if self.__plugins is not None:
             for plugin_index, plugin in enumerate(self.__plugins):
                 plugin_menu = wx.Menu()
                 menus = plugin.get_menus()
@@ -101,16 +109,33 @@ class MainWindow(wx.Frame, PluginInterface):
 
                 menu_bar.Append(plugin_menu, plugin.get_name())
 
-        help_menu = wx.Menu()
-        about_item = help_menu.Append(wx.ID_ABOUT, 'About')
-        self.Bind(wx.EVT_MENU, self.__about_item_event, about_item)
-        menu_bar.Append(help_menu, '&Help')
+                tools = plugin.get_tools()
+                if len(tools):
+                    if toolbar is None:
+                        toolbar = self.CreateToolBar()
+                        toolbar.Bind(wx.EVT_TOOL, self.__tb_menu_event)
+                    else:
+                        toolbar.AddSeparator()
 
-        self.SetMenuBar(menu_bar)
+                    for i, tool in enumerate(tools):
+                        if not len(tool[0]):
+                            toolbar.AddSeparator()
+                        else:
+                            bitmap = wx.Bitmap(tool[2])
+                            toolbar.AddTool(toolId=plugin_index * 1000 + i, label=tool[0], bitmap=bitmap, shortHelp=tool[1])
+
+        if toolbar is not None:
+            toolbar.Realize()
+
+    def __tb_menu_event(self, e):
+        menu_id = e.GetId()
+        plugin_index = menu_id // 1000
+        self.__plugins[plugin_index].get_tools()[menu_id % 1000][3]()
 
     def __plugin_menu_event(self, e):
-        plugin_index = e.GetId() // 1000
-        self.__plugins[plugin_index].get_menus()[e.GetId() % 1000][1]()
+        menu_id = e.GetId()
+        plugin_index = menu_id // 1000
+        self.__plugins[plugin_index].get_menus()[menu_id % 1000][1]()
 
     def __file_dropped(self, file_name: str):
         if self.__asn1_handler is not None:
