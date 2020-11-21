@@ -28,7 +28,7 @@ class ViewControllerFactory(object):
             return self._bool(type_, controller)
         elif isinstance(type_, oer.Real):
             return self._number(type_, checker, controller)
-        elif isinstance(type_, oer.Sequence):
+        elif isinstance(type_, oer.Sequence) or isinstance(type_, oer.Set):
             # noinspection PyTypeChecker
             return self._sequence(type_, checker, controller)
         elif isinstance(type_, oer.SequenceOf) or isinstance(type_, oer.SetOf):

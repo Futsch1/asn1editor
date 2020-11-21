@@ -43,7 +43,8 @@ def actions(main_window: asn1editor.wxPython.MainWindow):
 
 
 class MonkeyTest(TestCase):
-    def test_monkey(self):
+    @staticmethod
+    def test_monkey():
         if os.getenv('TRAVIS') is not None:
             return
         # noinspection PyUnusedLocal
