@@ -15,7 +15,7 @@ from asn1editor.wxPython.FilePickerHandler import FilePickerHandler
 from asn1editor.wxPython.MenuHandler import MenuHandler
 from asn1editor.wxPython.SingleFileDropTarget import SingleFileDropTarget
 from asn1editor.wxPython.Styler import Styler
-from asn1editor.wxPython.treeView.TreeView import TreeView
+from asn1editor.wxPython.TreeView import TreeView
 
 
 class MainWindow(wx.Frame, PluginInterface):
@@ -39,11 +39,6 @@ class MainWindow(wx.Frame, PluginInterface):
         self.Maximize(Environment.settings.get('maximized', True))
         self.SetPosition(wx.Point(Environment.settings.get('position', (0, 0))))
         self._menu_handler.view_select.selected = Environment.settings.get('view', 1)
-
-        self.__main_panel = wx.ScrolledWindow(self, style=wx.HSCROLL | wx.VSCROLL)
-        self.__main_panel.SetScrollbars(15, 15, 50, 50)
-        self.__main_panel.SetSizer(wx.BoxSizer(wx.VERTICAL))
-        self.__main_panel.SetAutoLayout(True)
 
         self.__asn1_handler = None
 
@@ -86,26 +81,41 @@ class MainWindow(wx.Frame, PluginInterface):
             self.__file_name = file_name
 
             styler = Styler(os.path.splitext(file_name)[0] + '.style')
-            view_factory = WxPythonViewFactory.WxPythonViewFactory(self.__main_panel, styler)
+
+            if self._menu_handler.view_select.selected == self._menu_handler.view_select.TREE:
+                main_panel = wx.Window(self, style=wx.EXPAND)
+                content_panel = wx.ScrolledWindow(main_panel, style=wx.HSCROLL | wx.VSCROLL)
+                content_panel.SetScrollbars(15, 15, 50, 50)
+                content_panel.SetSizer(wx.BoxSizer(wx.VERTICAL))
+                content_panel.SetAutoLayout(True)
+            else:
+                content_panel = wx.ScrolledWindow(self, style=wx.HSCROLL | wx.VSCROLL)
+                content_panel.SetScrollbars(15, 15, 50, 50)
+                content_panel.SetSizer(wx.BoxSizer(wx.VERTICAL))
+                content_panel.SetAutoLayout(True)
+
+            view_factory = WxPythonViewFactory.WxPythonViewFactory(content_panel, styler)
             view_factory.freeze()
 
-            if self.__view is not None:
-                self.__view.destroy()
-
             self.__view, self.__controller = self.__asn1_handler.create_mvc_for_type(self.__type_name, view_factory)
-            sizer: wx.Sizer = self.__main_panel.GetSizer()
-            sizer.Clear()
             if self._menu_handler.view_select.selected == self._menu_handler.view_select.TREE:
-                tree_ctrl = TreeView.get_ctrl(self.__main_panel, self.__view.realize(), type_name)
-                sizer.Add(tree_ctrl, 0, wx.ALL | wx.EXPAND, 5)
+                self.__tree_view = TreeView(main_panel, content_panel)
+                tree_ctrl = self.__tree_view.get_ctrl(self.__view.realize(), type_name)
+                sizer = wx.BoxSizer(wx.HORIZONTAL)
+                sizer.Add(tree_ctrl, 1, flag=wx.EXPAND)
+                sizer.Add(content_panel, 1, flag=wx.EXPAND)
+                main_panel.SetSizerAndFit(sizer)
             else:
-                sizer.Add(self.__view.realize().get_sizer(), 0, wx.ALL | wx.EXPAND, 5)
+                sizer: wx.Sizer = content_panel.GetSizer()
+                sizer.Clear()
 
-            sizer.Layout()
+                sizer.Add(self.__view.realize().get_sizer(recursive=True), 0, wx.ALL | wx.EXPAND, 5)
 
-            self.__main_panel.SetSizer(sizer)
-            self.__main_panel.FitInside()
-            self.__main_panel.AdjustScrollbars()
+                sizer.Layout()
+
+                content_panel.SetSizer(sizer)
+                content_panel.FitInside()
+                content_panel.AdjustScrollbars()
 
             view_factory.thaw()
 

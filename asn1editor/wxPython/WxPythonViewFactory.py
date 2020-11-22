@@ -11,8 +11,9 @@ from asn1editor.view.AbstractView import AbstractView, ContainerView, ListView, 
 from asn1editor.view.AbstractViewFactory import AbstractViewFactory
 from asn1editor.wxPython.Resources import resource_path
 from asn1editor.wxPython.Styler import Styler
-from asn1editor.wxPython.WxPythonViews import WxPythonValueView, WxPythonView, WxPythonContainerView, WxPythonListView, WxPythonBooleanView, \
-    WxPythonChoiceView, WxPythonBitstringView, WxPythonHexStringView, WxPythonValueSelectionView
+from asn1editor.wxPython.WxPythonComplexViews import WxPythonContainerView, WxPythonListView, WxPythonChoiceView
+from asn1editor.wxPython.WxPythonViews import WxPythonValueView, WxPythonBooleanView, \
+    WxPythonBitstringView, WxPythonHexStringView, WxPythonValueSelectionView, ControlList
 
 
 class WxPythonViewFactory(AbstractViewFactory):
@@ -21,60 +22,36 @@ class WxPythonViewFactory(AbstractViewFactory):
         self._styler = styler
 
     def get_enumerated_view(self, name: str, choices: List[str], optional: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
-        sizer = wx.BoxSizer(wx.HORIZONTAL)
-        optional_control = self._add_name_control(sizer, name, optional, ':', 'enumerated')
-        edit = wx.Choice(self._window, choices=choices)
-        sizer.Add(edit, proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
+        controls = self._get_controls(name, optional, ':', 'enumerated')
+        controls['orientation'] = wx.HORIZONTAL
 
-        style = self._styler.get_style(name)
-        if style == 'read_only':
-            edit.Enabled(False)
-        if style == 'hidden':
-            sizer.ShowItems(False)
+        controls['value'] = wx.Choice(self._window, choices=choices)
 
-        view = WxPythonValueSelectionView(name, sizer, edit, optional_control)
+        view = WxPythonValueSelectionView(name, controls)
         return view, view, view if optional else None
 
     def get_text_view(self, name: str, text: str) -> AbstractView:
-        sizer = wx.BoxSizer(wx.HORIZONTAL)
-        dummy_text = wx.StaticText(self._window, wx.ID_ANY, text)
-        self._add_name_control(sizer, name, False)
-        sizer.Add(dummy_text, flag=wx.ALL, border=5)
+        controls = self._get_controls(name, False)
+        controls['orientation'] = wx.HORIZONTAL
 
-        view = WxPythonView(name, sizer, None)
+        controls['value'] = wx.StaticText(self._window, wx.ID_ANY, text)
+
+        view = WxPythonValueView(name, controls)
 
         return view
 
     def get_container_view(self, name: str, optional: bool) -> Tuple[ContainerView, OptionalInterface]:
-        sizer = wx.StaticBoxSizer(wx.VERTICAL, self._window, name)
-        sizer.Add(self._get_svg('sequence'))
-        if optional:
-            optional_control = self._add_name_control(sizer, name, optional)
-        else:
-            optional_control = None
+        controls = self._get_controls(name, optional, icon='sequence')
+        controls['orientation'] = wx.VERTICAL
 
-        container_sizer = wx.FlexGridSizer(cols=2, vgap=8, hgap=8)
-        sizer.Add(container_sizer)
-
-        style = self._styler.get_style(name)
-        if style == 'hidden':
-            sizer.ShowItems(False)
-
-        view = WxPythonContainerView(name, sizer, container_sizer, optional_control)
+        view = WxPythonContainerView(name, controls, self._window)
 
         return view, view if optional else None
 
     def get_list_view(self, name: str, minimum: int, maximum: int, optional: bool) -> Tuple[ListView, ValueInterface, OptionalInterface]:
-        sizer = wx.StaticBoxSizer(wx.VERTICAL, self._window, name)
-        sizer.Add(self._get_svg('sequence_of'))
-        if optional:
-            optional_control = self._add_name_control(sizer, name, optional)
-        else:
-            optional_control = None
+        controls = self._get_controls(name, optional, icon='sequence_of')
+        controls['orientation'] = wx.VERTICAL
 
-        num_elements_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        num_elements_label = wx.StaticText(self._window, wx.ID_ANY, "Elements:")
-        num_elements_sizer.Add(num_elements_label, flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL, border=5)
         num_elements = wx.SpinCtrl(self._window)
         if minimum is not None:
             num_elements.SetMin(minimum)
@@ -85,28 +62,18 @@ class WxPythonViewFactory(AbstractViewFactory):
         else:
             maximum = 'infinite'
         num_elements.SetToolTip(f"Minimum elements: {minimum}, maximum elements: {maximum}")
-        num_elements_sizer.Add(num_elements, flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL, border=5)
+        controls['value'] = num_elements
+        controls['num_elements'] = wx.StaticText(self._window, wx.ID_ANY, "Elements:")
 
-        content = wx.BoxSizer(wx.VERTICAL)
-        content.Add(num_elements_sizer)
-
-        sizer.Add(content)
-
-        style = self._styler.get_style(name)
-        if style == 'read_only':
-            num_elements.Enabled(False)
-        if style == 'hidden':
-            sizer.ShowItems(False)
-
-        view = WxPythonListView(name, sizer, num_elements, optional_control)
+        view = WxPythonListView(name, controls, self._window)
 
         return view, view, view if optional else None
 
     def get_number_view(self, name: str, optional: bool, minimum: Optional[Union[int, float]],
                         maximum: Optional[Union[int, float]], float_: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
-        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        controls = self._get_controls(name, optional, ':', 'float' if float_ else 'integer')
+        controls['orientation'] = wx.HORIZONTAL
 
-        optional_control = self._add_name_control(sizer, name, optional, ':', 'float' if float_ else 'integer')
         edit = wx.lib.masked.numctrl.NumCtrl(self._window)
         tool_tip = []
         if isinstance(minimum, int) or isinstance(minimum, float):
@@ -121,35 +88,24 @@ class WxPythonViewFactory(AbstractViewFactory):
         if len(tool_tip):
             edit.SetToolTip(', '.join(tool_tip))
 
-        sizer.Add(edit, proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
+        controls['value'] = edit
 
-        style = self._styler.get_style(name)
-        if style == 'read_only':
-            edit.SetEditable(False)
-        if style == 'hidden':
-            sizer.ShowItems(False)
-
-        view = WxPythonValueView(name, sizer, edit, optional_control)
+        view = WxPythonValueView(name, controls)
         return view, view, view if optional else None
 
     def get_boolean_view(self, name: str, optional: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
-        sizer = wx.BoxSizer(wx.HORIZONTAL)
-        optional_control = self._add_name_control(sizer, name, optional, ':', 'bool')
-        check_box = wx.CheckBox(self._window)
-        sizer.Add(check_box, proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
+        controls = self._get_controls(name, optional, ':', 'bool')
+        controls['orientation'] = wx.HORIZONTAL
 
-        style = self._styler.get_style(name)
-        if style == 'read_only':
-            check_box.Enable(False)
-        if style == 'hidden':
-            sizer.ShowItems(False)
+        controls['value'] = wx.CheckBox(self._window)
 
-        view = WxPythonBooleanView(name, sizer, check_box, optional_control)
+        view = WxPythonBooleanView(name, controls)
         return view, view, view if optional else None
 
     def get_string_view(self, name: str, string_type: str, optional: bool, minimum: Optional[int], maximum: Optional[int]):
-        sizer = wx.BoxSizer(wx.HORIZONTAL)
-        optional_control = self._add_name_control(sizer, name, optional, ':', 'string', string_type)
+        controls = self._get_controls(name, optional, ':', 'string', string_type)
+        controls['orientation'] = wx.HORIZONTAL
+
         edit = wx.TextCtrl(self._window)
         if maximum:
             edit.SetMaxLength(maximum)
@@ -159,91 +115,56 @@ class WxPythonViewFactory(AbstractViewFactory):
             minimum = '0'
         edit.SetToolTip(f"Minimum characters: {minimum}, maximum characters: {maximum}")
 
-        sizer.Add(edit, proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
+        controls['value'] = edit
 
-        style = self._styler.get_style(name)
-        if style == 'read_only':
-            edit.SetEditable(False)
-        if style == 'hidden':
-            sizer.ShowItems(False)
-
-        view = WxPythonValueView(name, sizer, edit, optional_control)
+        view = WxPythonValueView(name, controls)
         return view, view, view if optional else None
 
     def get_hex_string_view(self, name: str, optional: bool, minimum: Optional[int], maximum: Optional[int]):
-        sizer = wx.BoxSizer(wx.HORIZONTAL)
-        optional_control = self._add_name_control(sizer, name, optional, ':', 'string', 'OCTET STRING')
-        selector = wx.CheckBox(self._window, label='Hex')
-        sizer.Add(selector, flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL, border=5)
-        edit = wx.TextCtrl(self._window)
+        controls = self._get_controls(name, optional, ':', 'string', 'OCTET STRING')
+        controls['orientation'] = wx.HORIZONTAL
 
-        sizer.Add(edit, proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
+        controls['selector'] = wx.CheckBox(self._window, label='Hex')
+        controls['value'] = wx.TextCtrl(self._window)
 
-        style = self._styler.get_style(name)
-        if style == 'read_only':
-            edit.SetEditable(False)
-        if style == 'hidden':
-            sizer.ShowItems(False)
-
-        view = WxPythonHexStringView(name, sizer, edit, selector, minimum, maximum, optional_control)
+        view = WxPythonHexStringView(name, controls, minimum, maximum)
         return view, view, view if optional else None
 
     def get_choice_view(self, name: str, choices: List[str], optional: bool) -> Tuple[ChoiceView, ValueInterface, OptionalInterface]:
-        sizer = wx.BoxSizer(wx.HORIZONTAL)
-        optional_control = self._add_name_control(sizer, name, optional, icon='choice')
+        controls = self._get_controls(name, optional, icon='choice')
+        controls['orientation'] = wx.VERTICAL
 
-        choice_element_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        choice_element_label = wx.StaticText(self._window, wx.ID_ANY)
-        choice_element_sizer.Add(choice_element_label, flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL, border=5)
-        choice_element = wx.Choice(self._window, choices=choices)
-        choice_element_sizer.Add(choice_element, flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL, border=5)
+        controls['value'] = wx.Choice(self._window, choices=choices)
 
-        content = wx.BoxSizer(wx.VERTICAL)
-        content.Add(choice_element_sizer)
-
-        sizer.Add(content, flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL)
-
-        style = self._styler.get_style(name)
-        if style == 'read_only':
-            choice_element.Enable(False)
-        if style == 'hidden':
-            sizer.ShowItems(False)
-
-        view = WxPythonChoiceView(name, sizer, choice_element, optional_control)
+        view = WxPythonChoiceView(name, controls)
 
         return view, view, view if optional else None
 
     def get_bitstring_view(self, name: str, number_of_bits: int, named_bits: List[Tuple[str, int]], optional: bool) -> Tuple[AbstractView, BitstringInterface,
                                                                                                                              OptionalInterface]:
-        sizer = wx.BoxSizer(wx.HORIZONTAL)
-        optional_control = self._add_name_control(sizer, name, optional, icon='bitstring')
+        controls = self._get_controls(name, optional, icon='bitstring')
+        controls['orientation'] = wx.HORIZONTAL
 
         checkboxes: List[Tuple[int, wx.CheckBox]] = []
 
         style = self._styler.get_style(name)
 
-        bits_sizer = wx.StaticBoxSizer(wx.VERTICAL, self._window, "Bits")
         if named_bits:
             for name, bit in named_bits:
                 bit_checkbox = wx.CheckBox(self._window, label=f"{bit}: {name}")
-                bits_sizer.Add(bit_checkbox)
                 if style == 'read_only':
                     bit_checkbox.Enable(False)
                 checkboxes.append((bit, bit_checkbox))
         else:
             for bit in range(number_of_bits):
                 bit_checkbox = wx.CheckBox(self._window, label=str(bit))
-                bits_sizer.Add(bit_checkbox)
                 if style == 'read_only':
                     bit_checkbox.Enable(False)
                 checkboxes.append((bit, bit_checkbox))
 
-        sizer.Add(bits_sizer)
+        controls['checkboxes'] = checkboxes
 
-        if style == 'hidden':
-            sizer.ShowItems(False)
-
-        view = WxPythonBitstringView(name, sizer, checkboxes, optional_control)
+        view = WxPythonBitstringView(name, controls, self._window)
 
         return view, view, view if optional else None
 
@@ -258,18 +179,25 @@ class WxPythonViewFactory(AbstractViewFactory):
     def thaw(self):
         self._window.Thaw()
 
-    def _add_name_control(self, sizer: wx.BoxSizer, name: str, optional: bool, suffix: str = '', icon: str = None, icon_tooltip: str = None) -> \
-            Optional[wx.CheckBox]:
-        flags = wx.ALL | (0 if sizer.GetOrientation() == wx.VERTICAL else wx.ALIGN_CENTER_VERTICAL)
+    def _get_controls(self, name: str, optional: bool, suffix: str = '', icon: str = None, icon_tooltip: str = None) -> \
+            ControlList:
+        controls = {}
         if optional:
             control = wx.CheckBox(self._window, wx.ID_ANY, name + suffix)
             control.SetToolTip("Optional element")
+            controls['optional'] = control
+            controls['name'] = control
         else:
             control = wx.StaticText(self._window, wx.ID_ANY, name + suffix)
+            controls['name'] = control
         if icon is not None:
-            sizer.Add(self._get_svg(icon, icon_tooltip), flag=flags)
-        sizer.Add(control, flag=flags, border=5)
-        return control if optional else None
+            controls['icon'] = self._get_svg(icon, icon_tooltip)
+
+        style = self._styler.get_style(name)
+        if style is not None:
+            controls['style'] = style
+
+        return controls
 
     def _get_svg(self, bitmap_name: str, icon_tooltip: str = None) -> wx.StaticBitmap:
         # noinspection PyArgumentList

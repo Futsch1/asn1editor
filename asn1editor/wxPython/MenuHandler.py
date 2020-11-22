@@ -97,17 +97,17 @@ class MenuHandler:
 
         # Event binding
         def schema_dialog_constructor() -> wx.FileDialog:
-            return wx.FileDialog(self, "ASN.1 schema", wildcard="ASN.1 files (*.asn)|*.asn",
+            return wx.FileDialog(self.__frame, "ASN.1 schema", wildcard="ASN.1 files (*.asn)|*.asn",
                                  style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST | wx.FD_MULTIPLE)
 
         def data_load_dialog_constructor() -> wx.FileDialog:
             extensions = ';'.join(ASN1SpecHandler.get_extensions())
-            return wx.FileDialog(self, "ASN.1 encoded file", wildcard=f"ASN.1 encoded ({extensions})|{extensions}",
+            return wx.FileDialog(self.__frame, "ASN.1 encoded file", wildcard=f"ASN.1 encoded ({extensions})|{extensions}",
                                  style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
 
         def data_save_dialog_constructor() -> wx.FileDialog:
             extensions = ';'.join(ASN1SpecHandler.get_extensions())
-            return wx.FileDialog(self, "ASN.1 encoded file", wildcard=f"ASN.1 encoded ({extensions})|{extensions}", style=wx.FD_SAVE)
+            return wx.FileDialog(self.__frame, "ASN.1 encoded file", wildcard=f"ASN.1 encoded ({extensions})|{extensions}", style=wx.FD_SAVE)
 
         self.__frame.Bind(wx.EVT_MENU, self.__exit, exit_item)
 
