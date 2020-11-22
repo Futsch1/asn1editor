@@ -19,9 +19,12 @@ class WxPythonContainerView(WxPythonView, ContainerView):
         else:
             sizer = wx.BoxSizer(wx.VERTICAL)
 
-        if self.get_has_value():
-            sizer.Add(self._controls['icon'], flag=wx.ALL)
+        sizer.Add(self._controls['icon'], flag=wx.ALL)
+        sizer.Add(self._controls['name'], flag=wx.ALL, border=5)
+        if 'optional' not in self._controls:
+            sizer.Hide(self._controls['name'])
 
+        if self.get_has_value():
             if recursive:
                 container_sizer = wx.FlexGridSizer(cols=2, vgap=8, hgap=8)
                 sizer.Add(container_sizer)
@@ -31,22 +34,24 @@ class WxPythonContainerView(WxPythonView, ContainerView):
             for child in self._children:
                 if recursive or not child._container:
                     container_sizer.Add(child.get_sizer(recursive))
+        else:
+            hide_sizer = wx.BoxSizer(wx.HORIZONTAL)
+            for child in self._children:
+                child_sizer = child.get_sizer(True)
+                hide_sizer.Add(child_sizer)
+                hide_sizer.Hide(child_sizer, recursive=True)
+            sizer.Add(hide_sizer)
 
         return sizer
 
     def add_child(self, view: WxPythonView):
-        if self.any_shown(view.get_sizer(False)):
-            self._children.append(view)
+        self._children.append(view)
 
     def enable(self, enabled: bool):
         pass
 
     def get_children(self) -> List[WxPythonView]:
         return self._children
-
-    @staticmethod
-    def any_shown(sizer: wx.Sizer) -> bool:
-        return any([child.IsShown() for child in sizer.GetChildren()])
 
 
 class WxPythonListView(WxPythonView, ListView, ValueInterface):
@@ -81,8 +86,8 @@ class WxPythonListView(WxPythonView, ListView, ValueInterface):
     def get_sizer(self, recursive: bool) -> wx.Sizer:
         sizer = self._create_sizer()
         sub_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        sub_sizer.Add(self._controls['num_elements'], border=5)
-        sub_sizer.Add(self._controls['value'], border=5)
+        sub_sizer.Add(self._controls['num_elements'], border=5, flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL)
+        sub_sizer.Add(self._controls['value'], border=5, flag=wx.ALL)
         sizer.Add(sub_sizer)
 
         content = wx.StaticBoxSizer(wx.VERTICAL, self._parent, self._name)
