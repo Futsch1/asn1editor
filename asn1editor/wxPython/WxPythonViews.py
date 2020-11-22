@@ -13,6 +13,8 @@ ControlList = typing.Dict[str, typing.Union[wx.TextCtrl, wx.CheckBox, wx.StaticB
 
 
 class WxPythonView(AbstractView, OptionalInterface):
+    structure_changed: Callable = None
+
     def __init__(self, name: str, controls: ControlList, container=False):
         self._name = name
         self._controls = controls
@@ -52,7 +54,11 @@ class WxPythonView(AbstractView, OptionalInterface):
         return
 
     def destroy(self):
-        pass
+        for name, control in self._controls.items():
+            if name == 'optional':
+                continue
+            if isinstance(control, wx.Object):
+                control.Destroy()
 
     def get_name(self) -> str:
         return self._name
@@ -294,3 +300,8 @@ class WxPythonBitstringView(WxPythonView, BitstringInterface):
         sizer.Add(bits_sizer)
 
         return sizer
+
+    def destroy(self):
+        super(WxPythonBitstringView, self).destroy()
+        for _, checkbox in self._controls['checkboxes']:
+            checkbox.Destroy()

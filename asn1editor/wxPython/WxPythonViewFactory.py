@@ -168,17 +168,6 @@ class WxPythonViewFactory(AbstractViewFactory):
 
         return view, view, view if optional else None
 
-    def update(self):
-        self._window.Layout()
-        self._window.FitInside()
-        self._window.AdjustScrollbars()
-
-    def freeze(self):
-        self._window.Freeze()
-
-    def thaw(self):
-        self._window.Thaw()
-
     def _get_controls(self, name: str, optional: bool, suffix: str = '', icon: str = None, icon_tooltip: str = None) -> \
             ControlList:
         controls = {}

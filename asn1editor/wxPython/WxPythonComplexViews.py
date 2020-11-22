@@ -35,30 +35,36 @@ class WxPythonContainerView(WxPythonView, ContainerView):
                 if recursive or not child._container:
                     container_sizer.Add(child.get_sizer(recursive))
         else:
-            hide_sizer = wx.BoxSizer(wx.HORIZONTAL)
-            for child in self._children:
-                child_sizer = child.get_sizer(True)
-                hide_sizer.Add(child_sizer)
-                hide_sizer.Hide(child_sizer, recursive=True)
-            sizer.Add(hide_sizer)
+            sizer.Add(self._get_hide_sizer())
 
         return sizer
+
+    def _get_hide_sizer(self):
+        hide_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        for child in self._children:
+            child_sizer = child.get_sizer(True)
+            hide_sizer.Add(child_sizer)
+            hide_sizer.Hide(child_sizer, recursive=True)
+        return hide_sizer
 
     def add_child(self, view: WxPythonView):
         self._children.append(view)
 
     def enable(self, enabled: bool):
-        pass
+        self.structure_changed()
 
     def get_children(self) -> List[WxPythonView]:
         return self._children
 
+    def destroy(self):
+        super(WxPythonContainerView, self).destroy()
+        for child in self._children:
+            child.destroy()
 
-class WxPythonListView(WxPythonView, ListView, ValueInterface):
+
+class WxPythonListView(WxPythonContainerView, ListView, ValueInterface):
     def __init__(self, name: str, controls: ControlList, parent: wx.Window):
-        super(WxPythonListView, self).__init__(name, controls, True)
-        self._children: List[WxPythonView] = []
-        self._parent = parent
+        super(WxPythonListView, self).__init__(name, controls, parent)
 
     def register_change_event(self, callback: Callable):
         # noinspection PyUnusedLocal
@@ -76,12 +82,16 @@ class WxPythonListView(WxPythonView, ListView, ValueInterface):
 
     def enable(self, enabled: bool):
         self._controls['value'].Enable(enabled)
+        self.structure_changed()
 
     def add(self, view: WxPythonView):
         self._children.append(view)
+        self.structure_changed()
 
     def remove(self, view: WxPythonView):
         self._children.remove(view)
+        view.destroy()
+        self.structure_changed()
 
     def get_sizer(self, recursive: bool) -> wx.Sizer:
         sizer = self._create_sizer()
@@ -90,11 +100,14 @@ class WxPythonListView(WxPythonView, ListView, ValueInterface):
         sub_sizer.Add(self._controls['value'], border=5, flag=wx.ALL)
         sizer.Add(sub_sizer)
 
-        content = wx.StaticBoxSizer(wx.VERTICAL, self._parent, self._name)
-        for child in self._children:
-            if recursive or not child._container:
-                content.Add(child.get_sizer(recursive))
-        sizer.Add(content)
+        if self.get_has_value():
+            content = wx.StaticBoxSizer(wx.VERTICAL, self._parent, self._name)
+            for child in self._children:
+                if recursive or not child._container:
+                    content.Add(child.get_sizer(recursive))
+            sizer.Add(content)
+        else:
+            sizer.Add(self._get_hide_sizer())
 
         return sizer
 
@@ -124,10 +137,15 @@ class WxPythonChoiceView(WxPythonView, ChoiceView, ValueInterface):
             self._view.enable(enabled)
 
     def set_view(self, view: WxPythonView):
+        if self._view is not None:
+            self._view.destroy()
+
         self._view = view
 
         if not self._controls['value'].Enabled:
             self._view.enable(False)
+
+        self.structure_changed()
 
     def get_sizer(self, recursive: bool) -> wx.Sizer:
         outer_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -136,7 +154,15 @@ class WxPythonChoiceView(WxPythonView, ChoiceView, ValueInterface):
         outer_sizer.Add(sizer)
         if recursive or not self._view._container:
             content_sizer = wx.BoxSizer(wx.VERTICAL)
-            content_sizer.Add(self._view.get_sizer(recursive))
+            view_sizer = self._view.get_sizer(recursive)
+            content_sizer.Add(view_sizer)
+            if not self.get_has_value():
+                content_sizer.Hide(view_sizer)
             outer_sizer.Add(content_sizer)
 
         return outer_sizer
+
+    def destroy(self):
+        super(WxPythonChoiceView, self).destroy()
+        if self._view is not None:
+            self._view.destroy()

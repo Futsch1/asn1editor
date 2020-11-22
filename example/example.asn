@@ -14,7 +14,7 @@ Sequence ::= SEQUENCE
     octetString         OCTET STRING (SIZE(4)) DEFAULT "abcd",
     visibleString       VisibleString (SIZE(15)),
     utf8String          UTF8String (SIZE(1..5)) DEFAULT "äö",
-    optionalSequenceOf  SEQUENCE (SIZE(2)) OF SubSequence OPTIONAL,
+    optionalSequenceOf  SEQUENCE (SIZE(1..2)) OF SubSequence OPTIONAL,
     choiceExample       CHOICE {
         sequence            SubSequence,
         exampleInt          INTEGER (0..255),

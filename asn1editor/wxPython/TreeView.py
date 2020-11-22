@@ -39,3 +39,6 @@ class TreeView:
             self.__content_window.SetSizer(sizer)
             self.__content_window.FitInside()
             self.__content_window.AdjustScrollbars()
+
+    def get_window(self) -> wx.Window:
+        return self.__window
