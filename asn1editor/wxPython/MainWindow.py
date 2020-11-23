@@ -54,7 +54,8 @@ class MainWindow(wx.Frame, PluginInterface):
         self.__progress_window: typing.Optional[wx.ProgressDialog] = None
 
         self.SetDropTarget(SingleFileDropTarget(self.__file_dropped))
-        # self.SetSizer(wx.BoxSizer(wx.HORIZONTAL))
+        self.SetAutoLayout(True)
+        self.SetSizer(wx.BoxSizer(wx.HORIZONTAL))
 
         # noinspection SpellCheckingInspection
         sys.excepthook = self.__exception_handler
@@ -101,16 +102,16 @@ class MainWindow(wx.Frame, PluginInterface):
                 main_panel = wx.Window(self, style=wx.EXPAND)
                 self.__content_panel = wx.ScrolledWindow(main_panel, style=wx.HSCROLL | wx.VSCROLL)
                 self.__content_panel.SetScrollbars(15, 15, 50, 50)
-                self.__content_panel.SetSizer(wx.BoxSizer(wx.VERTICAL))
                 self.__content_panel.SetAutoLayout(True)
-                # self.GetSizer().Add(main_panel)
+                self.__content_panel.SetSizer(wx.BoxSizer(wx.VERTICAL))
+                self.GetSizer().Add(main_panel, flag=wx.ALL | wx.EXPAND)
             else:
                 main_panel = None
                 self.__content_panel = wx.ScrolledWindow(self, style=wx.HSCROLL | wx.VSCROLL)
                 self.__content_panel.SetScrollbars(15, 15, 50, 50)
-                self.__content_panel.SetSizer(wx.BoxSizer(wx.VERTICAL))
                 self.__content_panel.SetAutoLayout(True)
-                # self.GetSizer().Add(self.__content_panel, flag=wx.ALL)
+                self.__content_panel.SetSizer(wx.BoxSizer(wx.VERTICAL))
+                self.GetSizer().Add(self.__content_panel, flag=wx.ALL)
 
             view_factory = WxPythonViewFactory.WxPythonViewFactory(self.__content_panel, styler)
 
@@ -141,16 +142,13 @@ class MainWindow(wx.Frame, PluginInterface):
             content_sizer = self.__view.realize().get_sizer(recursive=True)
             sizer.Add(content_sizer, 0, wx.ALL | wx.EXPAND, 5)
 
-            sizer.Layout()
-            self.__content_panel.SetSizer(sizer)
+            self.__content_panel.SetSizerAndFit(sizer)
 
-        self.Update()
-
-        self.__content_panel.Layout()
-        self.__content_panel.FitInside()
         self.__content_panel.AdjustScrollbars()
 
         self.__content_panel.Thaw()
+
+        self.Refresh()
 
     def load_data_from_file(self, file_name: str):
         self.__controller.model_to_view(self.__asn1_handler.load_data_file(file_name))
