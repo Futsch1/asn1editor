@@ -34,7 +34,7 @@ class MainWindow(wx.Frame, PluginInterface):
         self._menu_handler = MenuHandler(self, plugins)
 
         self._menu_handler.build(self.load_spec, self.load_data_from_file, self.save_data_to_file)
-        self.Bind(wx.EVT_CLOSE, self.close, self)
+        self.Bind(wx.EVT_CLOSE, self.close)
 
         self.SetSize(wx.Size(Environment.settings.get('size', (500, 800))))
         self.Maximize(Environment.settings.get('maximized', True))
@@ -127,7 +127,7 @@ class MainWindow(wx.Frame, PluginInterface):
             self._menu_handler.enable()
 
     def _structure_changed(self):
-        self.__content_panel.Freeze()
+        self.Freeze()
 
         if self.__tree_view:
             tree_ctrl = self.__tree_view.get_ctrl(self.__view.realize(), self.__type_name)
@@ -146,9 +146,10 @@ class MainWindow(wx.Frame, PluginInterface):
 
         self.__content_panel.AdjustScrollbars()
 
-        self.__content_panel.Thaw()
-
         self.Refresh()
+        self.PostSizeEvent()
+
+        self.Thaw()
 
     def load_data_from_file(self, file_name: str):
         self.__controller.model_to_view(self.__asn1_handler.load_data_file(file_name))

@@ -81,8 +81,9 @@ class WxPythonListView(WxPythonContainerView, ListView, ValueInterface):
         self._controls['value'].SetValue(val)
 
     def enable(self, enabled: bool):
-        self._controls['value'].Enable(enabled)
-        self.structure_changed()
+        if enabled != self._controls['value'].Enabled:
+            self._controls['value'].Enable(enabled)
+            self.structure_changed()
 
     def add(self, view: WxPythonView):
         self._children.append(view)
