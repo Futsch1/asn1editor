@@ -63,6 +63,11 @@ class WxPythonView(AbstractView, OptionalInterface):
     def get_name(self) -> str:
         return self._name
 
+    def set_visible(self, visible, recursive=True):
+        for control in self._controls.values():
+            if isinstance(control, wx.Window):
+                control.Show(visible)
+
     def _create_sizer(self) -> wx.BoxSizer:
         sizer = wx.BoxSizer(self._controls['orientation'])
         if self._controls['orientation'] == wx.HORIZONTAL:
@@ -305,3 +310,8 @@ class WxPythonBitstringView(WxPythonView, BitstringInterface):
         super(WxPythonBitstringView, self).destroy()
         for _, checkbox in self._controls['checkboxes']:
             checkbox.Destroy()
+
+    def set_visible(self, visible, recursive=True):
+        super(WxPythonBitstringView, self).set_visible(visible, recursive)
+        for _, checkbox in self._controls['checkboxes']:
+            checkbox.Show(visible)

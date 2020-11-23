@@ -61,6 +61,12 @@ class WxPythonContainerView(WxPythonView, ContainerView):
         for child in self._children:
             child.destroy()
 
+    def set_visible(self, visible, recursive=True):
+        super(WxPythonContainerView, self).set_visible(visible, recursive)
+        for child in self._children:
+            if recursive or not child._container:
+                child.set_visible(visible, recursive)
+
 
 class WxPythonListView(WxPythonContainerView, ListView, ValueInterface):
     def __init__(self, name: str, controls: ControlList, parent: wx.Window):
@@ -148,6 +154,9 @@ class WxPythonChoiceView(WxPythonView, ChoiceView, ValueInterface):
 
         self.structure_changed()
 
+    def get_view(self) -> WxPythonView:
+        return self._view
+
     def get_sizer(self, recursive: bool) -> wx.Sizer:
         outer_sizer = wx.BoxSizer(wx.HORIZONTAL)
         sizer = self._create_sizer()
@@ -167,3 +176,8 @@ class WxPythonChoiceView(WxPythonView, ChoiceView, ValueInterface):
         super(WxPythonChoiceView, self).destroy()
         if self._view is not None:
             self._view.destroy()
+
+    def set_visible(self, visible, recursive=True):
+        super(WxPythonChoiceView, self).set_visible(visible, recursive)
+        if recursive or not self._view._container:
+            self._view.set_visible(visible, recursive)

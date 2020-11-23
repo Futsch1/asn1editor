@@ -91,33 +91,24 @@ class MainWindow(wx.Frame, PluginInterface):
             if self.__view is not None:
                 self.__view.realize().destroy()
                 self.__content_panel.Destroy()
-                # self.GetSizer().Clear()
 
             styler = Styler(os.path.splitext(file_name)[0] + '.style')
 
             WxPythonView.structure_changed = lambda x: None
 
             view_as_tree = self._menu_handler.view_select.selected == self._menu_handler.view_select.TREE
-            if view_as_tree:
-                main_panel = wx.Window(self, style=wx.EXPAND)
-                self.__content_panel = wx.ScrolledWindow(main_panel, style=wx.HSCROLL | wx.VSCROLL)
-                self.__content_panel.SetScrollbars(15, 15, 50, 50)
-                self.__content_panel.SetAutoLayout(True)
-                self.__content_panel.SetSizer(wx.BoxSizer(wx.VERTICAL))
-                self.GetSizer().Add(main_panel, flag=wx.ALL | wx.EXPAND)
-            else:
-                main_panel = None
-                self.__content_panel = wx.ScrolledWindow(self, style=wx.HSCROLL | wx.VSCROLL)
-                self.__content_panel.SetScrollbars(15, 15, 50, 50)
-                self.__content_panel.SetAutoLayout(True)
-                self.__content_panel.SetSizer(wx.BoxSizer(wx.VERTICAL))
+            self.__content_panel = wx.ScrolledWindow(self, style=wx.HSCROLL | wx.VSCROLL)
+            self.__content_panel.SetScrollbars(15, 15, 50, 50)
+            self.__content_panel.SetAutoLayout(True)
+            self.__content_panel.SetSizer(wx.BoxSizer(wx.VERTICAL))
+            if not view_as_tree:
                 self.GetSizer().Add(self.__content_panel, flag=wx.ALL)
 
             view_factory = WxPythonViewFactory.WxPythonViewFactory(self.__content_panel, styler)
 
             self.__view, self.__controller = self.__asn1_handler.create_mvc_for_type(self.__type_name, view_factory)
             if view_as_tree:
-                self.__tree_view = TreeView(main_panel, self.__content_panel)
+                self.__tree_view = TreeView(self, self.__content_panel, self.__type_name)
             else:
                 self.__tree_view = None
 
@@ -130,11 +121,14 @@ class MainWindow(wx.Frame, PluginInterface):
         self.Freeze()
 
         if self.__tree_view:
-            tree_ctrl = self.__tree_view.get_ctrl(self.__view.realize(), self.__type_name)
-            sizer = wx.BoxSizer(wx.HORIZONTAL)
-            sizer.Add(tree_ctrl, 1, flag=wx.EXPAND)
-            sizer.Add(self.__content_panel, 1, flag=wx.EXPAND)
-            self.__tree_view.get_window().SetSizer(sizer)
+            tree_ctrl = self.__tree_view.get_ctrl(self.__view.realize())
+            sizer = self.GetSizer()
+            sizer.Clear()
+
+            sizer.Add(tree_ctrl, proportion=1, flag=wx.EXPAND)
+            sizer.Add(self.__content_panel, proportion=2, flag=wx.EXPAND)
+
+            self.SetSizer(sizer)
         else:
             sizer: wx.Sizer = self.__content_panel.GetSizer()
             sizer.Clear()
@@ -143,8 +137,6 @@ class MainWindow(wx.Frame, PluginInterface):
             sizer.Add(content_sizer, 0, wx.ALL | wx.EXPAND, 5)
 
             self.__content_panel.SetSizerAndFit(sizer)
-
-        self.__content_panel.AdjustScrollbars()
 
         self.Refresh()
         self.PostSizeEvent()
