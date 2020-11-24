@@ -53,7 +53,7 @@ class TreeView:
         root_view.set_visible(False, recursive=True)
 
         selected = self.__tree_ctrl.GetSelection()
-        if selected.IsOk():
+        if selected.IsOk() and self.__tree_ctrl.GetItemData(selected) is not None:
             self.__show_view(self.__tree_ctrl.GetItemData(selected))
 
         self.__tree_ctrl.Show()
@@ -63,12 +63,17 @@ class TreeView:
         self.__current_view = None
         self.__tree_ctrl.Hide()
 
+    def destroy(self):
+        self.__tree_ctrl.Destroy()
+
     def item_selected(self, e: wx.TreeEvent):
         view = self.__tree_ctrl.GetItemData(e.GetItem())
         if view is not None:
             self.__show_view(view)
 
     def __show_view(self, view: WxPythonView):
+        self.__content_window.GetTopLevelParent().Freeze()
+
         if self.__current_view is not None:
             self.__current_view.set_visible(False, recursive=False)
 
@@ -84,3 +89,5 @@ class TreeView:
         self.__content_window.SetSizer(sizer)
         self.__content_window.FitInside()
         self.__content_window.AdjustScrollbars()
+
+        self.__content_window.GetTopLevelParent().Thaw()

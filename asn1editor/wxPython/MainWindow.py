@@ -91,6 +91,8 @@ class MainWindow(wx.Frame, PluginInterface):
             if self.__view is not None:
                 self.__view.realize().destroy()
                 self.__content_panel.Destroy()
+            if self.__tree_view is not None:
+                self.__tree_view.destroy()
 
             styler = Styler(os.path.splitext(file_name)[0] + '.style')
 
@@ -103,8 +105,12 @@ class MainWindow(wx.Frame, PluginInterface):
 
             view_factory = WxPythonViewFactory.WxPythonViewFactory(self.__content_panel, styler)
 
+            self.Freeze()
+
             self.__view, self.__controller = self.__asn1_handler.create_mvc_for_type(self.__type_name, view_factory)
             self.__tree_view = TreeView(self, self.__content_panel, self.__type_name)
+
+            self.Thaw()
 
             WxPythonView.structure_changed = self._structure_changed
             self._structure_changed()
