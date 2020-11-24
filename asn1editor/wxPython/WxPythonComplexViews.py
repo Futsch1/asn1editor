@@ -8,6 +8,8 @@ from asn1editor.wxPython.WxPythonViews import WxPythonView, ControlList
 
 
 class WxPythonContainerView(WxPythonView, ContainerView):
+    icon = 'sequence'
+
     def __init__(self, name: str, controls: ControlList, parent: wx.Window):
         super(WxPythonContainerView, self).__init__(name, controls, container=True)
         self._children: List[WxPythonView] = []
@@ -19,10 +21,14 @@ class WxPythonContainerView(WxPythonView, ContainerView):
         else:
             sizer = wx.BoxSizer(wx.VERTICAL)
 
-        sizer.Add(self._controls['icon'], flag=wx.ALL)
-        sizer.Add(self._controls['name'], flag=wx.ALL, border=5)
         if 'optional' not in self._controls:
-            sizer.Hide(self._controls['name'])
+            self._controls['icon'].Show(False)
+            self._controls['name'].Show(False)
+        else:
+            name_sizer = wx.BoxSizer(wx.HORIZONTAL)
+            name_sizer.Add(self._controls['icon'], flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL)
+            name_sizer.Add(self._controls['name'], flag=wx.ALL, border=5)
+            sizer.Add(name_sizer)
 
         if recursive:
             container_sizer = wx.FlexGridSizer(cols=2, vgap=8, hgap=8)
@@ -62,6 +68,8 @@ class WxPythonContainerView(WxPythonView, ContainerView):
 
 
 class WxPythonListView(WxPythonContainerView, ListView, ValueInterface):
+    icon = 'sequence_of'
+
     def __init__(self, name: str, controls: ControlList, parent: wx.Window):
         super(WxPythonListView, self).__init__(name, controls, parent)
 
@@ -116,6 +124,8 @@ class WxPythonListView(WxPythonContainerView, ListView, ValueInterface):
 
 
 class WxPythonChoiceView(WxPythonView, ChoiceView, ValueInterface):
+    icon = 'choice'
+
     def __init__(self, name: str, controls: ControlList):
         super(WxPythonChoiceView, self).__init__(name, controls, True)
         self._view: Optional[WxPythonView] = None
