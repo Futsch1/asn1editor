@@ -17,22 +17,32 @@ class TreeView:
 
     def __sync(self, tree_item: wx.TreeItemId, view: WxPythonView):
         if isinstance(view, WxPythonContainerView):
-            tree_child, cookie = self.__tree_ctrl.GetFirstChild(tree_item)
             found = False
-            container_item = None
+            container_item_for_view = None
+            tree_child, cookie = self.__tree_ctrl.GetFirstChild(tree_item)
             while tree_child.IsOk():
-                if self.__tree_ctrl.GetItemData(tree_child) == view:
-                    container_item = tree_child
+                child_view = self.__tree_ctrl.GetItemData(tree_child)
+                if child_view == view:
+                    container_item_for_view = tree_child
                     found = True
                 tree_child, cookie = self.__tree_ctrl.GetNextChild(tree_child, cookie)
             if not found:
-                container_item = self.__tree_ctrl.AppendItem(tree_item, view.get_name())
-                self.__tree_ctrl.SetItemData(container_item, view)
+                container_item_for_view = self.__tree_ctrl.AppendItem(tree_item, view.get_name())
+                self.__tree_ctrl.SetItemData(container_item_for_view, view)
 
-            # TODO: Check the other way around: view is no longer present
+            # Find children of current item
+            current_child_views_in_tree = []
+            tree_child, cookie = self.__tree_ctrl.GetFirstChild(container_item_for_view)
+            while tree_child.IsOk():
+                current_child_views_in_tree.append((self.__tree_ctrl.GetItemData(tree_child), tree_child))
+                tree_child, cookie = self.__tree_ctrl.GetNextChild(tree_child, cookie)
+
+            for current_child, current_treeitem in current_child_views_in_tree:
+                if current_child not in view.get_children():
+                    self.__tree_ctrl.Delete(current_treeitem)
 
             for child in view.get_children():
-                self.__sync(container_item, child)
+                self.__sync(container_item_for_view, child)
         if isinstance(view, WxPythonChoiceView):
             pass
 
