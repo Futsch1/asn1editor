@@ -56,7 +56,12 @@ class TreeView:
         if selected.IsOk():
             self.__show_view(self.__tree_ctrl.GetItemData(selected))
 
+        self.__tree_ctrl.Show()
         return self.__tree_ctrl
+
+    def hide(self):
+        self.__current_view = None
+        self.__tree_ctrl.Hide()
 
     def item_selected(self, e: wx.TreeEvent):
         view = self.__tree_ctrl.GetItemData(e.GetItem())

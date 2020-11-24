@@ -20,7 +20,7 @@ class MenuHandler:
         self.__save_data_item = None
         self.view_select: typing.Optional[ViewSelect] = None
 
-    def build(self, load_spec: typing.Callable, load_data_from_file: typing.Callable, save_data_to_file: typing.Callable):
+    def build(self, load_spec: typing.Callable, load_data_from_file: typing.Callable, save_data_to_file: typing.Callable, view_changed: typing.Callable):
         menu_bar = wx.MenuBar()
         file_menu = wx.Menu()
         load_spec_item: wx.MenuItem = file_menu.Append(wx.ID_ANY, 'Open ASN.1 specification')
@@ -120,7 +120,7 @@ class MenuHandler:
         picker = FilePickerHandler(data_save_dialog_constructor, save_data_to_file, True)
         self.__frame.Bind(wx.EVT_MENU, picker.on_menu_click, self.__save_data_item)
 
-        self.view_select = ViewSelect(self.__frame, auto_view, groups_view, tree_view)
+        self.view_select = ViewSelect(self.__frame, auto_view, groups_view, tree_view, view_changed)
 
     def enable(self):
         self.__load_data_item.Enable(True)
