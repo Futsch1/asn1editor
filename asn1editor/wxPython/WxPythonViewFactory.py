@@ -206,3 +206,8 @@ class WxPythonViewFactory(AbstractViewFactory):
     def _apply_style(controls: ControlList):
         if controls.get('style') == 'read_only' and 'value' in controls:
             controls['value'].Enable(False)
+
+    @staticmethod
+    def _apply_style(controls: ControlList):
+        if controls.get('style') == 'read_only' and 'value' in controls:
+            controls['value'].Enable(False)
