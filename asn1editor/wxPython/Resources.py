@@ -1,5 +1,10 @@
 import os
 import sys
+import typing
+
+from asn1editor.wxPython.ImageList import ImageList
+
+image_list: typing.Optional[ImageList] = None
 
 
 def resource_path(relative_path: str) -> str:

@@ -9,9 +9,10 @@ import asn1editor
 from asn1editor.ASN1SpecHandler import ASN1SpecHandler
 from asn1editor.Plugin import Plugin
 from asn1editor.PluginInterface import PluginInterface
-from asn1editor.wxPython import Environment
+from asn1editor.wxPython import Environment, Resources
 from asn1editor.wxPython import WxPythonViewFactory
 from asn1editor.wxPython.FilePickerHandler import FilePickerHandler
+from asn1editor.wxPython.ImageList import ImageList
 from asn1editor.wxPython.MenuHandler import MenuHandler
 from asn1editor.wxPython.SingleFileDropTarget import SingleFileDropTarget
 from asn1editor.wxPython.Styler import Styler
@@ -24,6 +25,7 @@ class MainWindow(wx.Frame, PluginInterface):
         super(MainWindow, self).__init__(None, title=title)
 
         Environment.load()
+        Resources.image_list = ImageList()
 
         if plugins is not None:
             for plugin in plugins:

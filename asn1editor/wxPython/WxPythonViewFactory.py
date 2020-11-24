@@ -9,7 +9,7 @@ from asn1editor.interfaces.OptionalInterface import OptionalInterface
 from asn1editor.interfaces.ValueInterface import ValueInterface
 from asn1editor.view.AbstractView import AbstractView, ContainerView, ListView, ChoiceView
 from asn1editor.view.AbstractViewFactory import AbstractViewFactory
-from asn1editor.wxPython.Resources import resource_path
+from asn1editor.wxPython import Resources
 from asn1editor.wxPython.Styler import Styler
 from asn1editor.wxPython.WxPythonComplexViews import WxPythonContainerView, WxPythonListView, WxPythonChoiceView
 from asn1editor.wxPython.WxPythonViews import WxPythonValueView, WxPythonBooleanView, \
@@ -41,14 +41,14 @@ class WxPythonViewFactory(AbstractViewFactory):
         return view
 
     def get_container_view(self, name: str, optional: bool) -> Tuple[ContainerView, OptionalInterface]:
-        controls = self._get_controls(name, optional, icon='sequence')
+        controls = self._get_controls(name, optional, icon=WxPythonContainerView.icon)
 
         view = WxPythonContainerView(name, controls, self._window)
 
         return view, view if optional else None
 
     def get_list_view(self, name: str, minimum: int, maximum: int, optional: bool) -> Tuple[ListView, ValueInterface, OptionalInterface]:
-        controls = self._get_controls(name, optional, icon='sequence_of')
+        controls = self._get_controls(name, optional, icon=WxPythonListView.icon)
 
         num_elements = wx.SpinCtrl(self._window)
         if minimum is not None:
@@ -130,7 +130,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         return view, view, view if optional else None
 
     def get_choice_view(self, name: str, choices: List[str], optional: bool) -> Tuple[ChoiceView, ValueInterface, OptionalInterface]:
-        controls = self._get_controls(name, optional, icon='choice')
+        controls = self._get_controls(name, optional, icon=WxPythonChoiceView.icon)
 
         controls['value'] = wx.ComboBox(self._window, choices=choices, style=wx.CB_READONLY)
         self._apply_style(controls)
@@ -187,14 +187,20 @@ class WxPythonViewFactory(AbstractViewFactory):
         return controls
 
     def _get_svg(self, bitmap_name: str, icon_tooltip: str = None) -> wx.StaticBitmap:
-        # noinspection PyArgumentList
-        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile(resource_path(f'icons/{bitmap_name}.svg'))
-        bitmap = wx.StaticBitmap(self._window, bitmap=image.ConvertToBitmap(width=16, height=16))
+        bitmap = Resources.image_list.get_bitmap(bitmap_name)
+        if bitmap is None:
+            # noinspection PyArgumentList
+            image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile(Resources.resource_path(f'icons/{bitmap_name}.svg'))
+            bitmap = image.ConvertToBitmap(width=16, height=16)
+            Resources.image_list.add_bitmap(bitmap, bitmap_name)
+
+        static_bitmap = wx.StaticBitmap(self._window, bitmap=bitmap)
+
         if icon_tooltip:
-            bitmap.SetToolTip(icon_tooltip)
+            static_bitmap.SetToolTip(icon_tooltip)
         else:
-            bitmap.SetToolTip(bitmap_name.upper().replace('_', ' '))
-        return bitmap
+            static_bitmap.SetToolTip(bitmap_name.upper().replace('_', ' '))
+        return static_bitmap
 
     @staticmethod
     def _apply_style(controls: ControlList):

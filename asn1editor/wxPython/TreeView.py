@@ -2,6 +2,7 @@ import typing
 
 import wx
 
+from asn1editor.wxPython import Resources
 from asn1editor.wxPython.WxPythonComplexViews import WxPythonContainerView, WxPythonChoiceView
 from asn1editor.wxPython.WxPythonViews import WxPythonView
 
@@ -10,8 +11,11 @@ class TreeView:
 
     def __init__(self, window: wx.Window, content_window: wx.ScrolledWindow, root_name: str):
         self.__tree_ctrl = wx.TreeCtrl(window)
-        self.__tree_ctrl.AddRoot(root_name)
+        root_item = self.__tree_ctrl.AddRoot(root_name)
+        self.__tree_ctrl.SetItemBold(root_item, True)
         self.__tree_ctrl.Bind(wx.EVT_TREE_SEL_CHANGED, self.item_selected)
+        self.__tree_ctrl.Bind(wx.EVT_TREE_ITEM_RIGHT_CLICK, self.item_right_clicked)
+        self.__tree_ctrl.SetImageList(Resources.image_list.get_image_list())
         self.__content_window = content_window
         self.__current_view: typing.Optional[WxPythonView] = None
 
@@ -34,7 +38,7 @@ class TreeView:
             if view.get_has_value():
                 self.__sync(container_item_for_view, view.get_view())
 
-    def __add_if_not_in_tree(self, tree_item: wx.TreeItemId, view: WxPythonView) -> typing.Optional[wx.TreeItemId]:
+    def __add_if_not_in_tree(self, tree_item: wx.TreeItemId, view: typing.Union[WxPythonContainerView, WxPythonChoiceView]) -> typing.Optional[wx.TreeItemId]:
         # First, check if the view is not in the tree yet
         found = False
         container_item_for_view = None
@@ -46,8 +50,11 @@ class TreeView:
                 found = True
             tree_child, cookie = self.__tree_ctrl.GetNextChild(tree_child, cookie)
         if not found:
-            container_item_for_view = self.__tree_ctrl.AppendItem(tree_item, view.get_name())
+            image = Resources.image_list.get_index(view.icon)
+            container_item_for_view = self.__tree_ctrl.AppendItem(tree_item, view.get_name(), image=image)
             self.__tree_ctrl.SetItemData(container_item_for_view, view)
+
+        self.__tree_ctrl.SetItemBold(container_item_for_view, view.get_has_value())
 
         return container_item_for_view
 
@@ -84,6 +91,25 @@ class TreeView:
         view = self.__tree_ctrl.GetItemData(e.GetItem())
         if view is not None:
             self.__show_view(view)
+
+    def item_right_clicked(self, e: wx.TreeEvent):
+        class RightClickMenu(wx.Menu):
+            def __init__(self, parent):
+                super(RightClickMenu, self).__init__()
+                self.parent = parent
+
+                self.expand = self.Append(wx.NewId(), 'Expand')
+                self.expand_all = self.Append(wx.NewId(), 'Expand all')
+                self.AppendSeparator()
+                self.collapse = self.Append(wx.NewId(), 'Collapse')
+                self.collapse_all = self.Append(wx.NewId(), 'Collapse all')
+
+        menu = RightClickMenu(self.__tree_ctrl.GetTopLevelParent())
+        menu.Bind(wx.EVT_MENU, lambda _: self.__tree_ctrl.ExpandAllChildren(e.GetItem()), menu.expand)
+        menu.Bind(wx.EVT_MENU, lambda _: self.__tree_ctrl.ExpandAll(), menu.expand_all)
+        menu.Bind(wx.EVT_MENU, lambda _: self.__tree_ctrl.CollapseAllChildren(e.GetItem()), menu.collapse)
+        menu.Bind(wx.EVT_MENU, lambda _: self.__tree_ctrl.CollapseAll(), menu.collapse_all)
+        self.__tree_ctrl.GetTopLevelParent().PopupMenu(menu, e.GetPoint())
 
     def __show_view(self, view: WxPythonView):
         self.__content_window.GetTopLevelParent().Freeze()
