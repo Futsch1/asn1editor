@@ -68,9 +68,9 @@ class WxPythonView(AbstractView, OptionalInterface):
             if isinstance(control, wx.Window):
                 control.Show(visible)
 
-    def _create_sizer(self) -> wx.BoxSizer:
-        sizer = wx.BoxSizer(self._controls['orientation'])
-        if self._controls['orientation'] == wx.HORIZONTAL:
+    def _create_sizer(self, orientation: int = wx.HORIZONTAL) -> wx.BoxSizer:
+        sizer = wx.BoxSizer(orientation)
+        if orientation == wx.HORIZONTAL:
             if 'icon' in self._controls:
                 sizer.Add(self._controls['icon'], flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL)
             sizer.Add(self._controls['name'], flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL, border=5)
@@ -93,6 +93,9 @@ class WxPythonValueView(WxPythonView, ValueInterface):
     def get_sizer(self, recursive: bool) -> wx.Sizer:
         sizer = self._create_sizer()
         sizer.Add(self._controls['value'], proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
+
+        if self._controls.get('style') == 'hidden':
+            sizer.ShowItems(False)
         return sizer
 
     def register_change_event(self, callback: Callable):

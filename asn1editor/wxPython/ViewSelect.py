@@ -8,15 +8,16 @@ class ViewSelect:
 
     def __init__(self, frame: wx.Frame, auto_item: wx.MenuItem, groups_item: wx.MenuItem, tree_item: wx.MenuItem):
         self.__auto_item = auto_item
+        self.__auto_item.Enable(False)
         self.__groups_item = groups_item
         self.__tree_item = tree_item
         frame.Bind(wx.EVT_MENU, self.event, auto_item)
         frame.Bind(wx.EVT_MENU, self.event, groups_item)
         frame.Bind(wx.EVT_MENU, self.event, tree_item)
 
-        self.__auto_item.Check(True)
+        self.__auto_item.Check(False)
         self.__groups_item.Check(False)
-        self.__tree_item.Check(False)
+        self.__tree_item.Check(True)
 
     def event(self, e: wx.Event):
         self.selected = e.GetId()

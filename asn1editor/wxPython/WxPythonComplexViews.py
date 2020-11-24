@@ -101,7 +101,7 @@ class WxPythonListView(WxPythonContainerView, ListView, ValueInterface):
         self.structure_changed()
 
     def get_sizer(self, recursive: bool) -> wx.Sizer:
-        sizer = self._create_sizer()
+        sizer = self._create_sizer(wx.VERTICAL)
         sub_sizer = wx.BoxSizer(wx.HORIZONTAL)
         sub_sizer.Add(self._controls['num_elements'], border=5, flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL)
         sub_sizer.Add(self._controls['value'], border=5, flag=wx.ALL)
@@ -162,7 +162,7 @@ class WxPythonChoiceView(WxPythonView, ChoiceView, ValueInterface):
 
     def get_sizer(self, recursive: bool) -> wx.Sizer:
         outer_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        sizer = self._create_sizer()
+        sizer = self._create_sizer(wx.VERTICAL)
         sizer.Add(self._controls['value'], border=5)
         outer_sizer.Add(sizer)
         if recursive or not self._view._container:

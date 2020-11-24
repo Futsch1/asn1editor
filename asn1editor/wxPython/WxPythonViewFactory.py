@@ -23,18 +23,18 @@ class WxPythonViewFactory(AbstractViewFactory):
 
     def get_enumerated_view(self, name: str, choices: List[str], optional: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
         controls = self._get_controls(name, optional, ':', 'enumerated')
-        controls['orientation'] = wx.HORIZONTAL
 
         controls['value'] = wx.ComboBox(self._window, choices=choices, style=wx.CB_READONLY)
+        self._apply_style(controls)
 
         view = WxPythonValueSelectionView(name, controls)
         return view, view, view if optional else None
 
     def get_text_view(self, name: str, text: str) -> AbstractView:
         controls = self._get_controls(name, False)
-        controls['orientation'] = wx.HORIZONTAL
 
         controls['value'] = wx.StaticText(self._window, wx.ID_ANY, text)
+        self._apply_style(controls)
 
         view = WxPythonValueView(name, controls)
 
@@ -42,7 +42,6 @@ class WxPythonViewFactory(AbstractViewFactory):
 
     def get_container_view(self, name: str, optional: bool) -> Tuple[ContainerView, OptionalInterface]:
         controls = self._get_controls(name, optional, icon='sequence')
-        controls['orientation'] = wx.VERTICAL
 
         view = WxPythonContainerView(name, controls, self._window)
 
@@ -50,7 +49,6 @@ class WxPythonViewFactory(AbstractViewFactory):
 
     def get_list_view(self, name: str, minimum: int, maximum: int, optional: bool) -> Tuple[ListView, ValueInterface, OptionalInterface]:
         controls = self._get_controls(name, optional, icon='sequence_of')
-        controls['orientation'] = wx.VERTICAL
 
         num_elements = wx.SpinCtrl(self._window)
         if minimum is not None:
@@ -64,6 +62,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         num_elements.SetToolTip(f"Minimum elements: {minimum}, maximum elements: {maximum}")
         controls['value'] = num_elements
         controls['num_elements'] = wx.StaticText(self._window, wx.ID_ANY, "Elements:")
+        self._apply_style(controls)
 
         view = WxPythonListView(name, controls, self._window)
 
@@ -72,7 +71,6 @@ class WxPythonViewFactory(AbstractViewFactory):
     def get_number_view(self, name: str, optional: bool, minimum: Optional[Union[int, float]],
                         maximum: Optional[Union[int, float]], float_: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
         controls = self._get_controls(name, optional, ':', 'float' if float_ else 'integer')
-        controls['orientation'] = wx.HORIZONTAL
 
         edit = wx.lib.masked.numctrl.NumCtrl(self._window)
         tool_tip = []
@@ -89,22 +87,22 @@ class WxPythonViewFactory(AbstractViewFactory):
             edit.SetToolTip(', '.join(tool_tip))
 
         controls['value'] = edit
+        self._apply_style(controls)
 
         view = WxPythonValueView(name, controls)
         return view, view, view if optional else None
 
     def get_boolean_view(self, name: str, optional: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
         controls = self._get_controls(name, optional, ':', 'bool')
-        controls['orientation'] = wx.HORIZONTAL
 
         controls['value'] = wx.CheckBox(self._window)
+        self._apply_style(controls)
 
         view = WxPythonBooleanView(name, controls)
         return view, view, view if optional else None
 
     def get_string_view(self, name: str, string_type: str, optional: bool, minimum: Optional[int], maximum: Optional[int]):
         controls = self._get_controls(name, optional, ':', 'string', string_type)
-        controls['orientation'] = wx.HORIZONTAL
 
         edit = wx.TextCtrl(self._window)
         if maximum:
@@ -116,25 +114,26 @@ class WxPythonViewFactory(AbstractViewFactory):
         edit.SetToolTip(f"Minimum characters: {minimum}, maximum characters: {maximum}")
 
         controls['value'] = edit
+        self._apply_style(controls)
 
         view = WxPythonValueView(name, controls)
         return view, view, view if optional else None
 
     def get_hex_string_view(self, name: str, optional: bool, minimum: Optional[int], maximum: Optional[int]):
         controls = self._get_controls(name, optional, ':', 'string', 'OCTET STRING')
-        controls['orientation'] = wx.HORIZONTAL
 
         controls['selector'] = wx.CheckBox(self._window, label='Hex')
         controls['value'] = wx.TextCtrl(self._window)
+        self._apply_style(controls)
 
         view = WxPythonHexStringView(name, controls, minimum, maximum)
         return view, view, view if optional else None
 
     def get_choice_view(self, name: str, choices: List[str], optional: bool) -> Tuple[ChoiceView, ValueInterface, OptionalInterface]:
         controls = self._get_controls(name, optional, icon='choice')
-        controls['orientation'] = wx.VERTICAL
 
-        controls['value'] = wx.Choice(self._window, choices=choices)
+        controls['value'] = wx.ComboBox(self._window, choices=choices, style=wx.CB_READONLY)
+        self._apply_style(controls)
 
         view = WxPythonChoiceView(name, controls)
 
@@ -143,7 +142,6 @@ class WxPythonViewFactory(AbstractViewFactory):
     def get_bitstring_view(self, name: str, number_of_bits: int, named_bits: List[Tuple[str, int]], optional: bool) -> Tuple[AbstractView, BitstringInterface,
                                                                                                                              OptionalInterface]:
         controls = self._get_controls(name, optional, icon='bitstring')
-        controls['orientation'] = wx.HORIZONTAL
 
         checkboxes: List[Tuple[int, wx.CheckBox]] = []
 
@@ -197,3 +195,8 @@ class WxPythonViewFactory(AbstractViewFactory):
         else:
             bitmap.SetToolTip(bitmap_name.upper().replace('_', ' '))
         return bitmap
+
+    @staticmethod
+    def _apply_style(controls: ControlList):
+        if controls.get('style') == 'read_only' and 'value' in controls:
+            controls['value'].Enable(False)
