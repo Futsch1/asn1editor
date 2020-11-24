@@ -6,9 +6,6 @@ class AbstractView:  # pragma: no cover
     def realize(self) -> Any:
         raise NotImplementedError
 
-    def destroy(self):
-        raise NotImplementedError
-
 
 class ContainerView(AbstractView, ABC):  # pragma: no cover
     def add_child(self, view: AbstractView):
