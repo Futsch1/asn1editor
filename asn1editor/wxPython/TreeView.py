@@ -43,8 +43,9 @@ class TreeView:
                     self.__tree_ctrl.Delete(current_treeitem)
 
             # Finally handle children
-            for child in view.get_children():
-                self.__sync(container_item_for_view, child)
+            if view.get_has_value():
+                for child in view.get_children():
+                    self.__sync(container_item_for_view, child)
         if isinstance(view, WxPythonChoiceView):
             pass
 
