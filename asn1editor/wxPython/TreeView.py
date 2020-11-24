@@ -18,36 +18,49 @@ class TreeView:
     def __sync(self, tree_item: wx.TreeItemId, view: WxPythonView):
         if isinstance(view, WxPythonContainerView):
             # First, check if the view is not in the tree yet
-            found = False
-            container_item_for_view = None
-            tree_child, cookie = self.__tree_ctrl.GetFirstChild(tree_item)
-            while tree_child.IsOk():
-                child_view = self.__tree_ctrl.GetItemData(tree_child)
-                if child_view == view:
-                    container_item_for_view = tree_child
-                    found = True
-                tree_child, cookie = self.__tree_ctrl.GetNextChild(tree_child, cookie)
-            if not found:
-                container_item_for_view = self.__tree_ctrl.AppendItem(tree_item, view.get_name())
-                self.__tree_ctrl.SetItemData(container_item_for_view, view)
+            container_item_for_view = self.__add_if_not_in_tree(tree_item, view)
 
             # Now check if it was removed from the tree
-            current_child_views_in_tree = []
-            tree_child, cookie = self.__tree_ctrl.GetFirstChild(container_item_for_view)
-            while tree_child.IsOk():
-                current_child_views_in_tree.append((self.__tree_ctrl.GetItemData(tree_child), tree_child))
-                tree_child, cookie = self.__tree_ctrl.GetNextChild(tree_child, cookie)
-
-            for current_child, current_treeitem in current_child_views_in_tree:
-                if current_child not in view.get_children():
-                    self.__tree_ctrl.Delete(current_treeitem)
+            self.__delete_if_removed(container_item_for_view, view.get_children())
 
             # Finally handle children
             if view.get_has_value():
                 for child in view.get_children():
                     self.__sync(container_item_for_view, child)
         if isinstance(view, WxPythonChoiceView):
-            pass
+            container_item_for_view = self.__add_if_not_in_tree(tree_item, view)
+
+            self.__delete_if_removed(container_item_for_view, [view.get_view()])
+            if view.get_has_value():
+                self.__sync(container_item_for_view, view.get_view())
+
+    def __add_if_not_in_tree(self, tree_item: wx.TreeItemId, view: WxPythonView) -> typing.Optional[wx.TreeItemId]:
+        # First, check if the view is not in the tree yet
+        found = False
+        container_item_for_view = None
+        tree_child, cookie = self.__tree_ctrl.GetFirstChild(tree_item)
+        while tree_child.IsOk():
+            child_view = self.__tree_ctrl.GetItemData(tree_child)
+            if child_view == view:
+                container_item_for_view = tree_child
+                found = True
+            tree_child, cookie = self.__tree_ctrl.GetNextChild(tree_child, cookie)
+        if not found:
+            container_item_for_view = self.__tree_ctrl.AppendItem(tree_item, view.get_name())
+            self.__tree_ctrl.SetItemData(container_item_for_view, view)
+
+        return container_item_for_view
+
+    def __delete_if_removed(self, container_item_for_view: wx.TreeItemId, views: typing.List[WxPythonView]):
+        current_child_views_in_tree = []
+        tree_child, cookie = self.__tree_ctrl.GetFirstChild(container_item_for_view)
+        while tree_child.IsOk():
+            current_child_views_in_tree.append((self.__tree_ctrl.GetItemData(tree_child), tree_child))
+            tree_child, cookie = self.__tree_ctrl.GetNextChild(tree_child, cookie)
+
+        for current_child, current_treeitem in current_child_views_in_tree:
+            if current_child not in views:
+                self.__tree_ctrl.Delete(current_treeitem)
 
     def get_ctrl(self, root_view: WxPythonView) -> wx.TreeCtrl:
         self.__sync(self.__tree_ctrl.GetRootItem(), root_view)

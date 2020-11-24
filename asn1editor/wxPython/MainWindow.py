@@ -134,9 +134,9 @@ class MainWindow(wx.Frame, PluginInterface):
             content_panel_sizer: wx.Sizer = self.__content_panel.GetSizer()
             content_panel_sizer.Clear()
 
+            self.__view.realize().set_visible(True, recursive=True)
             content_sizer = self.__view.realize().get_sizer(recursive=True)
             content_panel_sizer.Add(content_sizer, 0, wx.ALL | wx.EXPAND, 5)
-            self.__view.realize().set_visible(True, recursive=True)
 
             self.__content_panel.SetSizerAndFit(content_panel_sizer)
 
