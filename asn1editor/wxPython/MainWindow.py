@@ -122,25 +122,25 @@ class MainWindow(wx.Frame, PluginInterface):
 
         sizer = self.GetSizer()
         sizer.Clear()
+        content_panel_sizer: wx.Sizer = self.__content_panel.GetSizer()
+        content_panel_sizer.Clear()
 
         if self._menu_handler.view_select.selected == self._menu_handler.view_select.TREE:
+
             tree_ctrl = self.__tree_view.get_ctrl(self.__view.realize())
 
-            sizer.Add(tree_ctrl, proportion=1, flag=wx.EXPAND)
-            sizer.Add(self.__content_panel, proportion=2, flag=wx.EXPAND)
+            sizer.Add(tree_ctrl, proportion=1, flag=wx.ALL | wx.EXPAND)
+            sizer.Add(self.__content_panel, proportion=2, flag=wx.ALL | wx.EXPAND)
         else:
             self.__tree_view.hide()
 
-            content_panel_sizer: wx.Sizer = self.__content_panel.GetSizer()
-            content_panel_sizer.Clear()
-
             self.__view.realize().set_visible(True, recursive=True)
             content_sizer = self.__view.realize().get_sizer(recursive=True)
-            content_panel_sizer.Add(content_sizer, 0, wx.ALL | wx.EXPAND, 5)
+            content_panel_sizer.Add(content_sizer, flag=wx.ALL | wx.EXPAND, border=5)
 
             self.__content_panel.SetSizerAndFit(content_panel_sizer)
 
-            sizer.Add(self.__content_panel, flag=wx.EXPAND)
+            sizer.Add(self.__content_panel, flag=wx.ALL | wx.EXPAND)
 
         self.SetSizer(sizer)
 
