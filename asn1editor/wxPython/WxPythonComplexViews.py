@@ -76,7 +76,9 @@ class WxPythonListView(WxPythonContainerView, ListView, ValueInterface):
         # noinspection PyUnusedLocal
         def event_closure(e: wx.Event):
             del e
+            self._controls['value'].GetTopLevelParent().Freeze()
             callback()
+            self._controls['value'].GetTopLevelParent().Thaw()
 
         self._controls['value'].Bind(wx.EVT_SPINCTRL, event_closure)
 

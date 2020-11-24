@@ -24,8 +24,10 @@ class WxPythonView(AbstractView, OptionalInterface):
         # noinspection PyUnusedLocal
         def event_closure(e: wx.Event):
             del e
+            self._controls['optional'].GetTopLevelParent().Freeze()
             callback()
             self.enable(self.get_has_value())
+            self._controls['optional'].GetTopLevelParent().Thaw()
 
         if 'optional' in self._controls:
             self._controls.get('optional').Bind(wx.EVT_CHECKBOX, event_closure)

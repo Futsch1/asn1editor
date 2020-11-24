@@ -17,6 +17,7 @@ class TreeView:
 
     def __sync(self, tree_item: wx.TreeItemId, view: WxPythonView):
         if isinstance(view, WxPythonContainerView):
+            # First, check if the view is not in the tree yet
             found = False
             container_item_for_view = None
             tree_child, cookie = self.__tree_ctrl.GetFirstChild(tree_item)
@@ -30,7 +31,7 @@ class TreeView:
                 container_item_for_view = self.__tree_ctrl.AppendItem(tree_item, view.get_name())
                 self.__tree_ctrl.SetItemData(container_item_for_view, view)
 
-            # Find children of current item
+            # Now check if it was removed from the tree
             current_child_views_in_tree = []
             tree_child, cookie = self.__tree_ctrl.GetFirstChild(container_item_for_view)
             while tree_child.IsOk():
@@ -41,6 +42,7 @@ class TreeView:
                 if current_child not in view.get_children():
                     self.__tree_ctrl.Delete(current_treeitem)
 
+            # Finally handle children
             for child in view.get_children():
                 self.__sync(container_item_for_view, child)
         if isinstance(view, WxPythonChoiceView):
