@@ -8,7 +8,7 @@ from asn1editor.interfaces.OptionalInterface import OptionalInterface
 from asn1editor.interfaces.ValueInterface import ValueInterface
 from asn1editor.view.AbstractView import AbstractView
 
-ControlList = typing.Dict[str, typing.Union[wx.TextCtrl, wx.CheckBox, wx.StaticBitmap, wx.Choice, wx.StaticText, wx.SpinCtrl, List[Tuple[int, wx.CheckBox]],
+ControlList = typing.Dict[str, typing.Union[wx.TextCtrl, wx.CheckBox, wx.StaticBitmap, wx.ComboBox, wx.StaticText, wx.SpinCtrl, List[Tuple[int, wx.CheckBox]],
                                             str]]
 
 
@@ -131,7 +131,7 @@ class WxPythonValueSelectionView(WxPythonView, ValueInterface):
 
     def get_sizer(self, recursive: bool) -> wx.Sizer:
         sizer = self._create_sizer()
-        sizer.Add(self._controls['value'], proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
+        sizer.Add(self._controls['value'], flag=wx.ALL | wx.EXPAND, border=5)
         return sizer
 
     def register_change_event(self, callback: Callable):

@@ -108,7 +108,10 @@ class WxPythonListView(WxPythonContainerView, ListView, ValueInterface):
         sizer.Add(sub_sizer)
 
         if self.get_has_value():
-            content = wx.StaticBoxSizer(wx.VERTICAL, self._parent, self._name)
+            if recursive:
+                content = wx.StaticBoxSizer(wx.VERTICAL, self._parent, self._name)
+            else:
+                content = wx.BoxSizer(wx.VERTICAL)
             for child in self._children:
                 if recursive or not child._container:
                     content.Add(child.get_sizer(recursive))

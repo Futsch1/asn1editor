@@ -25,7 +25,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         controls = self._get_controls(name, optional, ':', 'enumerated')
         controls['orientation'] = wx.HORIZONTAL
 
-        controls['value'] = wx.Choice(self._window, choices=choices)
+        controls['value'] = wx.ComboBox(self._window, choices=choices, style=wx.CB_READONLY)
 
         view = WxPythonValueSelectionView(name, controls)
         return view, view, view if optional else None

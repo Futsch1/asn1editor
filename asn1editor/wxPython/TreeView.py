@@ -29,6 +29,8 @@ class TreeView:
                 container_item = self.__tree_ctrl.AppendItem(tree_item, view.get_name())
                 self.__tree_ctrl.SetItemData(container_item, view)
 
+            # TODO: Check the other way around: view is no longer present
+
             for child in view.get_children():
                 self.__sync(container_item, child)
         if isinstance(view, WxPythonChoiceView):
