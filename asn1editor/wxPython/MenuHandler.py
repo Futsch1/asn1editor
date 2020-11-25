@@ -52,11 +52,6 @@ class MenuHandler:
         tree_view: wx.MenuItem = view_menu.Append(ViewSelect.TREE, 'Tree', kind=wx.ITEM_CHECK)
         menu_bar.Append(view_menu, '&View')
 
-        help_menu = wx.Menu()
-        about_item = help_menu.Append(wx.ID_ABOUT, 'About')
-        self.__frame.Bind(wx.EVT_MENU, self.__about_item_event, about_item)
-        menu_bar.Append(help_menu, '&Help')
-
         self.__frame.SetMenuBar(menu_bar)
 
         toolbar: typing.Optional[wx.ToolBar] = None
@@ -101,6 +96,11 @@ class MenuHandler:
         if toolbar is not None:
             toolbar.Realize()
 
+        help_menu = wx.Menu()
+        about_item = help_menu.Append(wx.ID_ABOUT, 'About')
+        self.__frame.Bind(wx.EVT_MENU, self.__about_item_event, about_item)
+        menu_bar.Append(help_menu, '&Help')
+
         # Event binding
         def schema_dialog_constructor() -> wx.FileDialog:
             return wx.FileDialog(self.__frame, "ASN.1 schema", wildcard="ASN.1 files (*.asn)|*.asn",
@@ -135,7 +135,7 @@ class MenuHandler:
     # noinspection PyUnusedLocal
     def __about_item_event(self, e: wx.Event):
         del e
-        dialog = wx.MessageDialog(self, f'''asn1editor {asn1editor.__version__}
+        dialog = wx.MessageDialog(self.__frame, f'''asn1editor {asn1editor.__version__}
 
 Published under MIT License
 
