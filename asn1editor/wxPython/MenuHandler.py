@@ -76,6 +76,7 @@ class MenuHandler:
                 if len(tools):
                     if toolbar is None:
                         toolbar = self.__frame.CreateToolBar()
+                        toolbar.SetToolSeparation(8)
                         toolbar.Bind(wx.EVT_TOOL, self.__tb_menu_event)
                     else:
                         toolbar.AddSeparator()
