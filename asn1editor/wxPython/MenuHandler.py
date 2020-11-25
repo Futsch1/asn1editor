@@ -8,7 +8,7 @@ import asn1editor
 from asn1editor.ASN1SpecHandler import ASN1SpecHandler
 from asn1editor.Plugin import Plugin
 from asn1editor.wxPython.FilePickerHandler import FilePickerHandler
-from asn1editor.wxPython.Resources import resource_path
+from asn1editor.wxPython.Resources import resource_path, plugin_resource_path
 from asn1editor.wxPython.ViewSelect import ViewSelect
 
 
@@ -85,12 +85,18 @@ class MenuHandler:
                     else:
                         toolbar.AddSeparator()
 
+                    labels = False
+
                     for i, tool in enumerate(tools):
-                        if not len(tool[0]):
+                        if not len(tool):
                             toolbar.AddSeparator()
                         else:
-                            bitmap = wx.Bitmap(tool[2])
+                            bitmap = wx.Bitmap(plugin_resource_path(tool[2]))
+                            labels |= len(tool[0])
                             toolbar.AddTool(toolId=plugin_index * 1000 + i, label=tool[0], bitmap=bitmap, shortHelp=tool[1])
+                    if labels:
+                        toolbar.SetWindowStyle(wx.TB_TEXT | wx.TB_HORIZONTAL)
+                        pass
 
         if toolbar is not None:
             toolbar.Realize()

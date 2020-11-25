@@ -21,7 +21,8 @@ class TestPlugin(Plugin):
                 ('Question', self.__open_question)]
 
     def get_tools(self) -> typing.List[typing.Tuple[str, str, str, typing.Callable]]:
-        return [('Toolbar', 'Toolbar tooltip', 'tests/test.png', self.__open_tooltip)]
+        return [('Toolbar', 'Toolbar tooltip', 'tests/test.png', self.__open_tooltip), (),
+                ('Toolbar', 'Toolbar tooltip', 'tests/test.png', self.__open_tooltip)]
 
     def connect(self, plugin_interface: PluginInterface):
         self.plugin_interface = plugin_interface

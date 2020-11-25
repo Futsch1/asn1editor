@@ -189,10 +189,7 @@ class WxPythonViewFactory(AbstractViewFactory):
     def _get_svg(self, bitmap_name: str, icon_tooltip: str = None) -> wx.StaticBitmap:
         bitmap = Resources.image_list.get_bitmap(bitmap_name)
         if bitmap is None:
-            # noinspection PyArgumentList
-            image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile(Resources.resource_path(f'icons/{bitmap_name}.svg'))
-            bitmap = image.ConvertToBitmap(width=16, height=16)
-            Resources.image_list.add_bitmap(bitmap, bitmap_name)
+            bitmap = Resources.get_bitmap_from_svg(bitmap_name)
 
         static_bitmap = wx.StaticBitmap(self._window, bitmap=bitmap)
 
@@ -201,11 +198,6 @@ class WxPythonViewFactory(AbstractViewFactory):
         else:
             static_bitmap.SetToolTip(bitmap_name.upper().replace('_', ' '))
         return static_bitmap
-
-    @staticmethod
-    def _apply_style(controls: ControlList):
-        if controls.get('style') == 'read_only' and 'value' in controls:
-            controls['value'].Enable(False)
 
     @staticmethod
     def _apply_style(controls: ControlList):

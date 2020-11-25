@@ -11,7 +11,8 @@ class TreeView:
 
     def __init__(self, window: wx.Window, content_window: wx.ScrolledWindow, root_name: str):
         self.__tree_ctrl = wx.TreeCtrl(window)
-        root_item = self.__tree_ctrl.AddRoot(root_name)
+        Resources.get_bitmap_from_svg('root')
+        root_item = self.__tree_ctrl.AddRoot(root_name, Resources.image_list.get_index('root'))
         self.__tree_ctrl.SetItemBold(root_item, True)
         self.__tree_ctrl.Bind(wx.EVT_TREE_SEL_CHANGED, self.item_selected)
         self.__tree_ctrl.Bind(wx.EVT_TREE_ITEM_RIGHT_CLICK, self.item_right_clicked)
