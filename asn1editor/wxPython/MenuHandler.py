@@ -1,14 +1,15 @@
+import os
 import typing
 
 import asn1tools
 import wx
-import wx.svg
 
 import asn1editor
 from asn1editor.ASN1SpecHandler import ASN1SpecHandler
 from asn1editor.Plugin import Plugin
+from asn1editor.wxPython import Resources
 from asn1editor.wxPython.FilePickerHandler import FilePickerHandler
-from asn1editor.wxPython.Resources import resource_path, plugin_resource_path
+from asn1editor.wxPython.Resources import plugin_resource_path
 from asn1editor.wxPython.ViewSelect import ViewSelect
 
 
@@ -18,31 +19,33 @@ class MenuHandler:
         self.__plugins = plugins
         self.__load_data_item = None
         self.__save_data_item = None
+        self.__load_spec = None
+        self.__recent: typing.Optional[typing.List[typing.List[str]]] = None
+        self.__recent_menu: typing.Optional[wx.Menu] = None
         self.view_select: typing.Optional[ViewSelect] = None
 
     def build(self, load_spec: typing.Callable, load_data_from_file: typing.Callable, save_data_to_file: typing.Callable, view_changed: typing.Callable):
+        self.__load_spec = load_spec
+
         menu_bar = wx.MenuBar()
         file_menu = wx.Menu()
         load_spec_item: wx.MenuItem = file_menu.Append(wx.ID_ANY, 'Open ASN.1 specification')
-        # noinspection PyArgumentList
-        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile(resource_path('icons/open.svg'))
-        load_spec_item.SetBitmap(image.ConvertToBitmap(width=16, height=16))
+        load_spec_item.SetBitmap(Resources.get_bitmap_from_svg('open'))
+        self.__recent_menu = wx.Menu()
+        self.__recent_menu.AppendSeparator()
+        self.__frame.Bind(wx.EVT_MENU, self.__clear_recent, self.__recent_menu.Append(wx.NewId(), 'Clear recent list'))
+        recent_submenu: wx.MenuItem = file_menu.AppendSubMenu(self.__recent_menu, 'Open recent')
+        recent_submenu.SetBitmap(Resources.get_bitmap_from_svg('recent'))
         file_menu.AppendSeparator()
         self.__load_data_item: wx.MenuItem = file_menu.Append(wx.ID_OPEN, 'Load encoded data')
-        # noinspection PyArgumentList
-        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile(resource_path('icons/load_encoded.svg'))
-        self.__load_data_item.SetBitmap(image.ConvertToBitmap(width=16, height=16))
+        self.__load_data_item.SetBitmap(Resources.get_bitmap_from_svg('load_encoded'))
         self.__load_data_item.Enable(False)
         self.__save_data_item: wx.MenuItem = file_menu.Append(wx.ID_SAVE, 'Save encoded data')
-        # noinspection PyArgumentList
-        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile(resource_path('icons/save_encoded.svg'))
-        self.__save_data_item.SetBitmap(image.ConvertToBitmap(width=16, height=16))
+        self.__save_data_item.SetBitmap(Resources.get_bitmap_from_svg('save_encoded'))
         self.__save_data_item.Enable(False)
         file_menu.AppendSeparator()
         exit_item = file_menu.Append(wx.ID_EXIT, 'Exit', 'Exit application')
-        # noinspection PyArgumentList
-        image: wx.svg.SVGimage = wx.svg.SVGimage.CreateFromFile(resource_path('icons/exit.svg'))
-        exit_item.SetBitmap(image.ConvertToBitmap(width=16, height=16))
+        exit_item.SetBitmap(Resources.get_bitmap_from_svg('exit'))
         menu_bar.Append(file_menu, '&File')
 
         view_menu = wx.Menu()
@@ -132,6 +135,36 @@ class MenuHandler:
     def enable(self):
         self.__load_data_item.Enable(True)
         self.__save_data_item.Enable(True)
+
+    @property
+    def recent(self) -> typing.List[typing.List[str]]:
+        return self.__recent
+
+    @recent.setter
+    def recent(self, recent_list: typing.List[typing.List[str]]):
+        self.__recent = recent_list
+
+        for recent_list in reversed(self.__recent):
+            self.__prepend_recent_to_menu(recent_list)
+
+    def add_recent(self, filename: str, typename: str):
+        recent = [filename, typename]
+        if recent not in self.__recent:
+            self.__recent.insert(0, recent)
+            self.__prepend_recent_to_menu(recent)
+
+    def __prepend_recent_to_menu(self, recent: typing.List[str]):
+        recent_item = self.__recent_menu.Prepend(wx.NewId(), f'{os.path.basename(recent[0])} {recent[1]} ({recent[0]})')
+        self.__frame.Bind(wx.EVT_MENU, lambda _: self.__load_spec(recent[0], recent[1]), recent_item)
+
+    def __clear_recent(self, _: wx.Event):
+        menu_items = self.__recent_menu.GetMenuItems()
+        for menu_item in menu_items:
+            if menu_item.GetKind() == wx.ITEM_SEPARATOR:
+                break
+            self.__recent_menu.RemoveItem(menu_item)
+
+        self.__recent = []
 
     # noinspection PyUnusedLocal
     def __about_item_event(self, e: wx.Event):

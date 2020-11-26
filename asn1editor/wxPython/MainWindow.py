@@ -42,6 +42,7 @@ class MainWindow(wx.Frame, PluginInterface):
         self.Maximize(Environment.settings.get('maximized', True))
         self.SetPosition(wx.Point(Environment.settings.get('position', (0, 0))))
         self._menu_handler.view_select.selected = Environment.settings.get('view', 1)
+        self._menu_handler.recent = Environment.settings.get('recent', [])
 
         self.__asn1_handler = None
 
@@ -87,6 +88,8 @@ class MainWindow(wx.Frame, PluginInterface):
             self.__type_name = type_name
 
         if self.__type_name is not None:
+            self._menu_handler.add_recent(os.path.abspath(file_name), self.__type_name)
+
             self._status_bar.SetStatusText(f'Loaded {file_name}')
             self.__file_name = file_name
 
@@ -258,6 +261,7 @@ class MainWindow(wx.Frame, PluginInterface):
         Environment.settings['maximized'] = self.IsMaximized()
         Environment.settings['position'] = self.GetPosition().Get()
         Environment.settings['view'] = self._menu_handler.view_select.selected
+        Environment.settings['recent'] = self._menu_handler.recent
 
         Environment.save()
 
