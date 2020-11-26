@@ -43,6 +43,7 @@ class MainWindow(wx.Frame, PluginInterface):
         self.SetPosition(wx.Point(Environment.settings.get('position', (0, 0))))
         self._menu_handler.view_select.selected = Environment.settings.get('view', 1)
         self._menu_handler.recent = Environment.settings.get('recent', [])
+        self._menu_handler.load_last = Environment.settings.get('load_last', True)
 
         self.__asn1_handler = None
 
@@ -65,6 +66,13 @@ class MainWindow(wx.Frame, PluginInterface):
 
         WxPythonView.structure_changed = None
 
+        if self._menu_handler.load_last:
+            # noinspection PyBroadException
+            try:
+                self._menu_handler.load_most_recent()
+            except Exception:
+                pass
+
     def __file_dropped(self, file_name: str):
         if self.__asn1_handler is not None:
             self.load_data_from_file(file_name)
@@ -74,7 +82,11 @@ class MainWindow(wx.Frame, PluginInterface):
     def load_spec(self, file_name: str, type_name: typing.Optional[str] = None):
         # Spec file loaded, compile it to show a selection of type names
         if not self.__asn1_handler or file_name not in self.__asn1_handler.get_filename():
-            self.__asn1_handler = ASN1SpecHandler(file_name)
+            try:
+                self.__asn1_handler = ASN1SpecHandler(file_name)
+            except FileNotFoundError:
+                self.show_message(f'File {file_name} not found', 'Error', PluginInterface.MessageType.ERROR)
+                return
 
         if type_name is None:
             types = self.__asn1_handler.get_types()
@@ -265,6 +277,7 @@ class MainWindow(wx.Frame, PluginInterface):
         Environment.settings['position'] = self.GetPosition().Get()
         Environment.settings['view'] = self._menu_handler.view_select.selected
         Environment.settings['recent'] = self._menu_handler.recent
+        Environment.settings['load_last'] = self._menu_handler.load_last
 
         Environment.save()
 

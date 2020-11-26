@@ -20,6 +20,7 @@ class MenuHandler:
         self.__load_data_item = None
         self.__save_data_item = None
         self.__load_spec = None
+        self.__load_last_spec = None
         self.__recent: typing.Optional[typing.List[typing.List[str]]] = None
         self.__recent_menu: typing.Optional[wx.Menu] = None
         self.view_select: typing.Optional[ViewSelect] = None
@@ -29,13 +30,14 @@ class MenuHandler:
 
         menu_bar = wx.MenuBar()
         file_menu = wx.Menu()
-        load_spec_item: wx.MenuItem = file_menu.Append(wx.ID_ANY, 'Open ASN.1 specification')
+        load_spec_item: wx.MenuItem = file_menu.Append(wx.NewId(), 'Open ASN.1 specification')
         load_spec_item.SetBitmap(Resources.get_bitmap_from_svg('open'))
         self.__recent_menu = wx.Menu()
         self.__recent_menu.AppendSeparator()
         self.__frame.Bind(wx.EVT_MENU, self.__clear_recent, self.__recent_menu.Append(wx.NewId(), 'Clear recent list'))
         recent_submenu: wx.MenuItem = file_menu.AppendSubMenu(self.__recent_menu, 'Open recent')
         recent_submenu.SetBitmap(Resources.get_bitmap_from_svg('recent'))
+        self.__load_last_spec: wx.MenuItem = file_menu.Append(wx.NewId(), 'Open last specification on startup', kind=wx.ITEM_CHECK)
         file_menu.AppendSeparator()
         self.__load_data_item: wx.MenuItem = file_menu.Append(wx.ID_OPEN, 'Load encoded data')
         self.__load_data_item.SetBitmap(Resources.get_bitmap_from_svg('load_encoded'))
@@ -165,6 +167,19 @@ class MenuHandler:
             self.__recent_menu.RemoveItem(menu_item)
 
         self.__recent = []
+
+    def load_most_recent(self):
+        if len(self.__recent):
+            most_recent = self.__recent[0]
+            self.__load_spec(most_recent[0], most_recent[1])
+
+    @property
+    def load_last(self) -> bool:
+        return self.__load_last_spec.IsChecked()
+
+    @load_last.setter
+    def load_last(self, load_last: bool):
+        self.__load_last_spec.Check(load_last)
 
     # noinspection PyUnusedLocal
     def __about_item_event(self, e: wx.Event):
