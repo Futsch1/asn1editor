@@ -41,6 +41,10 @@ class MainWindow(wx.Frame, PluginInterface):
         self.SetSize(wx.Size(Environment.settings.get('size', (500, 800))))
         self.Maximize(Environment.settings.get('maximized', True))
         self.SetPosition(wx.Point(Environment.settings.get('position', (0, 0))))
+        screen_rect: wx.Rect = self.GetScreenRect()
+        center = screen_rect.GetTopLeft() + (screen_rect.GetWidth() // 2, screen_rect.GetHeight() // 2)
+        if wx.Display.GetFromPoint(center) == wx.NOT_FOUND:
+            self.SetPosition(wx.Point(0, 0))
         self._menu_handler.view_select.selected = Environment.settings.get('view', 1)
         self._menu_handler.recent = Environment.settings.get('recent', [])
         self._menu_handler.load_last = Environment.settings.get('load_last', True)
