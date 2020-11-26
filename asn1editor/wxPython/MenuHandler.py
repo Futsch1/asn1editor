@@ -30,14 +30,14 @@ class MenuHandler:
 
         menu_bar = wx.MenuBar()
         file_menu = wx.Menu()
-        load_spec_item: wx.MenuItem = file_menu.Append(wx.NewId(), 'Open ASN.1 specification')
+        load_spec_item: wx.MenuItem = file_menu.Append(wx.ID_ANY, 'Open ASN.1 specification')
         load_spec_item.SetBitmap(Resources.get_bitmap_from_svg('open'))
         self.__recent_menu = wx.Menu()
         self.__recent_menu.AppendSeparator()
-        self.__frame.Bind(wx.EVT_MENU, self.__clear_recent, self.__recent_menu.Append(wx.NewId(), 'Clear recent list'))
+        self.__frame.Bind(wx.EVT_MENU, self.__clear_recent, self.__recent_menu.Append(wx.ID_ANY, 'Clear recent list'))
         recent_submenu: wx.MenuItem = file_menu.AppendSubMenu(self.__recent_menu, 'Open recent')
         recent_submenu.SetBitmap(Resources.get_bitmap_from_svg('recent'))
-        self.__load_last_spec: wx.MenuItem = file_menu.Append(wx.NewId(), 'Open last specification on startup', kind=wx.ITEM_CHECK)
+        self.__load_last_spec: wx.MenuItem = file_menu.Append(wx.ID_ANY, 'Open last specification on startup', kind=wx.ITEM_CHECK)
         file_menu.AppendSeparator()
         self.__load_data_item: wx.MenuItem = file_menu.Append(wx.ID_OPEN, 'Load encoded data')
         self.__load_data_item.SetBitmap(Resources.get_bitmap_from_svg('load_encoded'))
@@ -156,7 +156,7 @@ class MenuHandler:
             self.__prepend_recent_to_menu(recent)
 
     def __prepend_recent_to_menu(self, recent: typing.List[str]):
-        recent_item = self.__recent_menu.Prepend(wx.NewId(), f'{os.path.basename(recent[0])} {recent[1]} ({recent[0]})')
+        recent_item = self.__recent_menu.Prepend(wx.ID_ANY, f'{os.path.basename(recent[0])} {recent[1]} ({recent[0]})')
         self.__frame.Bind(wx.EVT_MENU, lambda _: self.__load_spec(recent[0], recent[1]), recent_item)
 
     def __clear_recent(self, _: wx.Event):
