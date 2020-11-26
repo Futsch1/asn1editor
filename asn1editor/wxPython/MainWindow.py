@@ -123,6 +123,9 @@ class MainWindow(wx.Frame, PluginInterface):
             self._menu_handler.enable()
 
     def _structure_changed(self):
+        if self.__type_name is None:
+            return
+
         self.Freeze()
 
         sizer = self.GetSizer()
