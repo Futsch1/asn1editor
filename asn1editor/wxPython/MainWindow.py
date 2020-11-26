@@ -21,7 +21,7 @@ from asn1editor.wxPython.WxPythonViews import WxPythonView
 
 
 class MainWindow(wx.Frame, PluginInterface):
-    def __init__(self, plugins: typing.Optional[typing.List[Plugin]] = None, title=f'ASN.1 editor {asn1editor.__version__}'):
+    def __init__(self, plugins: typing.Optional[typing.List[Plugin]] = None, title=f'ASN.1 editor {asn1editor.__version__}', enable_load_last=True):
         super(MainWindow, self).__init__(None, title=title)
 
         Environment.load()
@@ -70,7 +70,7 @@ class MainWindow(wx.Frame, PluginInterface):
 
         WxPythonView.structure_changed = None
 
-        if self._menu_handler.load_last:
+        if self._menu_handler.load_last and enable_load_last:
             # noinspection PyBroadException
             try:
                 self._menu_handler.load_most_recent()
