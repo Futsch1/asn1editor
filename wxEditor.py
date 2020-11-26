@@ -21,7 +21,6 @@ if __name__ == "__main__":
     else:
         frame = MainWindow()
     if args.asn1spec is not None:
-        app.ProcessPendingEvents()
         frame.load_spec(args.asn1spec, args.type)
     if args.data is not None:
         frame.load_data_from_file(args.data)

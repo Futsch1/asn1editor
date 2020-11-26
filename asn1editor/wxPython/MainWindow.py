@@ -84,6 +84,7 @@ class MainWindow(wx.Frame, PluginInterface):
             self.load_spec(file_name)
 
     def load_spec(self, file_name: str, type_name: typing.Optional[str] = None):
+        wx.App.Get().ProcessPendingEvents()
         # Spec file loaded, compile it to show a selection of type names
         if not self.__asn1_handler or file_name not in self.__asn1_handler.get_filename():
             try:
