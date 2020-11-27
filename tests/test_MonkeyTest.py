@@ -45,7 +45,7 @@ def actions(main_window: asn1editor.wxPython.MainWindow):
 class MonkeyTest(TestCase):
     @staticmethod
     def test_monkey():
-        if os.getenv('TRAVIS') is not None:
+        if os.getenv('TRAVIS') is not None or os.getenv('GITHUB_ACTIONS') is not None:
             return
         # noinspection PyUnusedLocal
         app = wx.App()
