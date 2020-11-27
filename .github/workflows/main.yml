@@ -29,9 +29,10 @@ jobs:
         python-version: 3.8
     - name: Install prerequisites
       run: |
+        sudo apt-get update && sudo apt-get install libsdl2-mixer-2.0-0 libsdl2-image-2.0-0 libsdl2-2.0-0
         python -m pip install --upgrade pip
         pip install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-18.04 wxPython==4.1.0
-        pip install wheel coveralls
+        pip install wheel
         pip install -r requirements.txt
     
     - name: Run unit test
@@ -44,6 +45,11 @@ jobs:
       with:
           name: coverage-report
           path: coverage/index.html
+          
+    - name: Coveralls
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
           
     - name: Lint with flake8
       run: |
