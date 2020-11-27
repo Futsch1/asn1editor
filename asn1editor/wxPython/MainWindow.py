@@ -21,7 +21,7 @@ from asn1editor.wxPython.WxPythonViews import WxPythonView
 
 
 class MainWindow(wx.Frame, PluginInterface):
-    def __init__(self, plugins: typing.Optional[typing.List[Plugin]] = None, title=f'ASN.1 editor {asn1editor.__version__}'):
+    def __init__(self, plugins: typing.Optional[typing.List[Plugin]] = None, title=f'ASN.1 editor {asn1editor.__version__}', enable_load_last=True):
         super(MainWindow, self).__init__(None, title=title)
 
         Environment.load()
@@ -41,7 +41,13 @@ class MainWindow(wx.Frame, PluginInterface):
         self.SetSize(wx.Size(Environment.settings.get('size', (500, 800))))
         self.Maximize(Environment.settings.get('maximized', True))
         self.SetPosition(wx.Point(Environment.settings.get('position', (0, 0))))
+        screen_rect: wx.Rect = self.GetScreenRect()
+        center = screen_rect.GetTopLeft() + (screen_rect.GetWidth() // 2, screen_rect.GetHeight() // 2)
+        if wx.Display.GetFromPoint(center) == wx.NOT_FOUND:
+            self.SetPosition(wx.Point(0, 0))
         self._menu_handler.view_select.selected = Environment.settings.get('view', 1)
+        self._menu_handler.recent = Environment.settings.get('recent', [])
+        self._menu_handler.load_last = Environment.settings.get('load_last', True)
 
         self.__asn1_handler = None
 
@@ -64,6 +70,13 @@ class MainWindow(wx.Frame, PluginInterface):
 
         WxPythonView.structure_changed = None
 
+        if self._menu_handler.load_last and enable_load_last:
+            # noinspection PyBroadException
+            try:
+                self._menu_handler.load_most_recent()
+            except Exception:
+                pass
+
     def __file_dropped(self, file_name: str):
         if self.__asn1_handler is not None:
             self.load_data_from_file(file_name)
@@ -71,9 +84,14 @@ class MainWindow(wx.Frame, PluginInterface):
             self.load_spec(file_name)
 
     def load_spec(self, file_name: str, type_name: typing.Optional[str] = None):
+        wx.App.Get().ProcessPendingEvents()
         # Spec file loaded, compile it to show a selection of type names
         if not self.__asn1_handler or file_name not in self.__asn1_handler.get_filename():
-            self.__asn1_handler = ASN1SpecHandler(file_name)
+            try:
+                self.__asn1_handler = ASN1SpecHandler(file_name)
+            except FileNotFoundError:
+                self.show_message(f'File {file_name} not found', 'Error', PluginInterface.MessageType.ERROR)
+                return
 
         if type_name is None:
             types = self.__asn1_handler.get_types()
@@ -87,6 +105,8 @@ class MainWindow(wx.Frame, PluginInterface):
             self.__type_name = type_name
 
         if self.__type_name is not None:
+            self._menu_handler.add_recent(os.path.abspath(file_name), self.__type_name)
+
             self._status_bar.SetStatusText(f'Loaded {file_name}')
             self.__file_name = file_name
 
@@ -120,6 +140,9 @@ class MainWindow(wx.Frame, PluginInterface):
             self._menu_handler.enable()
 
     def _structure_changed(self):
+        if self.__type_name is None:
+            return
+
         self.Freeze()
 
         sizer = self.GetSizer()
@@ -258,6 +281,8 @@ class MainWindow(wx.Frame, PluginInterface):
         Environment.settings['maximized'] = self.IsMaximized()
         Environment.settings['position'] = self.GetPosition().Get()
         Environment.settings['view'] = self._menu_handler.view_select.selected
+        Environment.settings['recent'] = self._menu_handler.recent
+        Environment.settings['load_last'] = self._menu_handler.load_last
 
         Environment.save()
 

@@ -32,7 +32,7 @@ class PluginInterfaceTest(TestCase):
     def test_dialogs(self):
         app = wx.App()
         plugin = TestPlugin()
-        main_window = MainWindow([plugin])
+        main_window = MainWindow([plugin], enable_load_last=False)
         with patch('wx.TextEntryDialog') as TextEntryDialogMock:
             instance = TextEntryDialogMock.return_value
             instance.GetValue.return_value = 'Test'
@@ -119,7 +119,7 @@ class PluginInterfaceTest(TestCase):
         app = wx.App()
         plugin1 = TestPlugin()
         plugin2 = TestPlugin()
-        MainWindow([plugin1, plugin2])
+        MainWindow([plugin1, plugin2], enable_load_last=False)
         with patch('wx.TextEntryDialog') as TextEntryDialogMock:
             instance = TextEntryDialogMock.return_value
             instance.GetValue.return_value = 'Test'
@@ -135,7 +135,7 @@ class PluginInterfaceTest(TestCase):
     def test_spec_interfaces(self):
         app = wx.App()
         plugin = TestPlugin()
-        main_window = MainWindow([plugin])
+        main_window = MainWindow([plugin], enable_load_last=False)
 
         self.assertIsNone(plugin.plugin_interface.get_spec_filename())
         self.assertIsNone(plugin.plugin_interface.get_typename())
@@ -150,7 +150,7 @@ class PluginInterfaceTest(TestCase):
     def test_encoding_decoding(self):
         app = wx.App()
         plugin = TestPlugin()
-        main_window = MainWindow([plugin])
+        main_window = MainWindow([plugin], enable_load_last=False)
 
         main_window.load_spec('example/example.asn', 'EXAMPLE.Sequence')
         asn1spec = plugin.plugin_interface.get_spec('jer')
@@ -164,20 +164,20 @@ class PluginInterfaceTest(TestCase):
     def test_settings(self):
         app = wx.App()
         plugin = TestPlugin()
-        main_window = MainWindow([plugin])
+        main_window = MainWindow([plugin], enable_load_last=False)
 
         plugin.plugin_interface.get_settings()['Test'] = 1
 
         main_window.close(wx.KeyEvent())
 
-        main_window = MainWindow([plugin])
+        main_window = MainWindow([plugin], enable_load_last=False)
 
         self.assertEqual(plugin.plugin_interface.get_settings()['Test'], 1)
         plugin.plugin_interface.get_settings()['Test'] = 0
 
         main_window.close(wx.KeyEvent())
 
-        main_window = MainWindow([plugin])
+        main_window = MainWindow([plugin], enable_load_last=False)
 
         self.assertEqual(plugin.plugin_interface.get_settings()['Test'], 0)
 
