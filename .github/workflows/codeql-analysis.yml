@@ -34,14 +34,14 @@ jobs:
         # https://docs.github.com/en/free-pro-team@latest/github/finding-security-vulnerabilities-and-errors-in-your-code/configuring-code-scanning#changing-the-languages-that-are-analyzed
 
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
     - name: Install prerequisites
       run: sudo apt-get update && sudo apt-get install libsdl2-mixer-2.0-0 libsdl2-image-2.0-0 libsdl2-2.0-0
     - name: Get wxPython
       run: pip3 install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-18.04 wxPython==4.1.0
-    - name: Checkout repository
-      uses: actions/checkout@v2
     - name: Install other dependencies
-      run: pip3 install setuptools && pip3 install -r requirements.txt
+      run: pip3 install setuptools wheel && pip3 install -r requirements.txt
     
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
