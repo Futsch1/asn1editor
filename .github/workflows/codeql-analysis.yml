@@ -41,7 +41,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
     - name: Install other dependencies
-      run: pip3 install -r requirements.txt
+      run: pip3 install setuptools && pip3 install -r requirements.txt
     
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
