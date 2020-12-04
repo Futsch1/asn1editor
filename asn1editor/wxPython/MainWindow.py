@@ -23,6 +23,7 @@ from asn1editor.wxPython.WxPythonViews import WxPythonView
 class MainWindow(wx.Frame, PluginInterface):
     def __init__(self, plugins: typing.Optional[typing.List[Plugin]] = None, title=f'ASN.1 editor {asn1editor.__version__}', enable_load_last=True):
         super(MainWindow, self).__init__(None, title=title)
+        self.__title = title
 
         Environment.load()
         Resources.image_list = ImageList()
@@ -108,6 +109,7 @@ class MainWindow(wx.Frame, PluginInterface):
             self._menu_handler.add_recent(os.path.abspath(file_name), self.__type_name)
 
             self._status_bar.SetStatusText(f'Loaded {file_name}')
+            self.SetTitle(f'{self.__title} - {file_name}')
             self.__file_name = file_name
 
             if self.__view is not None:
