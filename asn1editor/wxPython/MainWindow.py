@@ -317,7 +317,7 @@ class MainWindow(wx.Frame, PluginInterface):
         if plugins:
             for plugin in plugins:
                 about = plugin.get_about()
-                if len(about):
+                if about:
                     plugin_strs.append(f'{plugin.get_name()}: {about}')
 
         plugin_str = '\n' + '\n'.join(plugin_strs) + '\n'
