@@ -1,10 +1,8 @@
 import os
 import typing
 
-import asn1tools
 import wx
 
-import asn1editor
 from asn1editor.ASN1SpecHandler import ASN1SpecHandler
 from asn1editor.Plugin import Plugin
 from asn1editor.wxPython import Resources
@@ -14,7 +12,7 @@ from asn1editor.wxPython.ViewSelect import ViewSelect
 
 
 class MenuHandler:
-    def __init__(self, frame: wx.Frame, plugins: typing.Optional[typing.List[Plugin]]):
+    def __init__(self, frame: wx.Frame, plugins: typing.Optional[typing.List[Plugin]], about_box_content: str):
         self.__frame = frame
         self.__plugins = plugins
         self.__load_data_item = None
@@ -24,6 +22,7 @@ class MenuHandler:
         self.__close_spec_item = None
         self.__recent: typing.Optional[typing.List[typing.List[str]]] = None
         self.__recent_menu: typing.Optional[wx.Menu] = None
+        self.__about_box_content = about_box_content
         self.view_select: typing.Optional[ViewSelect] = None
 
     def build(self, load_spec: typing.Callable, load_data_from_file: typing.Callable, save_data_to_file: typing.Callable, view_changed: typing.Callable):
@@ -190,16 +189,7 @@ class MenuHandler:
     # noinspection PyUnusedLocal
     def __about_item_event(self, e: wx.Event):
         del e
-        dialog = wx.MessageDialog(self.__frame, f'''asn1editor {asn1editor.__version__}
-
-Published under MIT License
-
-Copyright (c) 2020 Florian Fetz
-https://github.com/Futsch1/asn1editor
-
-Based on eerimoq's asn1tools, used in {asn1tools.version.__version__}
-https://github.com/eerimoq/asn1tools
-''', style=wx.ICON_INFORMATION | wx.OK, caption='About')
+        dialog = wx.MessageDialog(self.__frame, self.__about_box_content, style=wx.ICON_INFORMATION | wx.OK, caption='About')
         dialog.ShowModal()
 
     def __tb_menu_event(self, e):

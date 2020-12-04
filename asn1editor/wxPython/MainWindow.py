@@ -34,7 +34,7 @@ class MainWindow(wx.Frame, PluginInterface):
 
         self._status_bar = self.CreateStatusBar()
 
-        self._menu_handler = MenuHandler(self, plugins)
+        self._menu_handler = MenuHandler(self, plugins, self.__about_box_content(title, plugins))
 
         self._menu_handler.build(self.load_spec, self.load_data_from_file, self.save_data_to_file, self._structure_changed)
         self.Bind(wx.EVT_CLOSE, self.close)
@@ -304,3 +304,31 @@ class MainWindow(wx.Frame, PluginInterface):
         Environment.save()
 
         self.Destroy()
+
+    @staticmethod
+    def __about_box_content(title: str, plugins: typing.List[Plugin]) -> str:
+        import asn1tools
+
+        my_version = f'ASN.1 editor {asn1editor.__version__}'
+        if my_version not in title:
+            title += f' based on {my_version}'
+
+        plugin_strs = []
+        if plugins:
+            for plugin in plugins:
+                about = plugin.get_about()
+                if len(about):
+                    plugin_strs.append(f'{plugin.get_name()}: {about}')
+
+        plugin_str = '\n' + '\n'.join(plugin_strs) + '\n'
+
+        return f'''{title}
+{plugin_str}
+Published under MIT License
+
+Copyright (c) 2020 Florian Fetz
+https://github.com/Futsch1/asn1editor
+
+Based on eerimoq's asn1tools, used in {asn1tools.version.__version__}
+https://github.com/eerimoq/asn1tools
+'''
