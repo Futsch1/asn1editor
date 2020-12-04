@@ -90,8 +90,7 @@ class TreeView:
 
     def item_selected(self, e: wx.TreeEvent):
         view = self.__tree_ctrl.GetItemData(e.GetItem())
-        if view is not None:
-            self.__show_view(view)
+        self.__show_view(view)
 
     def item_right_clicked(self, e: wx.TreeEvent):
         class RightClickMenu(wx.Menu):
@@ -112,18 +111,21 @@ class TreeView:
         menu.Bind(wx.EVT_MENU, lambda _: self.__tree_ctrl.CollapseAll(), menu.collapse_all)
         self.__tree_ctrl.GetTopLevelParent().PopupMenu(menu, e.GetPoint())
 
-    def __show_view(self, view: WxPythonView):
+    def __show_view(self, view: typing.Optional[WxPythonView]):
         self.__content_window.GetTopLevelParent().Freeze()
 
         if self.__current_view is not None:
             self.__current_view.set_visible(False, recursive=False)
 
         self.__current_view = view
-        view.set_visible(True, recursive=False)
+        if view is not None:
+            view.set_visible(True, recursive=False)
+
         sizer: wx.Sizer = self.__content_window.GetSizer()
         sizer.Clear()
 
-        sizer.Add(view.realize().get_sizer(recursive=False), 0, wx.ALL | wx.EXPAND, 5)
+        if view is not None:
+            sizer.Add(view.realize().get_sizer(recursive=False), 0, wx.ALL | wx.EXPAND, 5)
 
         sizer.Layout()
 
