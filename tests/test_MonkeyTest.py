@@ -8,6 +8,7 @@ import asn1tools
 import wx
 
 import asn1editor
+from asn1editor.wxPython.ViewSelect import ViewType
 
 
 def actions(main_window: asn1editor.wxPython.MainWindow):
@@ -23,13 +24,12 @@ def actions(main_window: asn1editor.wxPython.MainWindow):
 
     sleep(1)
 
-    main_window.SetFocus()
-
     key_codes = [wx.WXK_TAB, wx.WXK_DOWN, wx.WXK_UP, wx.WXK_LEFT, wx.WXK_RIGHT, wx.WXK_SPACE] + [c for c in range(ord('1'), ord('9'))]
 
     ui_sim = wx.UIActionSimulator()
 
     for _ in range(1000):
+        main_window.SetFocus()
         key_code = random.choice(key_codes)
         ui_sim.KeyDown(key_code)
         ui_sim.KeyUp(key_code)
@@ -50,6 +50,7 @@ class MonkeyTest(TestCase):
         # noinspection PyUnusedLocal
         app = wx.App()
         main_window = asn1editor.wxPython.MainWindow()
+        main_window.select_view(ViewType.GROUPS)
 
         test_types = [('example/example.asn', 'EXAMPLE.Sequence')]
 
