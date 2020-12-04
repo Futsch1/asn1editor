@@ -50,7 +50,7 @@ class MainWindow(wx.Frame, PluginInterface):
         self._menu_handler.recent = Environment.settings.get('recent', [])
         self._menu_handler.load_last = Environment.settings.get('load_last', True)
 
-        self.__asn1_handler = None
+        self.__asn1_handler: typing.Optional[ASN1SpecHandler] = None
 
         self.__model = None
         self.__view = None
@@ -84,8 +84,23 @@ class MainWindow(wx.Frame, PluginInterface):
         else:
             self.load_spec(file_name)
 
-    def load_spec(self, file_name: str, type_name: typing.Optional[str] = None):
+    def load_spec(self, file_name: typing.Optional[str], type_name: typing.Optional[str] = None):
         wx.App.Get().ProcessPendingEvents()
+        if file_name is None:
+            # Close spec
+            self.__asn1_handler = None
+            self.__type_name = None
+
+            if self.__view is not None:
+                self.__view.realize().destroy()
+                self.__content_panel.Destroy()
+                self.__view = None
+            if self.__tree_view is not None:
+                self.__tree_view.destroy()
+                self.__tree_view = None
+            self.SetTitle(self.__title)
+            return
+
         # Spec file loaded, compile it to show a selection of type names
         if not self.__asn1_handler or file_name not in self.__asn1_handler.get_filename():
             try:

@@ -21,6 +21,7 @@ class MenuHandler:
         self.__save_data_item = None
         self.__load_spec = None
         self.__load_last_spec = None
+        self.__close_spec_item = None
         self.__recent: typing.Optional[typing.List[typing.List[str]]] = None
         self.__recent_menu: typing.Optional[wx.Menu] = None
         self.view_select: typing.Optional[ViewSelect] = None
@@ -32,6 +33,8 @@ class MenuHandler:
         file_menu = wx.Menu()
         load_spec_item: wx.MenuItem = file_menu.Append(wx.ID_ANY, 'Open ASN.1 specification')
         load_spec_item.SetBitmap(Resources.get_bitmap_from_svg('open'))
+        self.__close_spec_item = file_menu.Append(wx.ID_ANY, 'Close ASN.1 specification')
+        self.__close_spec_item.Enable(False)
         self.__recent_menu = wx.Menu()
         self.__recent_menu.AppendSeparator()
         self.__frame.Bind(wx.EVT_MENU, self.__clear_recent, self.__recent_menu.Append(wx.ID_ANY, 'Clear recent list'))
@@ -123,6 +126,8 @@ class MenuHandler:
 
         self.__frame.Bind(wx.EVT_MENU, self.__exit, exit_item)
 
+        self.__frame.Bind(wx.EVT_MENU, self.__close_spec, self.__close_spec_item)
+
         picker = FilePickerHandler(schema_dialog_constructor, load_spec)
         self.__frame.Bind(wx.EVT_MENU, picker.on_menu_click, load_spec_item)
 
@@ -134,9 +139,10 @@ class MenuHandler:
 
         self.view_select = ViewSelect(self.__frame, auto_view, groups_view, tree_view, view_changed)
 
-    def enable(self):
-        self.__load_data_item.Enable(True)
-        self.__save_data_item.Enable(True)
+    def enable(self, enable: bool = True):
+        self.__load_data_item.Enable(enable)
+        self.__save_data_item.Enable(enable)
+        self.__close_spec_item.Enable(enable)
 
     @property
     def recent(self) -> typing.List[typing.List[str]]:
@@ -210,3 +216,7 @@ https://github.com/eerimoq/asn1tools
     def __exit(self, e: wx.Event):
         del e
         self.__frame.Close()
+
+    def __close_spec(self, _):
+        self.enable(False)
+        self.__load_spec(None)
