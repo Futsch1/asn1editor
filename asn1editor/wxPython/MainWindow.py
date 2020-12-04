@@ -17,6 +17,7 @@ from asn1editor.wxPython.MenuHandler import MenuHandler
 from asn1editor.wxPython.SingleFileDropTarget import SingleFileDropTarget
 from asn1editor.wxPython.Styler import Styler
 from asn1editor.wxPython.TreeView import TreeView
+from asn1editor.wxPython.ViewSelect import ViewType
 from asn1editor.wxPython.WxPythonViews import WxPythonView
 
 
@@ -45,7 +46,7 @@ class MainWindow(wx.Frame, PluginInterface):
         center = screen_rect.GetTopLeft() + (screen_rect.GetWidth() // 2, screen_rect.GetHeight() // 2)
         if wx.Display.GetFromPoint(center) == wx.NOT_FOUND:
             self.SetPosition(wx.Point(0, 0))
-        self._menu_handler.view_select.selected = Environment.settings.get('view', 1)
+        self._menu_handler.view_select.selected = ViewType(Environment.settings.get('view', ViewType.TREE.value))
         self._menu_handler.recent = Environment.settings.get('recent', [])
         self._menu_handler.load_last = Environment.settings.get('load_last', True)
 
@@ -65,6 +66,7 @@ class MainWindow(wx.Frame, PluginInterface):
         self.SetAutoLayout(True)
         self.SetSizer(wx.BoxSizer(wx.HORIZONTAL))
 
+        self.__default_excepthook = sys.excepthook
         # noinspection SpellCheckingInspection
         sys.excepthook = self.__exception_handler
 
@@ -150,7 +152,7 @@ class MainWindow(wx.Frame, PluginInterface):
         content_panel_sizer: wx.Sizer = self.__content_panel.GetSizer()
         content_panel_sizer.Clear()
 
-        if self._menu_handler.view_select.selected == self._menu_handler.view_select.TREE:
+        if self._menu_handler.view_select.selected == ViewType.TREE:
 
             tree_ctrl = self.__tree_view.get_ctrl(self.__view.realize())
 
@@ -264,6 +266,9 @@ class MainWindow(wx.Frame, PluginInterface):
     def get_settings(self) -> dict:
         return Environment.settings.setdefault('Plugin', {})
 
+    def select_view(self, view: ViewType):
+        self._menu_handler.view_select.selected = view
+
     def __exception_handler(self, exc_type, value, trace):
         import traceback
         trace = ''.join(traceback.format_exception(exc_type, value, trace))
@@ -280,10 +285,12 @@ class MainWindow(wx.Frame, PluginInterface):
         Environment.settings['size'] = (self.GetSize().Get())
         Environment.settings['maximized'] = self.IsMaximized()
         Environment.settings['position'] = self.GetPosition().Get()
-        Environment.settings['view'] = self._menu_handler.view_select.selected
+        Environment.settings['view'] = self._menu_handler.view_select.selected.value
         Environment.settings['recent'] = self._menu_handler.recent[:10]
         Environment.settings['load_last'] = self._menu_handler.load_last
 
         Environment.save()
+
+        sys.excepthook = self.__default_excepthook
 
         self.Destroy()

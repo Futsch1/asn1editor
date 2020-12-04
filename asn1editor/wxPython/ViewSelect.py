@@ -1,12 +1,16 @@
 import typing
+from enum import Enum
 
 import wx
 
 
-class ViewSelect:
+class ViewType(Enum):
     AUTO = 1
     GROUPS = 2
     TREE = 3
+
+
+class ViewSelect:
 
     def __init__(self, frame: wx.Frame, auto_item: wx.MenuItem, groups_item: wx.MenuItem, tree_item: wx.MenuItem, change_callback: typing.Callable):
         self.__auto_item = auto_item
@@ -28,10 +32,10 @@ class ViewSelect:
 
     @property
     def selected(self):
-        return self.AUTO if self.__auto_item.IsChecked() else self.GROUPS if self.__groups_item.IsChecked() else self.TREE
+        return ViewType.AUTO if self.__auto_item.IsChecked() else ViewType.GROUPS if self.__groups_item.IsChecked() else ViewType.TREE
 
     @selected.setter
     def selected(self, selected):
-        self.__auto_item.Check(selected == self.AUTO)
-        self.__groups_item.Check(selected == self.GROUPS)
-        self.__tree_item.Check(selected == self.TREE)
+        self.__auto_item.Check(selected == ViewType.AUTO)
+        self.__groups_item.Check(selected == ViewType.GROUPS)
+        self.__tree_item.Check(selected == ViewType.TREE)

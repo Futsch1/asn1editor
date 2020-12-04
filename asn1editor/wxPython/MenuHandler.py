@@ -10,7 +10,7 @@ from asn1editor.Plugin import Plugin
 from asn1editor.wxPython import Resources
 from asn1editor.wxPython.FilePickerHandler import FilePickerHandler
 from asn1editor.wxPython.Resources import plugin_resource_path
-from asn1editor.wxPython.ViewSelect import ViewSelect
+from asn1editor.wxPython.ViewSelect import ViewSelect, ViewType
 
 
 class MenuHandler:
@@ -51,10 +51,10 @@ class MenuHandler:
         menu_bar.Append(file_menu, '&File')
 
         view_menu = wx.Menu()
-        auto_view: wx.MenuItem = view_menu.Append(ViewSelect.AUTO, 'Automatic', kind=wx.ITEM_CHECK)
-        auto_view.Check(True)
-        groups_view: wx.MenuItem = view_menu.Append(ViewSelect.GROUPS, 'Groups', kind=wx.ITEM_CHECK)
-        tree_view: wx.MenuItem = view_menu.Append(ViewSelect.TREE, 'Tree', kind=wx.ITEM_CHECK)
+        auto_view: wx.MenuItem = view_menu.Append(ViewType.AUTO.value, 'Automatic', kind=wx.ITEM_CHECK)
+        groups_view: wx.MenuItem = view_menu.Append(ViewType.GROUPS.value, 'Groups', kind=wx.ITEM_CHECK)
+        tree_view: wx.MenuItem = view_menu.Append(ViewType.TREE.value, 'Tree', kind=wx.ITEM_CHECK)
+        tree_view.Check(True)
         menu_bar.Append(view_menu, '&View')
 
         self.__frame.SetMenuBar(menu_bar)
