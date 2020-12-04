@@ -29,6 +29,13 @@ class Plugin:  # pragma: no cover
         """
         raise NotImplementedError
 
+    def get_about(self) -> typing.Optional[str]:
+        """
+        Gets s string of the plugin to be added to the about box
+
+        """
+        raise NotImplementedError
+
     def connect(self, plugin_interface: PluginInterface):
         """
         Connects the plugin host and the plugin.

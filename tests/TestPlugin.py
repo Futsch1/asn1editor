@@ -24,6 +24,9 @@ class TestPlugin(Plugin):
         return [('Toolbar', 'Toolbar tooltip', 'tests/test.png', self.__open_tooltip), (),
                 ('Toolbar', 'Toolbar tooltip', 'tests/test.png', self.__open_tooltip)]
 
+    def get_about(self) -> typing.Optional[str]:
+        return 'Test plugin about text'
+
     def connect(self, plugin_interface: PluginInterface):
         self.plugin_interface = plugin_interface
 

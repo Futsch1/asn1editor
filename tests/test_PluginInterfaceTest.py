@@ -24,6 +24,9 @@ class TestPlugin(asn1editor.Plugin):
     def get_tools(self) -> typing.List[typing.Tuple[str, str, str, typing.Callable]]:
         return self.tools
 
+    def get_about(self) -> typing.Optional[str]:
+        return None
+
     def connect(self, plugin_interface: asn1editor.PluginInterface):
         self.plugin_interface = plugin_interface
 

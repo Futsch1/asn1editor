@@ -1,10 +1,8 @@
 import os
 import typing
 
-import asn1tools
 import wx
 
-import asn1editor
 from asn1editor.ASN1SpecHandler import ASN1SpecHandler
 from asn1editor.Plugin import Plugin
 from asn1editor.wxPython import Resources
@@ -14,15 +12,17 @@ from asn1editor.wxPython.ViewSelect import ViewSelect, ViewType
 
 
 class MenuHandler:
-    def __init__(self, frame: wx.Frame, plugins: typing.Optional[typing.List[Plugin]]):
+    def __init__(self, frame: wx.Frame, plugins: typing.Optional[typing.List[Plugin]], about_box_content: str):
         self.__frame = frame
         self.__plugins = plugins
         self.__load_data_item = None
         self.__save_data_item = None
         self.__load_spec = None
         self.__load_last_spec = None
+        self.__close_spec_item = None
         self.__recent: typing.Optional[typing.List[typing.List[str]]] = None
         self.__recent_menu: typing.Optional[wx.Menu] = None
+        self.__about_box_content = about_box_content
         self.view_select: typing.Optional[ViewSelect] = None
 
     def build(self, load_spec: typing.Callable, load_data_from_file: typing.Callable, save_data_to_file: typing.Callable, view_changed: typing.Callable):
@@ -32,6 +32,8 @@ class MenuHandler:
         file_menu = wx.Menu()
         load_spec_item: wx.MenuItem = file_menu.Append(wx.ID_ANY, 'Open ASN.1 specification')
         load_spec_item.SetBitmap(Resources.get_bitmap_from_svg('open'))
+        self.__close_spec_item = file_menu.Append(wx.ID_ANY, 'Close ASN.1 specification')
+        self.__close_spec_item.Enable(False)
         self.__recent_menu = wx.Menu()
         self.__recent_menu.AppendSeparator()
         self.__frame.Bind(wx.EVT_MENU, self.__clear_recent, self.__recent_menu.Append(wx.ID_ANY, 'Clear recent list'))
@@ -123,6 +125,8 @@ class MenuHandler:
 
         self.__frame.Bind(wx.EVT_MENU, self.__exit, exit_item)
 
+        self.__frame.Bind(wx.EVT_MENU, self.__close_spec, self.__close_spec_item)
+
         picker = FilePickerHandler(schema_dialog_constructor, load_spec)
         self.__frame.Bind(wx.EVT_MENU, picker.on_menu_click, load_spec_item)
 
@@ -134,9 +138,10 @@ class MenuHandler:
 
         self.view_select = ViewSelect(self.__frame, auto_view, groups_view, tree_view, view_changed)
 
-    def enable(self):
-        self.__load_data_item.Enable(True)
-        self.__save_data_item.Enable(True)
+    def enable(self, enable: bool = True):
+        self.__load_data_item.Enable(enable)
+        self.__save_data_item.Enable(enable)
+        self.__close_spec_item.Enable(enable)
 
     @property
     def recent(self) -> typing.List[typing.List[str]]:
@@ -184,16 +189,7 @@ class MenuHandler:
     # noinspection PyUnusedLocal
     def __about_item_event(self, e: wx.Event):
         del e
-        dialog = wx.MessageDialog(self.__frame, f'''asn1editor {asn1editor.__version__}
-
-Published under MIT License
-
-Copyright (c) 2020 Florian Fetz
-https://github.com/Futsch1/asn1editor
-
-Based on eerimoq's asn1tools, used in {asn1tools.version.__version__}
-https://github.com/eerimoq/asn1tools
-''', style=wx.ICON_INFORMATION | wx.OK, caption='About')
+        dialog = wx.MessageDialog(self.__frame, self.__about_box_content, style=wx.ICON_INFORMATION | wx.OK, caption='About')
         dialog.ShowModal()
 
     def __tb_menu_event(self, e):
@@ -210,3 +206,7 @@ https://github.com/eerimoq/asn1tools
     def __exit(self, e: wx.Event):
         del e
         self.__frame.Close()
+
+    def __close_spec(self, _):
+        self.enable(False)
+        self.__load_spec(None)
