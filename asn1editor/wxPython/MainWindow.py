@@ -286,7 +286,7 @@ class MainWindow(wx.Frame, PluginInterface):
         Environment.settings['maximized'] = self.IsMaximized()
         Environment.settings['position'] = self.GetPosition().Get()
         Environment.settings['view'] = self._menu_handler.view_select.selected.value
-        Environment.settings['recent'] = self._menu_handler.recent
+        Environment.settings['recent'] = self._menu_handler.recent[:10]
         Environment.settings['load_last'] = self._menu_handler.load_last
 
         Environment.save()
