@@ -35,7 +35,7 @@ class ViewSelect:
         return ViewType.AUTO if self.__auto_item.IsChecked() else ViewType.GROUPS if self.__groups_item.IsChecked() else ViewType.TREE
 
     @selected.setter
-    def selected(self, selected):
+    def selected(self, selected: int):
         self.__auto_item.Check(selected == ViewType.AUTO.value)
         self.__groups_item.Check(selected == ViewType.GROUPS.value)
         self.__tree_item.Check(selected == ViewType.TREE.value)
