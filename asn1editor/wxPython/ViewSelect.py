@@ -18,16 +18,16 @@ class ViewSelect:
         self.__groups_item = groups_item
         self.__tree_item = tree_item
         self.__change_callback = change_callback
-        frame.Bind(wx.EVT_MENU, self.event, auto_item)
-        frame.Bind(wx.EVT_MENU, self.event, groups_item)
-        frame.Bind(wx.EVT_MENU, self.event, tree_item)
+        frame.Bind(wx.EVT_MENU, lambda _: self.event(ViewType.AUTO.value), auto_item)
+        frame.Bind(wx.EVT_MENU, lambda _: self.event(ViewType.GROUPS.value), groups_item)
+        frame.Bind(wx.EVT_MENU, lambda _: self.event(ViewType.TREE.value), tree_item)
 
         self.__auto_item.Check(False)
         self.__groups_item.Check(False)
         self.__tree_item.Check(True)
 
-    def event(self, e: wx.Event):
-        self.selected = e.GetId()
+    def event(self, selected: int):
+        self.selected = selected
         self.__change_callback()
 
     @property
