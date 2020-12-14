@@ -48,7 +48,8 @@ class WxPythonContainerView(WxPythonView, ContainerView):
 
     def enable(self, enabled: bool):
         for child in self._children:
-            child.enable(enabled)
+            if child.get_has_value():
+                child.enable(enabled)
             child.set_visible(enabled, recursive=True)
         self.structure_changed()
 
