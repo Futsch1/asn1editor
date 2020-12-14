@@ -12,7 +12,8 @@ Sequence ::= SEQUENCE
     enumerated          ENUMERATED { enum1, enum2 },
     bitString           BIT STRING { a(0), b(1), c(23) } (SIZE(24)),
     octetString         OCTET STRING (SIZE(4)) DEFAULT "abcd",
-    visibleString       VisibleString (SIZE(15)),
+    octetString2        OCTET STRING (SIZE(4)) DEFAULT "abcd",
+    visibleString       VisibleString (SIZE(0..15)),
     utf8String          UTF8String (SIZE(1..5)) DEFAULT "äö",
     optionalSequenceOf  SEQUENCE (SIZE(1..2)) OF SubSequence OPTIONAL,
     choiceExample       CHOICE {
