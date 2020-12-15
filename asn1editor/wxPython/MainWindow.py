@@ -64,8 +64,7 @@ class MainWindow(wx.Frame, PluginInterface):
         self.__progress_window: typing.Optional[wx.ProgressDialog] = None
 
         self.SetDropTarget(SingleFileDropTarget(self.__file_dropped))
-        self.SetAutoLayout(True)
-        self.SetSizer(wx.BoxSizer(wx.HORIZONTAL))
+        self.SetSizer(wx.GridSizer(1))
 
         self.__default_excepthook = sys.excepthook
         # noinspection SpellCheckingInspection
@@ -170,23 +169,24 @@ class MainWindow(wx.Frame, PluginInterface):
         content_panel_sizer.Clear()
 
         if self._menu_handler.view_select.selected == ViewType.TREE:
-
+            sizer = wx.BoxSizer(wx.HORIZONTAL)
             tree_ctrl = self.__tree_view.get_ctrl(self.__view.realize())
 
             sizer.Add(tree_ctrl, proportion=1, flag=wx.ALL | wx.EXPAND)
             sizer.Add(self.__content_panel, proportion=2, flag=wx.ALL | wx.EXPAND)
         else:
+            sizer = wx.GridSizer(1)
             self.__tree_view.hide()
 
             self.__view.realize().set_visible(True, recursive=True)
             content_sizer = self.__view.realize().get_sizer(recursive=True)
             content_panel_sizer.Add(content_sizer, flag=wx.ALL | wx.EXPAND, border=5)
 
-            self.__content_panel.SetSizerAndFit(content_panel_sizer)
+            self.__content_panel.SetSizer(content_panel_sizer)
 
             sizer.Add(self.__content_panel, flag=wx.ALL | wx.EXPAND)
 
-        self.SetSizer(sizer)
+        self.SetSizer(sizer, deleteOld=True)
 
         self.Refresh()
         self.PostSizeEvent()
