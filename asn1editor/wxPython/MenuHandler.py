@@ -169,7 +169,7 @@ class MenuHandler:
         for menu_item in menu_items:
             if menu_item.GetKind() == wx.ITEM_SEPARATOR:
                 break
-            self.__recent_menu.RemoveItem(menu_item)
+            self.__recent_menu.Remove(menu_item)
 
         self.__recent = []
 
