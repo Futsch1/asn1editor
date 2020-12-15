@@ -75,7 +75,8 @@ class MainWindow(wx.Frame, PluginInterface):
         if self._menu_handler.load_last and enable_load_last:
             # noinspection PyBroadException
             try:
-                self._menu_handler.load_most_recent()
+                file_name, type_name = Environment.settings.get('last_loaded', [None, None])
+                self.load_spec(file_name, type_name)
             except Exception:
                 pass
 
@@ -91,6 +92,7 @@ class MainWindow(wx.Frame, PluginInterface):
             # Close spec
             self.__asn1_handler = None
             self.__type_name = None
+            self.__file_name = None
 
             if self.__view is not None:
                 self.__view.realize().destroy()
@@ -305,6 +307,7 @@ class MainWindow(wx.Frame, PluginInterface):
         Environment.settings['view'] = self._menu_handler.view_select.selected.value
         Environment.settings['recent'] = self._menu_handler.recent[:10]
         Environment.settings['load_last'] = self._menu_handler.load_last
+        Environment.settings['last_loaded'] = [self.__file_name, self.__type_name]
 
         Environment.save()
 
