@@ -31,7 +31,8 @@ class WxPythonContainerView(WxPythonView, ContainerView):
             sizer.Add(name_sizer)
 
         if recursive:
-            container_sizer = wx.FlexGridSizer(cols=2, vgap=8, hgap=8)
+            columns = 2 if len(self._children) >= 4 else 1
+            container_sizer = wx.FlexGridSizer(cols=columns, vgap=8, hgap=8)
             sizer.Add(container_sizer)
         else:
             container_sizer = sizer
