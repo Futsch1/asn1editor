@@ -158,6 +158,8 @@ class WxPythonValueSelectionView(WxPythonView, ValueInterface):
 
 
 class WxPythonHexStringView(WxPythonView, ValueInterface):
+    CHARS_PER_HEX_DIGIT = 3
+
     def __init__(self, name: str, controls: ControlList, minimum: Optional[int], maximum: Optional[int]):
         super(WxPythonHexStringView, self).__init__(name, controls)
 
@@ -214,12 +216,12 @@ class WxPythonHexStringView(WxPythonView, ValueInterface):
             if not self._hex:
                 # Was ASCII before, now is hex
                 if self._maximum:
-                    self._maximum *= 2
-                self._minimum *= 2
+                    self._maximum *= self.CHARS_PER_HEX_DIGIT
+                self._minimum *= self.CHARS_PER_HEX_DIGIT
             else:
                 if self._maximum:
-                    self._maximum //= 2
-                self._minimum //= 2
+                    self._maximum //= self.CHARS_PER_HEX_DIGIT
+                self._minimum //= self.CHARS_PER_HEX_DIGIT
 
             self._update_length()
             self._hex = self._is_hex()
