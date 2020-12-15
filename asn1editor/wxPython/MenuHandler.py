@@ -156,12 +156,22 @@ class MenuHandler:
 
     def add_recent(self, filename: str, typename: str):
         recent = [filename, typename]
-        if recent not in self.__recent:
-            self.__recent.insert(0, recent)
-            self.__prepend_recent_to_menu(recent)
+        if recent in self.__recent:
+            # If item is already in recent list, move it to the front
+            recent_string = self.__get_recent_string(recent)
+            menu_item = self.__recent_menu.FindItem(recent_string)
+            self.__recent_menu.Remove(menu_item)
+            self.__recent.remove(recent)
+
+        self.__recent.insert(0, recent)
+        self.__prepend_recent_to_menu(recent)
+
+    @staticmethod
+    def __get_recent_string(recent: typing.List[str]):
+        return f'{os.path.basename(recent[0])} {recent[1]} ({recent[0]})'
 
     def __prepend_recent_to_menu(self, recent: typing.List[str]):
-        recent_item = self.__recent_menu.Prepend(wx.ID_ANY, f'{os.path.basename(recent[0])} {recent[1]} ({recent[0]})')
+        recent_item = self.__recent_menu.Prepend(wx.ID_ANY, self.__get_recent_string(recent))
         self.__frame.Bind(wx.EVT_MENU, lambda _: self.__load_spec(recent[0], recent[1]), recent_item)
 
     def __clear_recent(self, _: wx.Event):
