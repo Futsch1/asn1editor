@@ -24,6 +24,8 @@ class FilePickerHandler:
                 return
             try:
                 filenames = file_dialog.GetPaths()
+            except AttributeError:
+                filenames = [file_dialog.GetPath()]
             except TypeError:
                 filenames = [file_dialog.GetPath()]
             Environment.settings[file_dialog.GetMessage()] = os.path.dirname(filenames[0])
