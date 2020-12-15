@@ -183,11 +183,6 @@ class MenuHandler:
 
         self.__recent = []
 
-    def load_most_recent(self):
-        if len(self.__recent):
-            most_recent = self.__recent[0]
-            self.__load_spec(most_recent[0], most_recent[1])
-
     @property
     def load_last(self) -> bool:
         return self.__load_last_spec.IsChecked()
