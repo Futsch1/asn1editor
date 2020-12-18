@@ -19,6 +19,7 @@ Sequence ::= SEQUENCE
     utf8String          UTF8String (SIZE(1..5)) DEFAULT "äö",
     optionalSequenceOf  SEQUENCE (SIZE(1..2)) OF SubSequence OPTIONAL,
     date                DATE,
+    time                TIME-OF-DAY,
     choiceExample       CHOICE {
         sequence            SubSequence,
         exampleInt          INTEGER (0..255),

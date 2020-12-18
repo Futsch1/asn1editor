@@ -55,6 +55,8 @@ class ViewControllerFactory(object):
             return self.create_view_and_controller(type_.inner, checker.inner, controller)
         elif isinstance(type_, oer.Date):
             return self._date(type_, controller)
+        elif isinstance(type_, oer.TimeOfDay):
+            return self._time(type_, controller)
         else:
             return self._text(type_, f'ASN.1 type {type_.name} {type_.type_name} not supported')
 
@@ -151,6 +153,13 @@ class ViewControllerFactory(object):
 
     def _date(self, type_: oer.Date, controller: Controller):
         view, value_interface, optional_interface = self._view_factory.get_date_view(type_.name, type_.optional)
+
+        ControllerFactory(controller).create_value_controller(type_, value_interface, optional_interface)
+
+        return view
+
+    def _time(self, type_: oer.TimeOfDay, controller: Controller):
+        view, value_interface, optional_interface = self._view_factory.get_time_view(type_.name, type_.optional)
 
         ControllerFactory(controller).create_value_controller(type_, value_interface, optional_interface)
 

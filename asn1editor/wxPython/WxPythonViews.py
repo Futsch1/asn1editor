@@ -10,7 +10,7 @@ from asn1editor.interfaces.ValueInterface import ValueInterface
 from asn1editor.view.AbstractView import AbstractView
 
 ControlList = typing.Dict[str, typing.Union[wx.TextCtrl, wx.CheckBox, wx.StaticBitmap, wx.ComboBox, wx.StaticText, wx.SpinCtrl, List[Tuple[int, wx.CheckBox]],
-                                            str, wx.adv.DatePickerCtrl]]
+                                            str, wx.adv.DatePickerCtrl, wx.adv.TimePickerCtrl]]
 
 
 class WxPythonView(AbstractView, OptionalInterface):

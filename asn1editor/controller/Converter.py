@@ -1,9 +1,9 @@
 import typing
-from datetime import date
+from datetime import date, time
 
 
 class Converter:
-    def __init__(self, minimum: typing.Optional[typing.Union[int, float]], default: typing.Optional[typing.Union[str, bytes, int, float, date]]):
+    def __init__(self, minimum: typing.Optional[typing.Union[int, float]], default: typing.Optional[typing.Union[str, bytes, int, float, date, time]]):
         self._default = default
         self._minimum = minimum
         if self._minimum is None:

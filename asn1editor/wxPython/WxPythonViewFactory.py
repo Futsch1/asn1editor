@@ -13,7 +13,7 @@ from asn1editor.view.AbstractViewFactory import AbstractViewFactory
 from asn1editor.wxPython import Resources
 from asn1editor.wxPython.Styler import Styler
 from asn1editor.wxPython.WxPythonComplexViews import WxPythonContainerView, WxPythonListView, WxPythonChoiceView
-from asn1editor.wxPython.WxPythonDateTimeViews import WxPythonDateView
+from asn1editor.wxPython.WxPythonDateTimeViews import WxPythonDateView, WxPythonTimeView
 from asn1editor.wxPython.WxPythonViews import WxPythonValueView, WxPythonBooleanView, \
     WxPythonBitstringView, WxPythonHexStringView, WxPythonValueSelectionView, ControlList
 
@@ -175,6 +175,15 @@ class WxPythonViewFactory(AbstractViewFactory):
         self._apply_style(controls)
 
         view = WxPythonDateView(name, controls)
+        return view, view, view if optional else None
+
+    def get_time_view(self, name: str, optional: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
+        controls = self._get_controls(name, optional, ':', 'date')
+
+        controls['value'] = wx.adv.TimePickerCtrl(self._window)
+        self._apply_style(controls)
+
+        view = WxPythonTimeView(name, controls)
         return view, view, view if optional else None
 
     def _get_controls(self, name: str, optional: bool, suffix: str = '', icon: str = None, icon_tooltip: str = None) -> \
