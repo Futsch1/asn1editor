@@ -1,8 +1,9 @@
 import typing
+from datetime import date
 
 
 class Converter:
-    def __init__(self, minimum: typing.Optional[typing.Union[int, float, str]], default: typing.Optional[typing.Union[str, bytes, int, float]]):
+    def __init__(self, minimum: typing.Optional[typing.Union[int, float]], default: typing.Optional[typing.Union[str, bytes, int, float, date]]):
         self._default = default
         self._minimum = minimum
         if self._minimum is None:
@@ -32,6 +33,19 @@ class Str(Converter):
 
     def default(self) -> str:
         return ' ' * self._minimum if not self._default else self._default
+
+
+class Any(Converter):
+    @staticmethod
+    def to_view(val: typing.Any) -> typing.Any:
+        return val
+
+    @staticmethod
+    def from_view(val: typing.Any) -> typing.Any:
+        return val
+
+    def default(self) -> typing.Any:
+        return self._default
 
 
 class Int(Converter):

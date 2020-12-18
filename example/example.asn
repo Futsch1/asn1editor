@@ -18,6 +18,7 @@ Sequence ::= SEQUENCE
     visibleString       VisibleString (SIZE(0..15)),
     utf8String          UTF8String (SIZE(1..5)) DEFAULT "äö",
     optionalSequenceOf  SEQUENCE (SIZE(1..2)) OF SubSequence OPTIONAL,
+    date                DATE,
     choiceExample       CHOICE {
         sequence            SubSequence,
         exampleInt          INTEGER (0..255),

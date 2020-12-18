@@ -38,3 +38,6 @@ class AbstractViewFactory:  # pragma: no cover
     def get_bitstring_view(self, name: str, number_of_bits: int, named_bits: List[Tuple[int, str]], optional: bool) -> Tuple[ChoiceView, BitstringInterface,
                                                                                                                              OptionalInterface]:
         raise NotImplementedError
+
+    def get_date_view(self, name: str, optional: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
+        raise NotImplementedError

@@ -1,3 +1,4 @@
+import datetime
 from typing import Optional, Union
 
 from asn1tools.codecs import oer
@@ -28,6 +29,8 @@ class ControllerFactory:
             controller = Controller.ValueController(type_.name, self._parent, value_interface, optional_interface, Converter.Str(minimum, type_.default))
         elif isinstance(type_, oer.OctetString) or isinstance(type_, oer.BitString):
             controller = Controller.ValueController(type_.name, self._parent, value_interface, optional_interface, Converter.ByteString(minimum, type_.default))
+        elif isinstance(type_, oer.Date):
+            controller = Controller.ValueController(type_.name, self._parent, value_interface, optional_interface, Converter.Any(0, datetime.date.today()))
         else:
             raise Exception(f"Unknown type for ControllerFactory: {type_}")
 

@@ -1,5 +1,6 @@
 import glob
 import json
+import locale
 import os
 import re
 import xml.dom.minidom
@@ -17,6 +18,9 @@ class ASN1SpecHandler:
     IMPORTS_REGEX = re.compile(r'IMPORTS\s*[\S,\s]*\s*FROM\s*(\S*);', flags=re.MULTILINE)
 
     def __init__(self, file_name: Union[str, List[str]]):
+        # This is necessary to enable parsing of stored dates
+        locale.setlocale(locale.LC_TIME, 'en_US.UTF-8')
+
         if isinstance(file_name, str):
             import_names = []
             # Pre process for import statements to automatically resolve other files

@@ -2,6 +2,7 @@ import typing
 from typing import Optional, Callable, List, Tuple
 
 import wx
+import wx.adv
 
 from asn1editor.interfaces.BitstringInterface import BitstringInterface
 from asn1editor.interfaces.OptionalInterface import OptionalInterface
@@ -9,7 +10,7 @@ from asn1editor.interfaces.ValueInterface import ValueInterface
 from asn1editor.view.AbstractView import AbstractView
 
 ControlList = typing.Dict[str, typing.Union[wx.TextCtrl, wx.CheckBox, wx.StaticBitmap, wx.ComboBox, wx.StaticText, wx.SpinCtrl, List[Tuple[int, wx.CheckBox]],
-                                            str]]
+                                            str, wx.adv.DatePickerCtrl]]
 
 
 class WxPythonView(AbstractView, OptionalInterface):
@@ -130,31 +131,15 @@ class WxPythonValueView(WxPythonView, ValueInterface):
             self._controls['value'].SetToolTip('\n'.join([self.get_value(), previous_tooltip]))
 
 
-class WxPythonValueSelectionView(WxPythonView, ValueInterface):
+class WxPythonValueSelectionView(WxPythonValueView):
     def __init__(self, name: str, controls: ControlList):
         super(WxPythonValueSelectionView, self).__init__(name, controls)
-
-    def get_sizer(self, recursive: bool) -> wx.Sizer:
-        sizer = self._create_sizer()
-        sizer.Add(self._controls['value'], flag=wx.ALL | wx.EXPAND, border=5)
-        return sizer
-
-    def register_change_event(self, callback: Callable):
-        # noinspection PyUnusedLocal
-        def event_closure(e: wx.Event):
-            del e
-            callback()
-
-        self._controls['value'].Bind(wx.EVT_TEXT, event_closure)
 
     def get_value(self) -> str:
         return self._controls['value'].GetStringSelection()
 
     def set_value(self, val: str):
         self._controls['value'].SetStringSelection(val)
-
-    def enable(self, enabled: bool):
-        self._controls['value'].Enable(enabled)
 
 
 class WxPythonHexStringView(WxPythonView, ValueInterface):

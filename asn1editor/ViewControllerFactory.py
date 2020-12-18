@@ -53,6 +53,8 @@ class ViewControllerFactory(object):
         elif isinstance(type_, oer.Recursive):
             # noinspection PyUnresolvedReferences
             return self.create_view_and_controller(type_.inner, checker.inner, controller)
+        elif isinstance(type_, oer.Date):
+            return self._date(type_, controller)
         else:
             return self._text(type_, f'ASN.1 type {type_.name} {type_.type_name} not supported')
 
@@ -144,6 +146,13 @@ class ViewControllerFactory(object):
 
         choice_instance_factory = ChoiceInstanceFactory(self._view_factory, view, members, checkers)
         ControllerFactory(controller).create_choice_controller(type_, value_interface, optional_interface, choice_instance_factory)
+
+        return view
+
+    def _date(self, type_: oer.Date, controller: Controller):
+        view, value_interface, optional_interface = self._view_factory.get_date_view(type_.name, type_.optional)
+
+        ControllerFactory(controller).create_value_controller(type_, value_interface, optional_interface)
 
         return view
 
