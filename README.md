@@ -60,6 +60,17 @@ The following encodings are supported for reading and writing data:
 - See limits of numeric values and texts as tooltips
 - Edit octet strings as ASCII or hex
 - List of recently opened specifications for quick access
+- Use a .style file to customize the way fields are displayed in asn1editor  
+
+  If an ASN.1 file is opened, asn1editor looks for an equally named file with a .style extension in the same directory.
+  If it is found, it is loaded and used to refine the layout of the specification. A style file is JSON formatted and
+  contains the name of the ASN.1 field as a key, and the layout specifier as value. The specifiers "read_only" and
+  "hidden" are supported.
+  
+  Example:
+  ```json
+  { "firstField": "read_only", "secondField": "hidden"}
+  ```
 
 ### IMPORTS
 IMPORT references are automatically resolved if the ASN1 files containing the imported types 
