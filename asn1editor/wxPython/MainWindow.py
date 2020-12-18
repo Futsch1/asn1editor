@@ -48,6 +48,7 @@ class MainWindow(wx.Frame, PluginInterface):
         if wx.Display.GetFromPoint(center) == wx.NOT_FOUND:
             self.SetPosition(wx.Point(0, 0))
         self._menu_handler.view_select.selected = Environment.settings.get('view', ViewType.TREE.value)
+        self._menu_handler.view_select.dark_mode = Environment.settings.get('dark_mode', False)
         self._menu_handler.recent = Environment.settings.get('recent', [])
         self._menu_handler.load_last = Environment.settings.get('load_last', True)
 
@@ -159,6 +160,15 @@ class MainWindow(wx.Frame, PluginInterface):
 
             self._menu_handler.enable()
 
+    def _get_all_children(self):
+        items = [self]
+        for item in self.GetChildren():
+            items.append(item)
+            if hasattr(item, "GetChildren"):
+                for child in item.GetChildren():
+                    items.append(child)
+        return items
+
     def _structure_changed(self):
         if self.__type_name is None:
             return
@@ -189,6 +199,18 @@ class MainWindow(wx.Frame, PluginInterface):
             sizer.Add(self.__content_panel, flag=wx.ALL | wx.EXPAND)
 
         self.SetSizer(sizer, deleteOld=True)
+
+        for child in self._get_all_children():
+            if self._menu_handler.view_select.dark_mode:
+                child.SetBackgroundColour("Dark Grey")
+                child.SetForegroundColour(wx.WHITE)
+            else:
+                if isinstance(child, wx.TreeCtrl):
+                    child.SetBackgroundColour(wx.WHITE)
+                    child.SetForegroundColour(wx.BLACK)
+                else:
+                    child.SetBackgroundColour(wx.NullColour)
+                    child.SetForegroundColour(wx.BLACK)
 
         self.Refresh()
         self.PostSizeEvent()
@@ -305,6 +327,7 @@ class MainWindow(wx.Frame, PluginInterface):
         Environment.settings['maximized'] = self.IsMaximized()
         Environment.settings['position'] = self.GetPosition().Get()
         Environment.settings['view'] = self._menu_handler.view_select.selected.value
+        Environment.settings['dark_mode'] = self._menu_handler.view_select.dark_mode
         Environment.settings['recent'] = self._menu_handler.recent[:10]
         Environment.settings['load_last'] = self._menu_handler.load_last
         Environment.settings['last_loaded'] = [self.__file_name, self.__type_name]

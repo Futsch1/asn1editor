@@ -1,4 +1,4 @@
-__version__ = "0.4.1"
+__version__ = "0.4.2"
 # noinspection SpellCheckingInspection
 __author__ = "Florian Fetz"
 
@@ -6,9 +6,9 @@ import argparse
 
 import wx
 
-from .wxPython import MainWindow as WxPythonMainWindow
 from .Plugin import Plugin
 from .PluginInterface import PluginInterface
+from .wxPython import MainWindow as WxPythonMainWindow
 
 __all__ = ['WxPythonMainWindow', 'Plugin', 'PluginInterface']
 
