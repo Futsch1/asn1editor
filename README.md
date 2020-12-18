@@ -11,6 +11,20 @@ ASN.1 specifications and read and write encoded data.
 The controller part of the editor is written independently of the 
 used GUI framework. A view implementation with wxPython is provided.
 
+![Screenshot](docs/screenshot_tree.png?raw=true "asn1editor")
+
+## Usage
+To start the wxPython based editor, install asn1editor via pip:
+
+```pip install asn1editor```
+
+Then you can run asn1editor from the shell
+
+```asn1editor [-h] [-type TYPE] [-data DATA] [asn1spec]```
+
+The ASN.1 specification to be loaded can be passed as an (optional) argument. The type inside the ASN.1 specification can be selected
+using the syntax <Namespace>.<Type name>. Finally, a data file can be passed as well that contains data encoded in the ASN.1 specification.
+
 ## Features
 
 ### Supported types
@@ -39,21 +53,17 @@ The following encodings are supported for reading and writing data:
 - PER 
 - UPER
 
+### GUI features
+- Load and save encoded data
+- View the data in a tree view or as groups
+![Screenshot](docs/screenshot_groups.png?raw=true "asn1editor group view")
+- See limits of numeric values and texts as tooltips
+- Edit octet strings as ASCII or hex
+- List of recently opened specifications for quick access
+
 ### IMPORTS
 IMPORT references are automatically resolved if the ASN1 files containing the imported types 
 reside in the same directory and have the extension ".asn". 
-
-## Usage
-To start the wxPython based editor, install asn1editor via pip:
-
-```pip install asn1editor```
-
-Then you can run asn1editor from the shell
-
-```asn1editor [-h] [-type TYPE] [-data DATA] [asn1spec]```
-
-The ASN.1 specification to be loaded can be passed as an (optional) argument. The type inside the ASN.1 specification can be selected
-using the syntax <Namespace>.<Type name>. Finally, a data file can be passed as well that contains data encoded in the ASN.1 specification.
 
 ### Extending asn1editor
 
