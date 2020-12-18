@@ -1,4 +1,4 @@
-from typing import Tuple, Union, Any
+import typing
 
 from asn1tools.codecs import constraints_checker
 from asn1tools.compiler import oer
@@ -15,7 +15,7 @@ class ViewControllerFactory(object):
     def __init__(self, view_factory: AbstractViewFactory):
         self._view_factory = view_factory
 
-    def create(self, asn1_type: oer.CompiledType) -> Tuple[AbstractView, Controller]:
+    def create(self, asn1_type: oer.CompiledType) -> typing.Tuple[AbstractView, Controller]:
         controller = RootController('root')
         view = self.create_view_and_controller(asn1_type.type, asn1_type.constraints_checker.type, controller)
 
@@ -57,6 +57,8 @@ class ViewControllerFactory(object):
             return self._date(type_, controller)
         elif isinstance(type_, oer.TimeOfDay):
             return self._time(type_, controller)
+        elif isinstance(type_, oer.DateTime) or isinstance(type_, oer.UTCTime) or isinstance(type_, oer.GeneralizedTime):
+            return self._datetime(type_, controller)
         else:
             return self._text(type_, f'ASN.1 type {type_.name} {type_.type_name} not supported')
 
@@ -67,7 +69,7 @@ class ViewControllerFactory(object):
         ControllerFactory(controller).create_null_controller(type_)
         return self._view_factory.get_text_view(type_.name, "NULL")
 
-    def _number(self, type_: Union[oer.Integer, oer.Real], checker: constraints_checker.Type, controller: Controller) -> AbstractView:
+    def _number(self, type_: typing.Union[oer.Integer, oer.Real], checker: constraints_checker.Type, controller: Controller) -> AbstractView:
         view, value_interface, optional_interface = self._view_factory.get_number_view(type_.name, type_.optional, self.__get_limit(checker.minimum),
                                                                                        self.__get_limit(checker.maximum), isinstance(type_, oer.Real))
 
@@ -165,6 +167,13 @@ class ViewControllerFactory(object):
 
         return view
 
+    def _datetime(self, type_: typing.Union[oer.DateTime, oer.UTCTime, oer.GeneralizedTime], controller: Controller):
+        view, value_interface, optional_interface = self._view_factory.get_datetime_view(type_.name, type_.optional)
+
+        ControllerFactory(controller).create_value_controller(type_, value_interface, optional_interface)
+
+        return view
+
     @staticmethod
     def __get_member_checker(checker: constraints_checker.Dict, name: str) -> constraints_checker.Type:
         for member in checker.members:
@@ -172,5 +181,5 @@ class ViewControllerFactory(object):
                 return member
 
     @staticmethod
-    def __get_limit(limit: Any):
+    def __get_limit(limit: typing.Any):
         return None if limit in ['MIN', 'MAX'] else limit

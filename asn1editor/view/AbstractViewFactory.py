@@ -44,3 +44,6 @@ class AbstractViewFactory:  # pragma: no cover
 
     def get_time_view(self, name: str, optional: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
         raise NotImplementedError
+
+    def get_datetime_view(self, name: str, optional: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
+        raise NotImplementedError

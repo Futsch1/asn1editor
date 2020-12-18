@@ -34,6 +34,9 @@ class ControllerFactory:
         elif isinstance(type_, oer.TimeOfDay):
             controller = Controller.ValueController(type_.name, self._parent, value_interface, optional_interface,
                                                     Converter.Any(0, datetime.datetime.now().time()))
+        elif isinstance(type_, oer.DateTime) or isinstance(type_, oer.UTCTime) or isinstance(type_, oer.GeneralizedTime):
+            controller = Controller.ValueController(type_.name, self._parent, value_interface, optional_interface,
+                                                    Converter.Any(0, datetime.datetime.now()))
         else:
             raise Exception(f"Unknown type for ControllerFactory: {type_}")
 

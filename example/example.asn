@@ -20,6 +20,7 @@ Sequence ::= SEQUENCE
     optionalSequenceOf  SEQUENCE (SIZE(1..2)) OF SubSequence OPTIONAL,
     date                DATE,
     time                TIME-OF-DAY,
+    datetime            UTCTime,
     choiceExample       CHOICE {
         sequence            SubSequence,
         exampleInt          INTEGER (0..255),
