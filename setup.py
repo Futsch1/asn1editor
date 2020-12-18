@@ -25,10 +25,14 @@ setup(name='asn1editor',
       ],
       keywords=['ASN.1', 'asn1', 'editor'],
       url='https://github.com/futsch1/asn1editor',
-      packages=find_packages(exclude=['tests', 'examples']),
+      packages=find_packages(exclude=['tests', 'example']),
+      include_package_data=True,
       install_requires=[
           'asn1tools>=0.153.0',
-          'wxpython>= 4.1.0'
+          'wxpython>=4.1.0'
       ],
       test_suite="tests",
-      python_requires='>=3.6')
+      python_requires='>=3.6',
+      entry_points={
+          'console_scripts': ['asn1editor=asn1editor.__init__:_wx_python_editor']
+      })

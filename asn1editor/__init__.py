@@ -1,9 +1,34 @@
-__version__ = "0.4.0"
+__version__ = "0.4.1"
 # noinspection SpellCheckingInspection
 __author__ = "Florian Fetz"
 
-from . import wxPython
+import argparse
+
+import wx
+
+from .wxPython import MainWindow as WxPythonMainWindow
 from .Plugin import Plugin
 from .PluginInterface import PluginInterface
 
-__all__ = ['wxPython', 'Plugin', 'PluginInterface']
+__all__ = ['WxPythonMainWindow', 'Plugin', 'PluginInterface']
+
+
+def _wx_python_editor():
+    parser = argparse.ArgumentParser(description='ASN.1 editor')
+    parser.add_argument('-asn1spec', required=False, help='ASN.1 specification file name')
+    parser.add_argument('-type', required=False, help='Name of the ASN.1 type to load (Module name.Type name)')
+    parser.add_argument('-data', required=False, help='Data file to load')
+
+    args = parser.parse_args()
+
+    app = wx.App()
+
+    frame = WxPythonMainWindow()
+    if args.asn1spec is not None:
+        frame.load_spec(args.asn1spec, args.type)
+    if args.data is not None:
+        frame.load_data_from_file(args.data)
+
+    frame.Show()
+
+    app.MainLoop()
