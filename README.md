@@ -1,6 +1,5 @@
-[![Build Status](https://travis-ci.org/Futsch1/asn1editor.svg?branch=master)](https://travis-ci.org/Futsch1/asn1editor)
+![Build](https://github.com/Futsch1/asn1editor/workflows/Build/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/Futsch1/asn1editor/badge.svg?branch=master)](https://coveralls.io/github/Futsch1/asn1editor?branch=master)
-[![Documentation Status](https://readthedocs.org/projects/asn1editor/badge/?version=latest)](https://asn1editor.readthedocs.io/en/latest/?badge=latest)
 # asn1editor
 Python based ASN.1 editor
 
