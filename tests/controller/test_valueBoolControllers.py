@@ -58,6 +58,21 @@ class TestValueController(TestCase):
         Controller.ValueController('test', root, value_interface, None, Converter.Int(12, None))
         self.assertEqual(value_interface.val, '12')
 
+        Controller.ValueController('test', root, value_interface, None, Converter.Int(None, 12))
+        self.assertEqual(value_interface.val, '12')
+
+        Controller.ValueController('test', root, value_interface, None, Converter.Float(0.0, 12.1))
+        self.assertEqual(value_interface.val, '12.1')
+
+        Controller.ValueController('test', root, value_interface, None, Converter.Float(0.0, None))
+        self.assertEqual(value_interface.val, '0.0')
+
+        Controller.ValueController('test', root, value_interface, None, Converter.Float(12.1, None))
+        self.assertEqual(value_interface.val, '12.1')
+
+        Controller.ValueController('test', root, value_interface, None, Converter.Float(None, 12.1))
+        self.assertEqual(value_interface.val, '12.1')
+
     def test_model_to_view(self):
         root = Controller.RootController('root')
         value_interface = TestValueInterface()

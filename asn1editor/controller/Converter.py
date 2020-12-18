@@ -2,7 +2,7 @@ import typing
 
 
 class Converter:
-    def __init__(self, minimum: typing.Union[int, float, str], default: typing.Optional[typing.Union[str, bytes, int, float]]):
+    def __init__(self, minimum: typing.Optional[typing.Union[int, float, str]], default: typing.Optional[typing.Union[str, bytes, int, float]]):
         self._default = default
         self._minimum = minimum
         if self._minimum is None:
