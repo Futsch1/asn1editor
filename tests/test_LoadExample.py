@@ -6,6 +6,7 @@ import wx
 
 import asn1editor
 from asn1editor.wxPython.ViewSelect import ViewType
+from tests.TestPlugin import TestPlugin
 
 
 def delay(main_window: asn1editor.wxPython.MainWindow):
@@ -28,7 +29,7 @@ class LoadExample(TestCase):
     def __test_internal(v: ViewType):
         # noinspection PyUnusedLocal
         app = wx.App()
-        main_window = asn1editor.wxPython.MainWindow()
+        main_window = asn1editor.wxPython.MainWindow(plugins=[TestPlugin()])
         main_window.select_view(v)
 
         test_types = [('example/example.asn', 'EXAMPLE.Sequence')]
