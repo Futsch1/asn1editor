@@ -15,7 +15,7 @@ __all__ = ['WxPythonMainWindow', 'Plugin', 'PluginInterface']
 
 def _wx_python_editor():
     parser = argparse.ArgumentParser(description='ASN.1 editor')
-    parser.add_argument('-asn1spec', required=False, help='ASN.1 specification file name')
+    parser.add_argument('asn1spec', nargs='?', help='ASN.1 specification file name')
     parser.add_argument('-type', required=False, help='Name of the ASN.1 type to load (Module name.Type name)')
     parser.add_argument('-data', required=False, help='Data file to load')
 

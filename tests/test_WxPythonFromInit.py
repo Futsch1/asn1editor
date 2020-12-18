@@ -1,3 +1,4 @@
+import sys
 import threading
 from time import sleep
 from unittest import TestCase
@@ -19,4 +20,5 @@ class WxPythonFromInit(TestCase):
         action_thread = threading.Thread(target=delay, args=[])
         action_thread.start()
 
+        sys.argv = ['asn1editor']
         asn1editor._wx_python_editor()

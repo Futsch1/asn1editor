@@ -9,8 +9,7 @@ It can load and save data encoded in various ASN.1 formats. It uses
 ASN.1 specifications and read and write encoded data.
 
 The controller part of the editor is written independently of the 
-used GUI framework. A view implementation with wxPython is provided and
-can be started by running wxEditor.
+used GUI framework. A view implementation with wxPython is provided.
 
 ## Features
 
@@ -51,7 +50,10 @@ To start the wxPython based editor, install asn1editor via pip:
 
 Then you can run asn1editor from the shell
 
-```asn1editor```
+```asn1editor [-h] [-type TYPE] [-data DATA] [asn1spec]```
+
+The ASN.1 specification to be loaded can be passed as an (optional) argument. The type inside the ASN.1 specification can be selected
+using the syntax <Namespace>.<Type name>. Finally, a data file can be passed as well that contains data encoded in the ASN.1 specification.
 
 ### Extending asn1editor
 
