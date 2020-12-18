@@ -18,7 +18,9 @@ class TestPlugin(Plugin):
                 ('TextEntry', self.__open_text_entry),
                 ('ChoiceEntry', self.__open_choice_entry),
                 ('ProgressDialog', self.__open_progress_dialog),
-                ('Question', self.__open_question)]
+                ('Question', self.__open_question),
+                ('', None),
+                ('Disabled', None)]
 
     def get_tools(self) -> typing.List[typing.Tuple[str, str, str, typing.Callable]]:
         return [('Toolbar', 'Toolbar tooltip', 'tests/test.png', self.__open_toolbar), (),
