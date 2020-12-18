@@ -18,59 +18,59 @@ jobs:
 
     steps:
       - name: Checkout repository
-      uses: actions/checkout@v2
+        uses: actions/checkout@v2
       
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
 
-    - uses: actions/cache@v2
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-      
-    - name: Install prerequisites
-      run: |
-        sudo apt-get update && sudo apt-get install libsdl2-mixer-2.0-0 libsdl2-image-2.0-0 libsdl2-2.0-0
-        python -m pip install --upgrade pip
-        pip install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-18.04 wxPython==4.1.0
-        pip install wheel coveralls
-        pip install -r requirements.txt
+      - uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
-    - name: Run unit test
-      run: |
-        xvfb-run --auto-servernum python -m coverage run --source=asn1editor -m unittest discover
-        python -m coverage html -d coverage
+      - name: Install prerequisites
+        run: |
+          sudo apt-get update && sudo apt-get install libsdl2-mixer-2.0-0 libsdl2-image-2.0-0 libsdl2-2.0-0
+          python -m pip install --upgrade pip
+          pip install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-18.04 wxPython==4.1.0
+          pip install wheel coveralls
+          pip install -r requirements.txt
 
-    - name: Coveralls
-      uses: AndreMiras/coveralls-python-action@develop
+      - name: Run unit test
+        run: |
+          xvfb-run --auto-servernum python -m coverage run --source=asn1editor -m unittest discover
+          python -m coverage html -d coverage
 
-    - name: Upload test results
-      uses: actions/upload-artifact@v2
-      with:
-        name: coverage-report
-        path: coverage/index.html
+      - name: Coveralls
+        uses: AndreMiras/coveralls-python-action@develop
 
-    - name: Lint with flake8
-      run: |
-        pip install flake8
-      flake8 asn1editor --max-line-length=160
+      - name: Upload test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-report
+          path: coverage/index.html
 
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
-      with:
-        languages: ${{ matrix.language }}
-        setup-python-dependencies: false
-        # If you wish to specify custom queries, you can do so here or in a config file.
-        # By default, queries listed here will override any specified in a config file.
-        # Prefix the list here with "+" to use these queries and those in the config file.
-        # queries: ./path/to/local/query, your-org/your-repo/queries@main
+      - name: Lint with flake8
+        run: |
+          pip install flake8
+          flake8 asn1editor --max-line-length=160
 
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v1
+        with:
+          languages: ${{ matrix.language }}
+          setup-python-dependencies: false
+          # If you wish to specify custom queries, you can do so here or in a config file.
+          # By default, queries listed here will override any specified in a config file.
+          # Prefix the list here with "+" to use these queries and those in the config file.
+          # queries: ./path/to/local/query, your-org/your-repo/queries@main
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v1
 
   release:
     name: Release to PyPI
