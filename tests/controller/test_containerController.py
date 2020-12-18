@@ -6,6 +6,20 @@ from tests.controller.test_listController import TestListInstanceFactory
 from tests.controller.test_valueBoolControllers import TestValueInterface, TestOptionalInterface
 
 
+class TestListInstanceFactoryContainer:
+    def __init__(self):
+        self.values = {}
+        self.instances = {}
+
+    def create(self, i, p: Controller.ListController):
+        self.values[i] = TestValueInterface()
+        self.instances[i] = Controller.ContainerController(str(i), p, None)
+
+    def destroy(self, i):
+        del self.values[i]
+        del self.instances[i]
+
+
 class TestContainerController(TestCase):
     def test_add_controller(self):
         root = Controller.RootController('root')
@@ -66,6 +80,18 @@ class TestContainerController(TestCase):
         Controller.ValueController('test_val', container, value_interface, None, Converter.Str(0, 'default'))
         container.model_to_view({'test': {'test_list': [1], 'test_val': 'test'}})
         self.assertEqual(value_interface.val, 'test')
+
+        list_instance_factory = TestListInstanceFactoryContainer()
+        list_value_interface.val = 0
+        container = Controller.ListController('test_list', root, list_value_interface, None, list_instance_factory, 0)
+
+        container.model_to_view({'test_list': []})
+        self.assertEqual(list_value_interface.val, '0')
+        self.assertEqual(len(list_instance_factory.instances), 0)
+
+        container.model_to_view({'test_list': [{}]})
+        self.assertEqual(list_value_interface.val, '1')
+        self.assertEqual(len(list_instance_factory.instances), 1)
 
     def test_view_to_model_value(self):
         root = Controller.RootController('root')

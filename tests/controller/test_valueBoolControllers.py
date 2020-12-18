@@ -109,6 +109,10 @@ class TestValueController(TestCase):
         optional_interface.val = False
         self.assertIsNone(controller.view_to_model())
 
+        controller = Controller.ValueController('test', root, value_interface, None, Converter.Float(0.0, 1.0))
+        value_interface.val = 'new'
+        self.assertEqual(controller.view_to_model(), 0.0)
+
 
 class TestBoolController(TestCase):
     def test_add_controller(self):
