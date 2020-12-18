@@ -5,7 +5,6 @@ import wx
 
 import asn1editor
 from asn1editor.ASN1SpecHandler import ASN1SpecHandler
-from asn1editor.wxPython.ViewSelect import ViewType
 
 
 class LoadStandardsTest(TestCase):
@@ -23,10 +22,6 @@ class LoadStandardsTest(TestCase):
         app = wx.App()
         main_window = asn1editor.wxPython.MainWindow()
 
-        main_window.select_view(ViewType.GROUPS)
-        self.__load_standards(main_window)
-
-        main_window.select_view(ViewType.TREE)
         self.__load_standards(main_window)
 
         app.Destroy()

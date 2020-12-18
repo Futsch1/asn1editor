@@ -286,7 +286,7 @@ class MainWindow(wx.Frame, PluginInterface):
         return Environment.settings.setdefault('Plugin', {})
 
     def select_view(self, view: ViewType):
-        self._menu_handler.view_select.selected = view
+        self._menu_handler.view_select.event(view.value)
 
     def __exception_handler(self, exc_type, value, trace):
         import traceback

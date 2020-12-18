@@ -11,6 +11,8 @@ Sequence ::= SEQUENCE
     realExample         REAL,
     enumerated          ENUMERATED { enum1, enum2 },
     bitString           BIT STRING { a(0), b(1), c(23) } (SIZE(24)),
+    bitString2          BIT STRING (SIZE(8)),
+    bitString3          BIT STRING { a(0) } (SIZE(1)),
     octetString         OCTET STRING (SIZE(4)) DEFAULT "abcd",
     octetString2        OCTET STRING (SIZE(4)) DEFAULT "abcd",
     visibleString       VisibleString (SIZE(0..15)),

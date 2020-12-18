@@ -62,3 +62,4 @@ class MonkeyTest(TestCase):
             app.MainLoop()
             action_thread.join(timeout=0.0)
 
+        app.Destroy()

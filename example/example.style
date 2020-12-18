@@ -1,4 +1,6 @@
 {
     "octetString2": "read_only",
+    "bitString2": "read_only",
+    "bitString3": "read_only",
     "member2": "hidden"
 }
