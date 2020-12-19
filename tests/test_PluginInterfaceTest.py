@@ -6,6 +6,7 @@ import wx
 
 import asn1editor
 from asn1editor.wxPython.MainWindow import MainWindow
+from tests import testHelper
 
 
 class TestPlugin(asn1editor.Plugin):
@@ -33,7 +34,7 @@ class TestPlugin(asn1editor.Plugin):
 
 class PluginInterfaceTest(TestCase):
     def test_dialogs(self):
-        app = wx.App()
+        app = testHelper.get_wx_app()
         plugin = TestPlugin()
         main_window = MainWindow([plugin], enable_load_last=False)
         with patch('wx.TextEntryDialog') as TextEntryDialogMock:
@@ -60,29 +61,31 @@ class PluginInterfaceTest(TestCase):
 
         with patch('wx.FileDialog') as FileDialogMock:
             instance = FileDialogMock.return_value
-            instance.GetPaths.return_value = ['example/example.asn']
+            instance.GetPaths.return_value = ['example2/example.asn']
             instance.GetMessage.return_value = 'TestFile'
             instance.__enter__.return_value = instance
 
             instance.ShowModal.return_value = wx.ID_OK
-            self.assertEqual('example/example.asn', plugin.plugin_interface.file_picker("Test my entry", "Test", True))
+            self.assertEqual('example2/example.asn', plugin.plugin_interface.file_picker("Test my entry", "Test", True))
 
+            instance.SetPath.reset_mock()
             instance.ShowModal.return_value = wx.ID_CANCEL
             self.assertIsNone(plugin.plugin_interface.file_picker("Test my entry", "Test", False))
-            instance.SetPath.assert_called_once_with('example/')
+            instance.SetPath.assert_called_once_with('example2/')
 
         with patch('wx.DirDialog') as DirDialogMock:
             instance = DirDialogMock.return_value
-            instance.GetPaths.return_value = ['example/example']
+            instance.GetPaths.return_value = ['example3/example']
             instance.GetMessage.return_value = 'TestDir'
             instance.__enter__.return_value = instance
 
             instance.ShowModal.return_value = wx.ID_OK
-            self.assertEqual('example/example', plugin.plugin_interface.dir_picker("Test my entry"))
+            self.assertEqual('example3/example', plugin.plugin_interface.dir_picker("Test my entry"))
 
+            instance.SetPath.reset_mock()
             instance.ShowModal.return_value = wx.ID_CANCEL
             self.assertIsNone(plugin.plugin_interface.dir_picker("Test my entry"))
-            instance.SetPath.assert_called_once_with('example/')
+            instance.SetPath.assert_called_once_with('example3/')
 
         plugin.plugin_interface.show_status("Test status bar")
         self.assertEqual(main_window._status_bar.GetStatusText(), 'Test status bar')
@@ -116,10 +119,10 @@ class PluginInterfaceTest(TestCase):
             plugin.plugin_interface.update_progress(None, True)
             instance.Close.assert_called_once()
 
-        app.Destroy()
+        app.GetTopWindow().Close()
 
     def test_multiple_plugins(self):
-        app = wx.App()
+        app = testHelper.get_wx_app()
         plugin1 = TestPlugin()
         plugin2 = TestPlugin()
         MainWindow([plugin1, plugin2], enable_load_last=False)
@@ -133,10 +136,10 @@ class PluginInterfaceTest(TestCase):
 
             self.assertEqual('Test', plugin1.plugin_interface.text_entry("Test my entry"))
 
-        app.Destroy()
+        app.GetTopWindow().Close()
 
     def test_spec_interfaces(self):
-        app = wx.App()
+        app = testHelper.get_wx_app()
         plugin = TestPlugin()
         main_window = MainWindow([plugin], enable_load_last=False)
 
@@ -148,10 +151,10 @@ class PluginInterfaceTest(TestCase):
         self.assertEqual(plugin.plugin_interface.get_spec_filename(), 'example/example.asn')
         self.assertEqual(plugin.plugin_interface.get_typename(), 'EXAMPLE.Sequence')
 
-        app.Destroy()
+        app.GetTopWindow().Close()
 
     def test_encoding_decoding(self):
-        app = wx.App()
+        app = testHelper.get_wx_app()
         plugin = TestPlugin()
         main_window = MainWindow([plugin], enable_load_last=False)
 
@@ -162,27 +165,26 @@ class PluginInterfaceTest(TestCase):
         jer_encoded = plugin.plugin_interface.encode_data('jer')
         plugin.plugin_interface.show_data(jer_encoded, 'jer')
 
-        app.Destroy()
+        app.GetTopWindow().Close()
 
     def test_settings(self):
-        app = wx.App()
+        app = testHelper.get_wx_app()
         plugin = TestPlugin()
-        main_window = MainWindow([plugin], enable_load_last=False)
+        MainWindow([plugin], enable_load_last=False)
 
         plugin.plugin_interface.get_settings()['Test'] = 1
 
-        main_window.close(wx.KeyEvent())
+        app.GetTopWindow().Close()
 
-        main_window = MainWindow([plugin], enable_load_last=False)
+        MainWindow([plugin], enable_load_last=False)
 
         self.assertEqual(plugin.plugin_interface.get_settings()['Test'], 1)
         plugin.plugin_interface.get_settings()['Test'] = 0
 
-        main_window.close(wx.KeyEvent())
+        app.GetTopWindow().Close()
 
-        main_window = MainWindow([plugin], enable_load_last=False)
+        MainWindow([plugin], enable_load_last=False)
 
         self.assertEqual(plugin.plugin_interface.get_settings()['Test'], 0)
 
-        main_window.close(wx.KeyEvent())
-        app.Destroy()
+        app.GetTopWindow().Close()

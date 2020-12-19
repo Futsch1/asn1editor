@@ -9,6 +9,7 @@ import wx
 
 import asn1editor
 from asn1editor.wxPython.ViewSelect import ViewType
+from tests import testHelper
 
 
 def actions(main_window: asn1editor.wxPython.MainWindow):
@@ -48,7 +49,7 @@ class MonkeyTest(TestCase):
         if os.getenv('TRAVIS') is not None or os.getenv('GITHUB_ACTIONS') is not None:
             return
         # noinspection PyUnusedLocal
-        app = wx.App()
+        app = testHelper.get_wx_app()
         main_window = asn1editor.wxPython.MainWindow()
         main_window.select_view(ViewType.GROUPS)
 
@@ -61,5 +62,3 @@ class MonkeyTest(TestCase):
             main_window.Show()
             app.MainLoop()
             action_thread.join(timeout=0.0)
-
-        app.Destroy()

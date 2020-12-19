@@ -6,6 +6,7 @@ import wx
 
 import asn1editor
 from asn1editor.wxPython.ViewSelect import ViewType
+from tests import testHelper
 from tests.TestPlugin import TestPlugin
 
 
@@ -28,7 +29,7 @@ class LoadExample(TestCase):
     @staticmethod
     def __test_internal(v: ViewType):
         # noinspection PyUnusedLocal
-        app = wx.App()
+        app = testHelper.get_wx_app()
         main_window = asn1editor.wxPython.MainWindow(plugins=[TestPlugin()])
         main_window.select_view(v)
 
@@ -41,5 +42,3 @@ class LoadExample(TestCase):
             main_window.Show()
             app.MainLoop()
             action_thread.join(timeout=0.0)
-
-        app.Destroy()
