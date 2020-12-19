@@ -96,7 +96,7 @@ class MenuHandler:
                             toolbar.AddSeparator()
                         else:
                             bitmap = wx.Bitmap(plugin_resource_path(tool[2]))
-                            labels |= len(tool[0])
+                            labels |= len(tool[0]) > 0
                             toolbar.AddTool(toolId=plugin_index * 1000 + i, label=tool[0], bitmap=bitmap, shortHelp=tool[1])
                     if labels:
                         toolbar.SetWindowStyle(wx.TB_TEXT | wx.TB_HORIZONTAL)
