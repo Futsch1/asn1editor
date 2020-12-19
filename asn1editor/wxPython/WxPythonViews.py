@@ -291,7 +291,11 @@ class WxPythonBitstringView(WxPythonView, BitstringInterface):
 
     def get_sizer(self, recursive: bool) -> wx.Sizer:
         sizer = self._create_sizer()
-        bits_sizer = wx.StaticBoxSizer(wx.VERTICAL, self._parent, "Bits")
+        if self._controls['name'].IsShown():
+            bits_sizer = wx.StaticBoxSizer(wx.VERTICAL, self._parent, "Bits")
+        else:
+            bits_sizer = wx.BoxSizer(wx.VERTICAL)
+
         for _, checkbox in self._controls['checkboxes']:
             bits_sizer.Add(checkbox)
         sizer.Add(bits_sizer)
