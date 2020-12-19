@@ -176,6 +176,7 @@ class PluginInterfaceTest(TestCase):
 
         app.GetTopWindow().Close()
 
+        app = testHelper.get_wx_app()
         MainWindow([plugin], enable_load_last=False)
 
         self.assertEqual(plugin.plugin_interface.get_settings()['Test'], 1)
@@ -183,6 +184,7 @@ class PluginInterfaceTest(TestCase):
 
         app.GetTopWindow().Close()
 
+        app = testHelper.get_wx_app()
         MainWindow([plugin], enable_load_last=False)
 
         self.assertEqual(plugin.plugin_interface.get_settings()['Test'], 0)
