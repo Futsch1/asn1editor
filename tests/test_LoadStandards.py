@@ -9,9 +9,11 @@ from tests import testHelper
 class LoadStandardsTest(TestCase):
     def __load_standards(self, main_window):
         for file in glob.glob('tests/standards/*'):
+            print(f'Loading all types in {file}')
             asn1_handler = ASN1SpecHandler(file)
             types = asn1_handler.get_types()
             for type_ in types:
+                print(f'  Loading {type_}')
                 main_window.load_spec(file, type_)
                 self.assertEqual(main_window.get_spec_filename(), file)
                 self.assertEqual(main_window.get_typename(), type_)
