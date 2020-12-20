@@ -2,6 +2,8 @@ import threading
 from time import sleep
 from unittest import TestCase
 
+import wx
+
 import asn1editor
 from asn1editor.wxPython.ViewSelect import ViewType
 from tests import testHelper
@@ -11,6 +13,7 @@ from tests.TestPlugin import TestPlugin
 def delay(main_window: asn1editor.wxPython.MainWindow):
     sleep(1)
     main_window.Close(True)
+    wx.GetApp().ExitMainLoop()
 
 
 class LoadExample(TestCase):
