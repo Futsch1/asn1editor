@@ -6,26 +6,21 @@ from unittest import TestCase
 import wx
 
 import asn1editor
-from tests import testHelper
 
 
-def delay(app: wx.App):
+def delay():
     sleep(1)
-    while app.GetTopWindow():
-        app.GetTopWindow().Close(True)
-    app.ExitMainLoop()
+    wx.GetApp().GetTopWindow().Close(True)
+
+    wx.GetApp().ExitMainLoop()
 
 
 class WxPythonFromInit(TestCase):
     @staticmethod
     def test_open():
-        app = testHelper.get_wx_app()
-
-        action_thread = threading.Thread(target=delay, args=[app])
+        action_thread = threading.Thread(target=delay, args=[])
         action_thread.start()
 
         sys.argv = ['asn1editor']
         asn1editor._wx_python_editor()
-        action_thread.join()
-
-        app.Destroy()
+        action_thread.join(timeout=0.0)
