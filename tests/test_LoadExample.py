@@ -38,4 +38,4 @@ class LoadExample(TestCase):
         action_thread.start()
         main_window.Show()
         self.app.MainLoop()
-        action_thread.join(timeout=1.0)
+        action_thread.join(timeout=0.0)
