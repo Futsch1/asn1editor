@@ -35,7 +35,7 @@ class LoadExample(TestCase):
         main_window.select_view(v)
 
         action_thread = threading.Thread(target=delay, args=[main_window])
-        # action_thread.start()
+        action_thread.start()
         main_window.Show()
         self.app.MainLoop()
         action_thread.join(timeout=1.0)
