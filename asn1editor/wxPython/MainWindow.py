@@ -202,7 +202,7 @@ class MainWindow(wx.Frame, PluginInterface):
 
         for child in self._get_all_children():
             if self._menu_handler.view_select.dark_mode:
-                child.SetBackgroundColour("Dark Grey")
+                child.SetBackgroundColour(wx.Colour(60, 60, 60))
                 child.SetForegroundColour(wx.WHITE)
             else:
                 if isinstance(child, wx.TreeCtrl):
