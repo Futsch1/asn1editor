@@ -22,8 +22,8 @@ Then you can run asn1editor from the shell
 
 ```asn1editor [-h] [-type TYPE] [-data DATA] [asn1spec]```
 
-The ASN.1 specification to be loaded can be passed as an (optional) argument. The type inside the ASN.1 specification can be selected
-using the syntax <Namespace>.<Type name>. Finally, a data file can be passed as well that contains data encoded in the ASN.1 specification.
+The ASN.1 specification to be loaded can be passed as an (optional) argument. The type inside the ASN.1 specification can be selected using the syntax < Module
+name >.< Type name >. Finally, a data file can be passed as well that contains data encoded in the ASN.1 specification.
 
 ## Features
 
