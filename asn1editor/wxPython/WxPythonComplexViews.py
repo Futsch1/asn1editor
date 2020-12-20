@@ -26,7 +26,7 @@ class WxPythonContainerView(WxPythonView, ContainerView):
             self._controls['name'].Show(False)
         else:
             name_sizer = wx.BoxSizer(wx.HORIZONTAL)
-            name_sizer.Add(self._controls['icon'], flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL)
+            name_sizer.Add(self._controls['icon'], flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL, border=2)
             name_sizer.Add(self._controls['name'], flag=wx.ALL, border=5)
             sizer.Add(name_sizer)
 

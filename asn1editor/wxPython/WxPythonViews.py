@@ -75,12 +75,12 @@ class WxPythonView(AbstractView, OptionalInterface):
         sizer = wx.BoxSizer(orientation)
         if orientation == wx.HORIZONTAL:
             if 'icon' in self._controls:
-                sizer.Add(self._controls['icon'], flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL)
+                sizer.Add(self._controls['icon'], flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL, border=2)
             sizer.Add(self._controls['name'], flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL, border=5)
         else:
             if 'icon' in self._controls:
                 sub_sizer = wx.BoxSizer(wx.HORIZONTAL)
-                sub_sizer.Add(self._controls['icon'], flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL)
+                sub_sizer.Add(self._controls['icon'], flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL, border=2)
                 sub_sizer.Add(self._controls['name'], flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL, border=5)
                 sizer.Add(sub_sizer)
             else:
