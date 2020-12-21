@@ -19,7 +19,10 @@ class ASN1SpecHandler:
 
     def __init__(self, file_name: Union[str, List[str]]):
         # This is necessary to enable parsing of stored dates
-        locale.setlocale(locale.LC_TIME, 'en_US.UTF-8')
+        try:
+            locale.setlocale(locale.LC_TIME, 'C')
+        except locale.Error:
+            pass
 
         if isinstance(file_name, str):
             import_names = []
