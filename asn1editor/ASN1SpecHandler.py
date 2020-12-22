@@ -38,14 +38,14 @@ class ASN1SpecHandler:
                         dir_file_name = os.path.splitext(os.path.basename(dir_file))[0].lower()
                         if import_type in dir_file_name or dir_file_name in import_type:
                             import_names.append(dir_file)
-            self.__file_name = [file_name] + import_names
+            self.__file_names = [os.path.abspath(file_name)] + import_names
         else:
-            self.__file_name = file_name
+            self.__file_names = file_name
         self.__compiled = {}
-        self.__type_name = None
+        self._type_name = None
 
-    def get_filename(self) -> List[str]:
-        return self.__file_name
+    def get_filenames(self) -> List[str]:
+        return self.__file_names
 
     def get_types(self, ) -> List[str]:
         types = []
@@ -57,7 +57,7 @@ class ASN1SpecHandler:
 
     def get_compiled(self, codec: str) -> asn1tools.compiler.Specification:
         if codec not in self.__compiled:
-            self.__compiled[codec] = asn1tools.compile_files(self.__file_name, codec)
+            self.__compiled[codec] = asn1tools.compile_files(self.__file_names, codec)
         return self.__compiled[codec]
 
     def create_mvc_for_type(self, load_type: str, view_factory: AbstractViewFactory) -> Tuple[AbstractView, Controller]:
@@ -67,7 +67,7 @@ class ASN1SpecHandler:
 
                 if module_name + '.' + type_name == load_type:
                     mvc_factory = ViewControllerFactory(view_factory)
-                    self.__type_name = type_name
+                    self._type_name = type_name
                     return mvc_factory.create(compiled_type)
 
         raise Exception(f'Requested type {load_type} not found in ASN.1 spec')
@@ -86,10 +86,14 @@ class ASN1SpecHandler:
         return extension_to_codec[extension]
 
     def load_data_file(self, file_name: str) -> Dict:
+        assert self._type_name is not None
+
         with open(file_name, 'rb') as f:
             return self.get_model_from_data(f.read(), self.__get_codec(file_name))
 
     def save_data_file(self, file_name: str, model: Dict):
+        assert self._type_name is not None
+
         codec = self.__get_codec(file_name)
         data = self.get_data_from_model(model, codec)
         # Pretty printing of JSON or XML files
@@ -103,8 +107,8 @@ class ASN1SpecHandler:
 
     def get_data_from_model(self, model: Dict, codec: str) -> bytes:
         compiled = self.get_compiled(codec)
-        return compiled.encode(self.__type_name, model[self.__type_name], check_constraints=True)
+        return compiled.encode(self._type_name, model[self._type_name], check_constraints=True)
 
     def get_model_from_data(self, data: bytes, codec: str) -> Dict:
         compiled = self.get_compiled(codec)
-        return {self.__type_name: compiled.decode(self.__type_name, data)}
+        return {self._type_name: compiled.decode(self._type_name, data)}
