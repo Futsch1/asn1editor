@@ -18,12 +18,12 @@ def delay():
 class WxPythonFromInit(TestCase):
     @staticmethod
     def test_open():
+        if wx.GetApp() is not None:
+            wx.GetApp().Destroy()
+
         action_thread = threading.Thread(target=delay, args=[])
         action_thread.start()
 
         sys.argv = ['asn1editor']
         asn1editor._wx_python_editor()
         action_thread.join(timeout=0.0)
-
-        if wx.GetApp() is not None:
-            wx.GetApp().Destroy()

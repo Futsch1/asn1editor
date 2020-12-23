@@ -33,13 +33,9 @@ class TestPlugin(asn1editor.Plugin):
 
 
 class PluginInterfaceTest(TestCase):
-    def setUp(self):
-        self.app = testHelper.get_wx_app()
-
-    def tearDown(self):
-        self.app.Destroy()
-
     def test_dialogs(self):
+        app = testHelper.get_wx_app()
+
         plugin = TestPlugin()
         main_window = MainWindow([plugin], enable_load_last=False)
         with patch('wx.TextEntryDialog') as TextEntryDialogMock:
@@ -124,9 +120,11 @@ class PluginInterfaceTest(TestCase):
             plugin.plugin_interface.update_progress(None, True)
             instance.Close.assert_called_once()
 
-        self.app.GetTopWindow().Close()
+        app.GetTopWindow().Close()
 
     def test_multiple_plugins(self):
+        app = testHelper.get_wx_app()
+
         plugin1 = TestPlugin()
         plugin2 = TestPlugin()
         MainWindow([plugin1, plugin2], enable_load_last=False)
@@ -140,9 +138,11 @@ class PluginInterfaceTest(TestCase):
 
             self.assertEqual('Test', plugin1.plugin_interface.text_entry("Test my entry"))
 
-        self.app.GetTopWindow().Close()
+        app.GetTopWindow().Close()
 
     def test_spec_interfaces(self):
+        app = testHelper.get_wx_app()
+
         plugin = TestPlugin()
         main_window = MainWindow([plugin], enable_load_last=False)
 
@@ -154,9 +154,11 @@ class PluginInterfaceTest(TestCase):
         self.assertEqual(plugin.plugin_interface.get_spec_filename(), 'example/example.asn')
         self.assertEqual(plugin.plugin_interface.get_typename(), 'EXAMPLE.Sequence')
 
-        self.app.GetTopWindow().Close()
+        app.GetTopWindow().Close()
 
     def test_encoding_decoding(self):
+        app = testHelper.get_wx_app()
+
         plugin = TestPlugin()
         main_window = MainWindow([plugin], enable_load_last=False)
 
@@ -167,25 +169,27 @@ class PluginInterfaceTest(TestCase):
         jer_encoded = plugin.plugin_interface.encode_data('jer')
         plugin.plugin_interface.show_data(jer_encoded, 'jer')
 
-        self.app.GetTopWindow().Close()
+        app.GetTopWindow().Close()
 
     def test_settings(self):
+        app = testHelper.get_wx_app()
+
         plugin = TestPlugin()
         MainWindow([plugin], enable_load_last=False)
 
         plugin.plugin_interface.get_settings()['Test'] = 1
 
-        self.app.GetTopWindow().Close()
+        app.GetTopWindow().Close()
 
         MainWindow([plugin], enable_load_last=False)
 
         self.assertEqual(plugin.plugin_interface.get_settings()['Test'], 1)
         plugin.plugin_interface.get_settings()['Test'] = 0
 
-        self.app.GetTopWindow().Close()
+        app.GetTopWindow().Close()
 
         MainWindow([plugin], enable_load_last=False)
 
         self.assertEqual(plugin.plugin_interface.get_settings()['Test'], 0)
 
-        self.app.GetTopWindow().Close()
+        app.GetTopWindow().Close()

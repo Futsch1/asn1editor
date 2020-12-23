@@ -18,19 +18,15 @@ def delay(main_window: asn1editor.wxPython.MainWindow):
 
 class LoadExample(TestCase):
 
-    def setUp(self) -> None:
-        self.app = testHelper.get_wx_app()
-
-    def tearDown(self) -> None:
-        self.app.Destroy()
-
     def test_tree(self):
         self.__test_internal(ViewType.TREE)
 
     def test_group(self):
         self.__test_internal(ViewType.GROUPS)
 
-    def __test_internal(self, v: ViewType):
+    @staticmethod
+    def __test_internal(v: ViewType):
+        app = testHelper.get_wx_app()
         # noinspection PyUnusedLocal
         main_window = asn1editor.wxPython.MainWindow(plugins=[TestPlugin()])
 
@@ -40,5 +36,5 @@ class LoadExample(TestCase):
         action_thread = threading.Thread(target=delay, args=[main_window])
         action_thread.start()
         main_window.Show()
-        self.app.MainLoop()
+        app.MainLoop()
         action_thread.join(timeout=0.0)
