@@ -143,7 +143,6 @@ class PluginInterfaceTest(TestCase):
         self.app.GetTopWindow().Close()
 
     def test_spec_interfaces(self):
-        app = testHelper.get_wx_app()
         plugin = TestPlugin()
         main_window = MainWindow([plugin], enable_load_last=False)
 

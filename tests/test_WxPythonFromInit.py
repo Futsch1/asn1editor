@@ -24,3 +24,6 @@ class WxPythonFromInit(TestCase):
         sys.argv = ['asn1editor']
         asn1editor._wx_python_editor()
         action_thread.join(timeout=0.0)
+
+        if wx.GetApp() is not None:
+            wx.GetApp().Destroy()
