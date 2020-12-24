@@ -1,6 +1,4 @@
-import cProfile
 import glob
-import random
 from unittest import TestCase
 
 import asn1editor
