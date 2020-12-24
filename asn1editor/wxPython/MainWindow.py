@@ -106,7 +106,7 @@ class MainWindow(wx.Frame, PluginInterface):
             return
 
         # Spec file loaded, compile it to show a selection of type names
-        if not self.__asn1_handler or file_name not in self.__asn1_handler.get_filenames():
+        if not self.__asn1_handler or not self.__asn1_handler.is_loaded(file_name):
             try:
                 self.__asn1_handler = ASN1SpecHandler(file_name)
             except FileNotFoundError:

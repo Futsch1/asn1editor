@@ -38,6 +38,7 @@ jobs:
 
       - name: Run unit test
         run: |
+          xvfb-run --auto-servernum python -m unittest tests/noCovTest_WxPythonFromInit.py
           xvfb-run --auto-servernum python -m coverage run --source=asn1editor -m unittest discover -v
           python -m coverage html -d coverage
 

@@ -1,5 +1,4 @@
 import glob
-import random
 from unittest import TestCase
 
 import asn1editor
@@ -11,10 +10,9 @@ class LoadStandardsTest(TestCase):
     def __load_standards(self, main_window):
         tested_types = set()
         for file in glob.glob('tests/standards/*'):
-            print(f'Loading random types from {file}')
+            print(f'Loading types from {file}')
             asn1_handler = ASN1SpecHandler(file)
             types = asn1_handler.get_types()
-            types = random.choices(types, k=max(5, len(types) // 16))
             for type_ in types:
                 if type_ in tested_types:
                     continue
@@ -28,5 +26,4 @@ class LoadStandardsTest(TestCase):
         # noinspection PyUnusedLocal
         app = testHelper.get_wx_app()
         main_window = asn1editor.wxPython.MainWindow()
-
         self.__load_standards(main_window)

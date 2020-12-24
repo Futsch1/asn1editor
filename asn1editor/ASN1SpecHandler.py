@@ -40,12 +40,15 @@ class ASN1SpecHandler:
                             import_names.append(dir_file)
             self.__file_names = [os.path.abspath(file_name)] + import_names
         else:
-            self.__file_names = file_name
+            self.__file_names = [os.path.abspath(f) for f in file_name]
         self.__compiled = {}
         self._type_name = None
 
     def get_filenames(self) -> List[str]:
         return self.__file_names
+
+    def is_loaded(self, file_name: str):
+        return os.path.abspath(file_name) in self.__file_names
 
     def get_types(self, ) -> List[str]:
         types = []
