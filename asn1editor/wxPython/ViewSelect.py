@@ -11,18 +11,24 @@ class ViewType(Enum):
 
 class ViewSelect:
 
-    def __init__(self, frame: wx.Frame, groups_item: wx.MenuItem, tree_item: wx.MenuItem, dark_mode: wx.MenuItem,
-                 change_callback: typing.Callable):
-        self.__groups_item = groups_item
-        self.__tree_item = tree_item
-        self.__dark_mode = dark_mode
+    def __init__(self, frame: wx.Frame, change_callback: typing.Callable):
+        self.__view_menu = wx.Menu()
+        self.__groups_item: wx.MenuItem = self.__view_menu.Append(wx.ID_ANY, 'Groups', kind=wx.ITEM_CHECK)
+        self.__tree_item: wx.MenuItem = self.__view_menu.Append(wx.ID_ANY, 'Tree', kind=wx.ITEM_CHECK)
+        self.__tree_item.Check(True)
+        self.__view_menu.AppendSeparator()
+        self.__dark_mode: wx.MenuItem = self.__view_menu.Append(wx.ID_ANY, 'Dark mode', kind=wx.ITEM_CHECK)
+
         self.__change_callback = change_callback
-        frame.Bind(wx.EVT_MENU, lambda _: self.event(ViewType.GROUPS.value), groups_item)
-        frame.Bind(wx.EVT_MENU, lambda _: self.event(ViewType.TREE.value), tree_item)
-        frame.Bind(wx.EVT_MENU, self.event_dark_mode, dark_mode)
+        frame.Bind(wx.EVT_MENU, lambda _: self.event(ViewType.GROUPS.value), self.__groups_item)
+        frame.Bind(wx.EVT_MENU, lambda _: self.event(ViewType.TREE.value), self.__tree_item)
+        frame.Bind(wx.EVT_MENU, self.event_dark_mode, self.__dark_mode)
 
         self.__groups_item.Check(False)
         self.__tree_item.Check(True)
+
+    def get_menu(self) -> wx.Menu:
+        return self.__view_menu
 
     def event(self, selected: int):
         self.selected = selected

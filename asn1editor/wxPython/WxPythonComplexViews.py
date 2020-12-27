@@ -1,4 +1,4 @@
-from typing import Optional, List, Callable
+from typing import Optional, List, Callable, Tuple
 
 import wx
 
@@ -10,14 +10,14 @@ from asn1editor.wxPython.WxPythonViews import WxPythonView, ControlList
 class WxPythonContainerView(WxPythonView, ContainerView):
     icon = 'sequence'
 
-    def __init__(self, name: str, controls: ControlList, parent: wx.Window):
-        super(WxPythonContainerView, self).__init__(name, controls, container=True)
+    def __init__(self, name_and_tag: Tuple[str, str], controls: ControlList, parent: wx.Window):
+        super(WxPythonContainerView, self).__init__(name_and_tag, controls, container=True)
         self._children: List[WxPythonView] = []
         self._parent = parent
 
     def get_sizer(self, recursive: bool) -> wx.Sizer:
         if recursive and self.get_has_value() and self._controls['name'].IsShown():
-            sizer = wx.StaticBoxSizer(wx.VERTICAL, self._parent, self._name)
+            sizer = wx.StaticBoxSizer(wx.VERTICAL, self._parent, self._name_and_tag[0])
         else:
             sizer = wx.BoxSizer(wx.VERTICAL)
 
@@ -72,8 +72,8 @@ class WxPythonContainerView(WxPythonView, ContainerView):
 class WxPythonListView(WxPythonContainerView, ListView, ValueInterface):
     icon = 'sequence_of'
 
-    def __init__(self, name: str, controls: ControlList, parent: wx.Window):
-        super(WxPythonListView, self).__init__(name, controls, parent)
+    def __init__(self, name_and_tag: Tuple[str, str], controls: ControlList, parent: wx.Window):
+        super(WxPythonListView, self).__init__(name_and_tag, controls, parent)
 
     def register_change_event(self, callback: Callable):
         # noinspection PyUnusedLocal
@@ -113,7 +113,7 @@ class WxPythonListView(WxPythonContainerView, ListView, ValueInterface):
         sizer.Add(sub_sizer)
 
         if recursive and self.get_has_value() and self._controls['name'].IsShown():
-            content = wx.StaticBoxSizer(wx.VERTICAL, self._parent, self._name)
+            content = wx.StaticBoxSizer(wx.VERTICAL, self._parent, self._name_and_tag[0])
         else:
             content = wx.BoxSizer(wx.VERTICAL)
         for child in self._children:
@@ -128,8 +128,8 @@ class WxPythonListView(WxPythonContainerView, ListView, ValueInterface):
 class WxPythonChoiceView(WxPythonView, ChoiceView, ValueInterface):
     icon = 'choice'
 
-    def __init__(self, name: str, controls: ControlList):
-        super(WxPythonChoiceView, self).__init__(name, controls, True)
+    def __init__(self, name_and_tag: Tuple[str, str], controls: ControlList):
+        super(WxPythonChoiceView, self).__init__(name_and_tag, controls, True)
         self._view: Optional[WxPythonView] = None
 
     def register_change_event(self, callback: Callable):

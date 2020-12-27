@@ -1,5 +1,5 @@
 import datetime
-from typing import Callable
+from typing import Callable, Tuple
 
 import wx
 
@@ -8,8 +8,8 @@ from asn1editor.wxPython.WxPythonViews import WxPythonValueView, ControlList, Wx
 
 
 class WxPythonDateView(WxPythonValueView):
-    def __init__(self, name: str, controls: ControlList):
-        super(WxPythonDateView, self).__init__(name, controls)
+    def __init__(self, name_and_tag: Tuple[str, str], controls: ControlList):
+        super(WxPythonDateView, self).__init__(name_and_tag, controls)
 
     def get_value(self) -> datetime.date:
         dt: wx.DateTime = self._controls['value'].GetValue()
@@ -20,8 +20,8 @@ class WxPythonDateView(WxPythonValueView):
 
 
 class WxPythonTimeView(WxPythonValueView):
-    def __init__(self, name: str, controls: ControlList):
-        super(WxPythonTimeView, self).__init__(name, controls)
+    def __init__(self, name_and_tag: Tuple[str, str], controls: ControlList):
+        super(WxPythonTimeView, self).__init__(name_and_tag, controls)
 
     def get_value(self) -> datetime.time:
         hour, minute, second = self._controls['value'].GetTime()
@@ -32,8 +32,8 @@ class WxPythonTimeView(WxPythonValueView):
 
 
 class WxPythonDateTimeView(WxPythonView, ValueInterface):
-    def __init__(self, name: str, controls: ControlList):
-        super(WxPythonDateTimeView, self).__init__(name, controls)
+    def __init__(self, name_and_tag: Tuple[str, str], controls: ControlList):
+        super(WxPythonDateTimeView, self).__init__(name_and_tag, controls)
 
     def get_sizer(self, recursive: bool) -> wx.Sizer:
         sizer = self._create_sizer()

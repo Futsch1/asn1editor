@@ -27,6 +27,7 @@ class MenuHandler:
 
     def build(self, load_spec: typing.Callable, load_data_from_file: typing.Callable, save_data_to_file: typing.Callable, view_changed: typing.Callable):
         self.__load_spec = load_spec
+        self.view_select = ViewSelect(self.__frame, view_changed)
 
         menu_bar = wx.MenuBar()
         file_menu = wx.Menu()
@@ -52,13 +53,7 @@ class MenuHandler:
         exit_item.SetBitmap(Resources.get_bitmap_from_svg('exit'))
         menu_bar.Append(file_menu, '&File')
 
-        view_menu = wx.Menu()
-        groups_view: wx.MenuItem = view_menu.Append(wx.ID_ANY, 'Groups', kind=wx.ITEM_CHECK)
-        tree_view: wx.MenuItem = view_menu.Append(wx.ID_ANY, 'Tree', kind=wx.ITEM_CHECK)
-        tree_view.Check(True)
-        view_menu.AppendSeparator()
-        dark_mode: wx.MenuItem = view_menu.Append(wx.ID_ANY, 'Dark mode', kind=wx.ITEM_CHECK)
-        menu_bar.Append(view_menu, '&View')
+        menu_bar.Append(self.view_select.get_menu(), '&View')
 
         self.__frame.SetMenuBar(menu_bar)
 
@@ -136,8 +131,6 @@ class MenuHandler:
 
         picker = FilePickerHandler(data_save_dialog_constructor, save_data_to_file, True)
         self.__frame.Bind(wx.EVT_MENU, picker.on_menu_click, self.__save_data_item)
-
-        self.view_select = ViewSelect(self.__frame, groups_view, tree_view, dark_mode, view_changed)
 
     def enable(self, enable: bool = True):
         self.__load_data_item.Enable(enable)
