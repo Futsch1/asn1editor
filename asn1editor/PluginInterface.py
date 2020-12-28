@@ -12,12 +12,14 @@ class PluginInterface:  # pragma: no cover
         ERROR = 3
         QUESTION = 4
 
-    def load_spec(self, file_name: str, type_name: typing.Optional[str] = None):
+    def load_spec(self, file_name: str, type_name: typing.Optional[str] = None) -> bool:
         """
         Loads an ASN.1 specification in the editor.
 
         :param file_name: File name of the ASN.1 specification
         :param type_name: Optional type name indication. Format: [Module name].[Type name]
+
+        :return: True if data was loaded successfully
         """
         raise NotImplementedError
 
