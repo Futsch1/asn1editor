@@ -105,8 +105,8 @@ class WxPythonViewFactory(AbstractViewFactory):
         view = WxPythonBooleanView(type_info, controls)
         return view, view, view if type_info.optional else None
 
-    def get_string_view(self, type_info: TypeInfo, string_type: str, minimum: Optional[int], maximum: Optional[int]):
-        controls = self._get_controls(type_info, ':', 'string', string_type)
+    def get_string_view(self, type_info: TypeInfo, minimum: Optional[int], maximum: Optional[int]):
+        controls = self._get_controls(type_info, ':', 'string')
 
         edit = wx.TextCtrl(self._window)
         if maximum:
@@ -124,7 +124,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         return view, view, view if type_info.optional else None
 
     def get_hex_string_view(self, type_info: TypeInfo, minimum: Optional[int], maximum: Optional[int]):
-        controls = self._get_controls(type_info, ':', 'string', 'OCTET STRING')
+        controls = self._get_controls(type_info, ':', 'string')
 
         controls['selector'] = wx.CheckBox(self._window, label='Hex')
         controls['value'] = wx.TextCtrl(self._window)
@@ -198,8 +198,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         view = WxPythonDateTimeView(type_info, controls)
         return view, view, view if type_info.optional else None
 
-    def _get_controls(self, type_info: TypeInfo, suffix: str = '', icon: str = None, icon_tooltip: str = None) -> \
-            ControlList:
+    def _get_controls(self, type_info: TypeInfo, suffix: str = '', icon: str = None) -> ControlList:
         controls = {}
 
         label = self._labels.get_label(type_info, suffix)
@@ -214,7 +213,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         controls['name'] = control
         control.SetToolTip(tooltip)
         if icon is not None:
-            controls['icon'] = self._get_svg(icon, icon_tooltip)
+            controls['icon'] = self._get_svg(icon, tooltip)
 
         style = self._styler.get_style(type_info.name)
         if style is not None:
@@ -229,10 +228,7 @@ class WxPythonViewFactory(AbstractViewFactory):
 
         static_bitmap = wx.StaticBitmap(self._window, bitmap=bitmap)
 
-        if icon_tooltip:
-            static_bitmap.SetToolTip(icon_tooltip)
-        else:
-            static_bitmap.SetToolTip(bitmap_name.upper().replace('_', ' '))
+        static_bitmap.SetToolTip(icon_tooltip)
         return static_bitmap
 
     @staticmethod

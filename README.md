@@ -41,7 +41,6 @@ The editor supports a large variety of ASN.1 data types:
 - DATE, TIME-OF-DAY, DATE-TIME, GeneralizedTime, UTCTime
 
 ### Supported encodings
-
 The following encodings are supported for reading and writing data:
 
 - JER
@@ -101,11 +100,15 @@ app.MainLoop()
 ```
 
 ## Plugin interface
-In order to use custom data formats or to work with the data, plugins
-can be used. These plugins need to inherit from the Plugin.Plugin class and
-can use the PluginInterface.PluginInterface class to interact with the
-main application. A list of plugins can be passed to the constructor of the main editor class
-and is then automatically embedded in the application.
 
-An example application is if a custom header is added to an ASN.1 encoded data. Then the plugin
-can decode the header, choose the appropriate ASN.1 specification, load it, decode the data and display it.
+In order to use custom data formats or to work with the data, plugins can be used. These plugins need to inherit from the Plugin.Plugin class and can use the
+PluginInterface.PluginInterface class to interact with the main application. A list of plugins can be passed to the constructor of the main editor class and is
+then automatically embedded in the application.
+
+An example application is if a custom header is added to an ASN.1 encoded data. Then the plugin can decode the header, choose the appropriate ASN.1
+specification, load it, decode the data and display it.
+
+## Tests
+
+Apart from unit tests in the source folder, there is a project on testquality.com that contains a number of manual tests to qualify an asn1editor
+release [here](https://futsch1.testquality.com). You can log in using the credentials futsch1@fehlbar.de/readonly to view the test cases and test results.

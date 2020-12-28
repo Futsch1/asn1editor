@@ -114,7 +114,7 @@ class ViewControllerFactory(object):
         return view
 
     def _string(self, type_: oer.VisibleString, checker: constraints_checker.String, controller: Controller):
-        view, value_interface, optional_interface = self._view_factory.get_string_view(self.__get_type_info(type_), type_.type_name,
+        view, value_interface, optional_interface = self._view_factory.get_string_view(self.__get_type_info(type_),
                                                                                        self.__get_limit(checker.minimum), self.__get_limit(checker.maximum))
 
         ControllerFactory(controller).create_value_controller(type_, value_interface, optional_interface, self.__get_limit(checker.minimum))
