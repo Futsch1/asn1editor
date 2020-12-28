@@ -38,8 +38,11 @@ jobs:
 
       - name: Run unit test
         run: |
-          xvfb-run --auto-servernum python -m unittest tests/noCovTest_WxPythonFromInit.py
-          xvfb-run --auto-servernum python -m coverage run --source=asn1editor -m unittest discover -v
+          rm .coverage
+          shopt -s globstar
+          for i in **/test_*.py; do
+            xvfb-run --auto-servernum python -m coverage run --source=asn1editor -a -m unittest $i -v
+          done
           python -m coverage html -d coverage
 
       - name: Coveralls
