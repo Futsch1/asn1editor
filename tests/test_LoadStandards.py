@@ -17,7 +17,7 @@ class LoadStandardsTest(TestCase):
                 if type_ in tested_types:
                     continue
                 print(f'  Loading {type_}')
-                main_window.load_spec(file, type_)
+                self.assertTrue(main_window.load_spec(file, type_))
                 self.assertEqual(main_window.get_spec_filename(), file)
                 self.assertEqual(main_window.get_typename(), type_)
                 tested_types.add(type_)

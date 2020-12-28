@@ -187,4 +187,4 @@ class ViewControllerFactory(object):
 
     @staticmethod
     def __get_name_and_tag(type_: oer.Type) -> typing.Tuple[str, str]:
-        return type_.name, f'0x{type_.tag.hex()}'
+        return type_.name, f'0x{type_.tag.hex()}' if type_.tag is not None else ''

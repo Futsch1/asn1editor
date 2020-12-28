@@ -24,13 +24,12 @@ class LoadExample(TestCase):
     def test_group(self):
         self.__test_internal(ViewType.GROUPS)
 
-    @staticmethod
-    def __test_internal(v: ViewType):
+    def __test_internal(self, v: ViewType):
         app = testHelper.get_wx_app()
         # noinspection PyUnusedLocal
         main_window = asn1editor.wxPython.MainWindow(plugins=[TestPlugin()])
 
-        main_window.load_spec('example/example.asn', 'EXAMPLE.Sequence')
+        self.assertTrue(main_window.load_spec('example/example.asn', 'EXAMPLE.Sequence'))
         main_window.select_view(v)
 
         action_thread = threading.Thread(target=delay, args=[main_window])

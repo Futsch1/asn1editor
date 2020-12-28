@@ -44,8 +44,7 @@ def actions(main_window: asn1editor.wxPython.MainWindow):
 
 
 class MonkeyTest(TestCase):
-    @staticmethod
-    def test_monkey():
+    def test_monkey(self):
         if os.getenv('TRAVIS') is not None or os.getenv('GITHUB_ACTIONS') is not None:
             return
         # noinspection PyUnusedLocal
@@ -56,7 +55,7 @@ class MonkeyTest(TestCase):
         test_types = [('example/example.asn', 'EXAMPLE.Sequence')]
 
         for spec, type_ in test_types:
-            main_window.load_spec(spec, type_)
+            self.assertTrue(main_window.load_spec(spec, type_))
             action_thread = threading.Thread(target=actions, args=[main_window])
             action_thread.start()
             main_window.Show()
