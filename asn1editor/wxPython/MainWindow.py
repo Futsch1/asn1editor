@@ -13,11 +13,12 @@ from asn1editor.wxPython import Environment, Resources
 from asn1editor.wxPython import WxPythonViewFactory
 from asn1editor.wxPython.FilePickerHandler import FilePickerHandler
 from asn1editor.wxPython.ImageList import ImageList
+from asn1editor.wxPython.Labels import Labels
 from asn1editor.wxPython.MenuHandler import MenuHandler
 from asn1editor.wxPython.SingleFileDropTarget import SingleFileDropTarget
 from asn1editor.wxPython.Styler import Styler
 from asn1editor.wxPython.TreeView import TreeView
-from asn1editor.wxPython.ViewSelect import ViewType
+from asn1editor.wxPython.ViewSelect import ViewType, TagInfo
 from asn1editor.wxPython.WxPythonViews import WxPythonView
 
 
@@ -47,7 +48,11 @@ class MainWindow(wx.Frame, PluginInterface):
         center = screen_rect.GetTopLeft() + (screen_rect.GetWidth() // 2, screen_rect.GetHeight() // 2)
         if wx.Display.GetFromPoint(center) == wx.NOT_FOUND:
             self.SetPosition(wx.Point(0, 0))
-        self._menu_handler.view_select.selected = Environment.settings.get('view', ViewType.TREE.value)
+        try:
+            self._menu_handler.view_select.view_type = ViewType(Environment.settings.get('view', ViewType.TREE.value))
+            self._menu_handler.view_select.tag_info = TagInfo(Environment.settings.get('tag_info', TagInfo.TOOLTIPS.value))
+        except ValueError:
+            pass
         self._menu_handler.view_select.dark_mode = Environment.settings.get('dark_mode', False)
         self._menu_handler.recent = Environment.settings.get('recent', [])
         self._menu_handler.load_last = Environment.settings.get('load_last', True)
@@ -87,7 +92,7 @@ class MainWindow(wx.Frame, PluginInterface):
         else:
             self.load_spec(file_name)
 
-    def load_spec(self, file_name: typing.Optional[str], type_name: typing.Optional[str] = None):
+    def load_spec(self, file_name: typing.Optional[str], type_name: typing.Optional[str] = None) -> bool:
         wx.App.Get().ProcessPendingEvents()
         if file_name is None:
             # Close spec
@@ -103,7 +108,7 @@ class MainWindow(wx.Frame, PluginInterface):
                 self.__tree_view.destroy()
                 self.__tree_view = None
             self.SetTitle(self.__title)
-            return
+            return True
 
         # Spec file loaded, compile it to show a selection of type names
         if not self.__asn1_handler or not self.__asn1_handler.is_loaded(file_name):
@@ -111,7 +116,7 @@ class MainWindow(wx.Frame, PluginInterface):
                 self.__asn1_handler = ASN1SpecHandler(file_name)
             except FileNotFoundError:
                 self.show_message(f'File {file_name} not found', 'Error', PluginInterface.MessageType.ERROR)
-                return
+                return False
 
         if type_name is None:
             types = self.__asn1_handler.get_types()
@@ -145,13 +150,14 @@ class MainWindow(wx.Frame, PluginInterface):
             self.__content_panel.SetScrollbars(15, 15, 50, 50)
             self.__content_panel.SetAutoLayout(True)
             self.__content_panel.SetSizer(wx.BoxSizer(wx.VERTICAL))
+            labels = Labels(self._menu_handler.view_select)
 
-            view_factory = WxPythonViewFactory.WxPythonViewFactory(self.__content_panel, styler)
+            view_factory = WxPythonViewFactory.WxPythonViewFactory(self.__content_panel, styler, labels)
 
             self.Freeze()
 
             self.__view, self.__controller = self.__asn1_handler.create_mvc_for_type(self.__type_name, view_factory)
-            self.__tree_view = TreeView(self, self.__content_panel, self.__type_name)
+            self.__tree_view = TreeView(self, self.__content_panel, self.__type_name, labels)
 
             self.Thaw()
 
@@ -159,6 +165,8 @@ class MainWindow(wx.Frame, PluginInterface):
             self._structure_changed()
 
             self._menu_handler.enable()
+
+        return self.__type_name is not None
 
     def _get_all_children(self):
         items = [self]
@@ -169,8 +177,12 @@ class MainWindow(wx.Frame, PluginInterface):
                     items.append(child)
         return items
 
-    def _structure_changed(self):
+    def _structure_changed(self, force_reload: bool = False):
         if self.__type_name is None:
+            return
+
+        if force_reload:
+            self.load_spec(self.__file_name, self.__type_name)
             return
 
         self.Freeze()
@@ -180,7 +192,7 @@ class MainWindow(wx.Frame, PluginInterface):
         content_panel_sizer: wx.Sizer = self.__content_panel.GetSizer()
         content_panel_sizer.Clear()
 
-        if self._menu_handler.view_select.selected == ViewType.TREE:
+        if self._menu_handler.view_select.view_type == ViewType.TREE:
             sizer = wx.BoxSizer(wx.HORIZONTAL)
             tree_ctrl = self.__tree_view.get_ctrl(self.__view.realize())
 
@@ -307,8 +319,10 @@ class MainWindow(wx.Frame, PluginInterface):
     def get_settings(self) -> dict:
         return Environment.settings.setdefault('Plugin', {})
 
-    def select_view(self, view: ViewType):
-        self._menu_handler.view_select.event(view.value)
+    def select_view_and_tag_info(self, view: ViewType, tag_info: TagInfo):
+        self._menu_handler.view_select.view_type = view
+        self._menu_handler.view_select.tag_info = tag_info
+        self._structure_changed(True)
 
     def __exception_handler(self, exc_type, value, trace):
         import traceback
@@ -326,8 +340,9 @@ class MainWindow(wx.Frame, PluginInterface):
         Environment.settings['size'] = (self.GetSize().Get())
         Environment.settings['maximized'] = self.IsMaximized()
         Environment.settings['position'] = self.GetPosition().Get()
-        Environment.settings['view'] = self._menu_handler.view_select.selected.value
+        Environment.settings['view'] = self._menu_handler.view_select.view_type.value
         Environment.settings['dark_mode'] = self._menu_handler.view_select.dark_mode
+        Environment.settings['tag_info'] = self._menu_handler.view_select.tag_info.value
         Environment.settings['recent'] = self._menu_handler.recent[:10]
         Environment.settings['load_last'] = self._menu_handler.load_last
         Environment.settings['last_loaded'] = [self.__file_name, self.__type_name]

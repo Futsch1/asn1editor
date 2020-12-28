@@ -3,22 +3,27 @@ import typing
 import wx
 
 from asn1editor.wxPython import Resources
+from asn1editor.wxPython.Labels import Labels
 from asn1editor.wxPython.WxPythonComplexViews import WxPythonContainerView, WxPythonChoiceView
 from asn1editor.wxPython.WxPythonViews import WxPythonView
 
 
 class TreeView:
 
-    def __init__(self, window: wx.Window, content_window: wx.ScrolledWindow, root_name: str):
+    def __init__(self, window: wx.Window, content_window: wx.ScrolledWindow, root_name: str, labels: Labels):
         self.__tree_ctrl = wx.TreeCtrl(window)
         Resources.get_bitmap_from_svg('root')
         root_item = self.__tree_ctrl.AddRoot(root_name, Resources.image_list.get_index('root'))
         self.__tree_ctrl.SetItemBold(root_item, True)
         self.__tree_ctrl.Bind(wx.EVT_TREE_SEL_CHANGED, self.item_selected)
         self.__tree_ctrl.Bind(wx.EVT_TREE_ITEM_RIGHT_CLICK, self.item_right_clicked)
+        self.__tree_ctrl.Bind(wx.EVT_TREE_ITEM_GETTOOLTIP, self.item_tooltip)
         self.__tree_ctrl.SetImageList(Resources.image_list.get_image_list())
         self.__content_window = content_window
         self.__current_view: typing.Optional[WxPythonView] = None
+        self.__tooltip_timer: typing.Optional[wx.CallLater] = None
+        self.__tooltip_event_and_tooltip: typing.Tuple[typing.Optional[wx.TreeEvent], typing.Optional[str]] = (None, None)
+        self.__labels = labels
 
     def __sync(self, tree_item: wx.TreeItemId, view: WxPythonView):
         if isinstance(view, WxPythonContainerView):
@@ -32,10 +37,11 @@ class TreeView:
             if view.get_has_value():
                 for child in view.get_children():
                     self.__sync(container_item_for_view, child)
+
         if isinstance(view, WxPythonChoiceView):
             container_item_for_view = self.__add_if_not_in_tree(tree_item, view)
-
             self.__delete_if_removed(container_item_for_view, [view.get_view()])
+
             if view.get_has_value():
                 self.__sync(container_item_for_view, view.get_view())
 
@@ -46,13 +52,15 @@ class TreeView:
         tree_child, cookie = self.__tree_ctrl.GetFirstChild(tree_item)
         while tree_child.IsOk():
             child_view = self.__tree_ctrl.GetItemData(tree_child)
+
             if child_view == view:
                 container_item_for_view = tree_child
                 found = True
             tree_child, cookie = self.__tree_ctrl.GetNextChild(tree_child, cookie)
+
         if not found:
             image = Resources.image_list.get_index(view.icon)
-            container_item_for_view = self.__tree_ctrl.AppendItem(tree_item, view.get_name(), image=image)
+            container_item_for_view = self.__tree_ctrl.AppendItem(tree_item, self.__labels.get_label(view.get_type_info()), image=image)
             self.__tree_ctrl.SetItemData(container_item_for_view, view)
 
         self.__tree_ctrl.SetItemBold(container_item_for_view, view.get_has_value())
@@ -62,6 +70,7 @@ class TreeView:
     def __delete_if_removed(self, container_item_for_view: wx.TreeItemId, views: typing.List[WxPythonView]):
         current_child_views_in_tree = []
         tree_child, cookie = self.__tree_ctrl.GetFirstChild(container_item_for_view)
+
         while tree_child.IsOk():
             current_child_views_in_tree.append((self.__tree_ctrl.GetItemData(tree_child), tree_child))
             tree_child, cookie = self.__tree_ctrl.GetNextChild(tree_child, cookie)
@@ -91,6 +100,14 @@ class TreeView:
     def item_selected(self, e: wx.TreeEvent):
         view = self.__tree_ctrl.GetItemData(e.GetItem())
         self.__show_view(view)
+
+    def item_tooltip(self, e: wx.TreeEvent):
+        view: WxPythonView = self.__tree_ctrl.GetItemData(e.GetItem())
+        if view is not None:
+            if self.__tooltip_timer is not None:
+                self.__tooltip_timer.Stop()
+                self.__tooltip_timer = None
+            self.__tooltip_timer = wx.CallLater(500, self.__tree_ctrl.SetToolTip, self.__labels.get_tooltip(view.get_type_info()))
 
     def item_right_clicked(self, e: wx.TreeEvent):
         class RightClickMenu(wx.Menu):

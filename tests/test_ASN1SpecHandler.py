@@ -9,7 +9,7 @@ from asn1editor.view.AbstractViewFactory import AbstractViewFactory
 class TestASN1SpecHandler(TestCase):
     def test_init_and_get_filenames(self):
         asn1_spec_handler = ASN1SpecHandler(['example/example.asn'])
-        self.assertIn('example/example.asn', asn1_spec_handler.get_filenames()[0])
+        self.assertIn('example.asn', asn1_spec_handler.get_filenames()[0])
 
         asn1_spec_handler = ASN1SpecHandler('tests/standards/rfc1157.asn')
         self.assertIn('rfc1155.asn', [os.path.split(p)[1] for p in asn1_spec_handler.get_filenames()])

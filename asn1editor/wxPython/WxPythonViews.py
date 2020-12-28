@@ -1,5 +1,4 @@
 import typing
-from typing import Optional, Callable, List, Tuple
 
 import wx
 import wx.adv
@@ -8,20 +7,21 @@ from asn1editor.interfaces.BitstringInterface import BitstringInterface
 from asn1editor.interfaces.OptionalInterface import OptionalInterface
 from asn1editor.interfaces.ValueInterface import ValueInterface
 from asn1editor.view.AbstractView import AbstractView
+from asn1editor.view.AbstractViewFactory import TypeInfo
 
-ControlList = typing.Dict[str, typing.Union[wx.TextCtrl, wx.CheckBox, wx.StaticBitmap, wx.ComboBox, wx.StaticText, wx.SpinCtrl, List[Tuple[int, wx.CheckBox]],
-                                            str, wx.adv.DatePickerCtrl, wx.adv.TimePickerCtrl]]
+ControlList = typing.Dict[str, typing.Union[wx.TextCtrl, wx.CheckBox, wx.StaticBitmap, wx.ComboBox, wx.StaticText, wx.SpinCtrl,
+                                            typing.List[typing.Tuple[int, wx.CheckBox]], str, wx.adv.DatePickerCtrl, wx.adv.TimePickerCtrl]]
 
 
 class WxPythonView(AbstractView, OptionalInterface):
-    structure_changed: Callable = None
+    structure_changed: typing.Callable = None
 
-    def __init__(self, name: str, controls: ControlList, container=False):
-        self._name = name
+    def __init__(self, type_info: TypeInfo, controls: ControlList, container=False):
+        self._type_info = type_info
         self._controls = controls
         self._container = container
 
-    def register_optional_event(self, callback: Callable):
+    def register_optional_event(self, callback: typing.Callable):
         # noinspection PyUnusedLocal
         def event_closure(e: wx.Event):
             del e
@@ -33,7 +33,7 @@ class WxPythonView(AbstractView, OptionalInterface):
         if 'optional' in self._controls:
             self._controls.get('optional').Bind(wx.EVT_CHECKBOX, event_closure)
 
-    def register_change_event(self, callback: Callable):
+    def register_change_event(self, callback: typing.Callable):
         pass
 
     def get_has_value(self) -> bool:
@@ -63,8 +63,8 @@ class WxPythonView(AbstractView, OptionalInterface):
             if isinstance(control, wx.Object):
                 control.Destroy()
 
-    def get_name(self) -> str:
-        return self._name
+    def get_type_info(self) -> TypeInfo:
+        return self._type_info
 
     def set_visible(self, visible, recursive=True):
         for control in self._controls.values():
@@ -90,8 +90,8 @@ class WxPythonView(AbstractView, OptionalInterface):
 
 
 class WxPythonValueView(WxPythonView, ValueInterface):
-    def __init__(self, name: str, controls: ControlList):
-        super(WxPythonValueView, self).__init__(name, controls)
+    def __init__(self, type_info: TypeInfo, controls: ControlList):
+        super(WxPythonValueView, self).__init__(type_info, controls)
 
     def get_sizer(self, recursive: bool) -> wx.Sizer:
         sizer = self._create_sizer()
@@ -101,7 +101,7 @@ class WxPythonValueView(WxPythonView, ValueInterface):
             sizer.ShowItems(False)
         return sizer
 
-    def register_change_event(self, callback: Callable):
+    def register_change_event(self, callback: typing.Callable):
         # noinspection PyUnusedLocal
         def event_closure(e: wx.Event):
             del e
@@ -132,8 +132,8 @@ class WxPythonValueView(WxPythonView, ValueInterface):
 
 
 class WxPythonValueSelectionView(WxPythonValueView):
-    def __init__(self, name: str, controls: ControlList):
-        super(WxPythonValueSelectionView, self).__init__(name, controls)
+    def __init__(self, type_info: TypeInfo, controls: ControlList):
+        super(WxPythonValueSelectionView, self).__init__(type_info, controls)
 
     def get_value(self) -> str:
         return self._controls['value'].GetStringSelection()
@@ -145,8 +145,8 @@ class WxPythonValueSelectionView(WxPythonValueView):
 class WxPythonHexStringView(WxPythonView, ValueInterface):
     CHARS_PER_HEX_DIGIT = 3
 
-    def __init__(self, name: str, controls: ControlList, minimum: Optional[int], maximum: Optional[int]):
-        super(WxPythonHexStringView, self).__init__(name, controls)
+    def __init__(self, type_info: TypeInfo, controls: ControlList, minimum: typing.Optional[int], maximum: typing.Optional[int]):
+        super(WxPythonHexStringView, self).__init__(type_info, controls)
 
         self._real_value = b''
         self._controls['selector'].Bind(wx.EVT_CHECKBOX, self.hex_selector_changed)
@@ -163,7 +163,7 @@ class WxPythonHexStringView(WxPythonView, ValueInterface):
         sizer.Add(self._controls['value'], proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
         return sizer
 
-    def register_change_event(self, callback: Callable):
+    def register_change_event(self, callback: typing.Callable):
         # noinspection PyUnusedLocal
         def event_closure(e: wx.Event):
             del e
@@ -243,10 +243,10 @@ class WxPythonHexStringView(WxPythonView, ValueInterface):
 
 
 class WxPythonBooleanView(WxPythonView, ValueInterface):
-    def __init__(self, name: str, controls: ControlList):
-        super(WxPythonBooleanView, self).__init__(name, controls)
+    def __init__(self, type_info: TypeInfo, controls: ControlList):
+        super(WxPythonBooleanView, self).__init__(type_info, controls)
 
-    def register_change_event(self, callback: Callable):
+    def register_change_event(self, callback: typing.Callable):
         # noinspection PyUnusedLocal
         def event_closure(e: wx.Event):
             del e
@@ -270,8 +270,8 @@ class WxPythonBooleanView(WxPythonView, ValueInterface):
 
 
 class WxPythonBitstringView(WxPythonView, BitstringInterface):
-    def __init__(self, name: str, controls: ControlList, parent: wx.Window):
-        super(WxPythonBitstringView, self).__init__(name, controls)
+    def __init__(self, type_info: TypeInfo, controls: ControlList, parent: wx.Window):
+        super(WxPythonBitstringView, self).__init__(type_info, controls)
         self._parent = parent
 
     def enable(self, enabled: bool):

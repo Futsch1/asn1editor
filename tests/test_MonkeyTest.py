@@ -8,8 +8,8 @@ import asn1tools
 import wx
 
 import asn1editor
-from asn1editor.wxPython.ViewSelect import ViewType
-from tests import testHelper
+from asn1editor.wxPython.ViewSelect import ViewType, TagInfo
+from tests import TestHelper
 
 
 def actions(main_window: asn1editor.wxPython.MainWindow):
@@ -44,19 +44,18 @@ def actions(main_window: asn1editor.wxPython.MainWindow):
 
 
 class MonkeyTest(TestCase):
-    @staticmethod
-    def test_monkey():
+    def test_monkey(self):
         if os.getenv('TRAVIS') is not None or os.getenv('GITHUB_ACTIONS') is not None:
             return
         # noinspection PyUnusedLocal
-        app = testHelper.get_wx_app()
+        app = TestHelper.get_wx_app()
         main_window = asn1editor.wxPython.MainWindow()
-        main_window.select_view(ViewType.GROUPS)
+        main_window.select_view_and_tag_info(ViewType.GROUPS, TagInfo.TOOLTIPS)
 
         test_types = [('example/example.asn', 'EXAMPLE.Sequence')]
 
         for spec, type_ in test_types:
-            main_window.load_spec(spec, type_)
+            self.assertTrue(main_window.load_spec(spec, type_))
             action_thread = threading.Thread(target=actions, args=[main_window])
             action_thread.start()
             main_window.Show()
