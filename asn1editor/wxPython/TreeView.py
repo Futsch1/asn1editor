@@ -3,13 +3,14 @@ import typing
 import wx
 
 from asn1editor.wxPython import Resources
+from asn1editor.wxPython.Labels import Labels
 from asn1editor.wxPython.WxPythonComplexViews import WxPythonContainerView, WxPythonChoiceView
 from asn1editor.wxPython.WxPythonViews import WxPythonView
 
 
 class TreeView:
 
-    def __init__(self, window: wx.Window, content_window: wx.ScrolledWindow, root_name: str):
+    def __init__(self, window: wx.Window, content_window: wx.ScrolledWindow, root_name: str, labels: Labels):
         self.__tree_ctrl = wx.TreeCtrl(window)
         Resources.get_bitmap_from_svg('root')
         root_item = self.__tree_ctrl.AddRoot(root_name, Resources.image_list.get_index('root'))
@@ -22,6 +23,7 @@ class TreeView:
         self.__current_view: typing.Optional[WxPythonView] = None
         self.__tooltip_timer: typing.Optional[wx.CallLater] = None
         self.__tooltip_event_and_tooltip: typing.Tuple[typing.Optional[wx.TreeEvent], typing.Optional[str]] = (None, None)
+        self.__labels = labels
 
     def __sync(self, tree_item: wx.TreeItemId, view: WxPythonView):
         if isinstance(view, WxPythonContainerView):
@@ -58,7 +60,7 @@ class TreeView:
 
         if not found:
             image = Resources.image_list.get_index(view.icon)
-            container_item_for_view = self.__tree_ctrl.AppendItem(tree_item, view.get_name(), image=image)
+            container_item_for_view = self.__tree_ctrl.AppendItem(tree_item, self.__labels.get_label(view.get_type_info()), image=image)
             self.__tree_ctrl.SetItemData(container_item_for_view, view)
 
         self.__tree_ctrl.SetItemBold(container_item_for_view, view.get_has_value())
@@ -105,7 +107,7 @@ class TreeView:
             if self.__tooltip_timer is not None:
                 self.__tooltip_timer.Stop()
                 self.__tooltip_timer = None
-            self.__tooltip_timer = wx.CallLater(500, self.__tree_ctrl.SetToolTip, f'Tag: {view.get_tag()}')
+            self.__tooltip_timer = wx.CallLater(500, self.__tree_ctrl.SetToolTip, self.__labels.get_tooltip(view.get_type_info()))
 
     def item_right_clicked(self, e: wx.TreeEvent):
         class RightClickMenu(wx.Menu):

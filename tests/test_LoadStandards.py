@@ -1,4 +1,5 @@
 import glob
+import os
 from unittest import TestCase
 
 import asn1editor
@@ -21,6 +22,8 @@ class LoadStandardsTest(TestCase):
                 self.assertEqual(main_window.get_spec_filename(), file)
                 self.assertEqual(main_window.get_typename(), type_)
                 tested_types.add(type_)
+                if os.getenv('ASN1EDITOR_QUICK_TESTS') is not None:
+                    break
 
     def test_load_standards(self):
         # noinspection PyUnusedLocal

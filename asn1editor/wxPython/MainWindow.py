@@ -13,6 +13,7 @@ from asn1editor.wxPython import Environment, Resources
 from asn1editor.wxPython import WxPythonViewFactory
 from asn1editor.wxPython.FilePickerHandler import FilePickerHandler
 from asn1editor.wxPython.ImageList import ImageList
+from asn1editor.wxPython.Labels import Labels
 from asn1editor.wxPython.MenuHandler import MenuHandler
 from asn1editor.wxPython.SingleFileDropTarget import SingleFileDropTarget
 from asn1editor.wxPython.Styler import Styler
@@ -146,13 +147,14 @@ class MainWindow(wx.Frame, PluginInterface):
             self.__content_panel.SetScrollbars(15, 15, 50, 50)
             self.__content_panel.SetAutoLayout(True)
             self.__content_panel.SetSizer(wx.BoxSizer(wx.VERTICAL))
+            labels = Labels(self._menu_handler.view_select)
 
-            view_factory = WxPythonViewFactory.WxPythonViewFactory(self.__content_panel, styler)
+            view_factory = WxPythonViewFactory.WxPythonViewFactory(self.__content_panel, styler, labels)
 
             self.Freeze()
 
             self.__view, self.__controller = self.__asn1_handler.create_mvc_for_type(self.__type_name, view_factory)
-            self.__tree_view = TreeView(self, self.__content_panel, self.__type_name)
+            self.__tree_view = TreeView(self, self.__content_panel, self.__type_name, labels)
 
             self.Thaw()
 
@@ -172,8 +174,12 @@ class MainWindow(wx.Frame, PluginInterface):
                     items.append(child)
         return items
 
-    def _structure_changed(self):
+    def _structure_changed(self, force_reload: bool = False):
         if self.__type_name is None:
+            return
+
+        if force_reload:
+            self.load_spec(self.__file_name, self.__type_name)
             return
 
         self.Freeze()

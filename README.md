@@ -38,7 +38,7 @@ The editor supports a large variety of ASN.1 data types:
 - SEQUENCE, SET
 - SEQUENCE OF, SET OF
 - CHOICE
-- DATE, TIME-OF-DAY, DATE-TIME, DURATION, GeneralizedTime, UTCTime
+- DATE, TIME-OF-DAY, DATE-TIME, GeneralizedTime, UTCTime
 
 ### Supported encodings
 

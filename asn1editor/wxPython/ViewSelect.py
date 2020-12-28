@@ -59,7 +59,7 @@ class ViewSelect:
         frame.Bind(wx.EVT_MENU, self.event_dark_mode, self.__dark_mode)
 
         self.__view_select_radio.bind(frame, change_callback)
-        self.__tag_info_radio.bind(frame, change_callback)
+        self.__tag_info_radio.bind(frame, lambda: change_callback(True))
 
     def get_menu(self) -> wx.Menu:
         return self.__view_menu

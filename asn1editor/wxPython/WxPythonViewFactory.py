@@ -9,8 +9,9 @@ from asn1editor.interfaces.BitstringInterface import BitstringInterface
 from asn1editor.interfaces.OptionalInterface import OptionalInterface
 from asn1editor.interfaces.ValueInterface import ValueInterface
 from asn1editor.view.AbstractView import AbstractView, ContainerView, ListView, ChoiceView
-from asn1editor.view.AbstractViewFactory import AbstractViewFactory
+from asn1editor.view.AbstractViewFactory import AbstractViewFactory, TypeInfo
 from asn1editor.wxPython import Resources
+from asn1editor.wxPython.Labels import Labels
 from asn1editor.wxPython.Styler import Styler
 from asn1editor.wxPython.WxPythonComplexViews import WxPythonContainerView, WxPythonListView, WxPythonChoiceView
 from asn1editor.wxPython.WxPythonDateTimeViews import WxPythonDateView, WxPythonTimeView, WxPythonDateTimeView
@@ -19,38 +20,39 @@ from asn1editor.wxPython.WxPythonViews import WxPythonValueView, WxPythonBoolean
 
 
 class WxPythonViewFactory(AbstractViewFactory):
-    def __init__(self, window: wx.ScrolledWindow, styler: Styler):
+    def __init__(self, window: wx.ScrolledWindow, styler: Styler, labels: Labels):
         self._window = window
         self._styler = styler
+        self._labels = labels
 
-    def get_enumerated_view(self, name_and_tag: Tuple[str, str], choices: List[str], optional: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
-        controls = self._get_controls(name_and_tag, optional, ':', 'enumerated')
+    def get_enumerated_view(self, type_info: TypeInfo, choices: List[str]) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
+        controls = self._get_controls(type_info, ':', 'enumerated')
 
         controls['value'] = wx.ComboBox(self._window, choices=choices, style=wx.CB_READONLY)
         self._apply_style(controls)
 
-        view = WxPythonValueSelectionView(name_and_tag, controls)
-        return view, view, view if optional else None
+        view = WxPythonValueSelectionView(type_info, controls)
+        return view, view, view if type_info.optional else None
 
-    def get_text_view(self, name_and_tag: Tuple[str, str], text: str) -> AbstractView:
-        controls = self._get_controls(name_and_tag, False)
+    def get_text_view(self, type_info: TypeInfo, text: str) -> AbstractView:
+        controls = self._get_controls(type_info)
 
         controls['value'] = wx.StaticText(self._window, wx.ID_ANY, text)
         self._apply_style(controls)
 
-        view = WxPythonValueView(name_and_tag, controls)
+        view = WxPythonValueView(type_info, controls)
 
         return view
 
-    def get_container_view(self, name_and_tag: Tuple[str, str], optional: bool) -> Tuple[ContainerView, OptionalInterface]:
-        controls = self._get_controls(name_and_tag, optional, icon=WxPythonContainerView.icon)
+    def get_container_view(self, type_info: TypeInfo) -> Tuple[ContainerView, OptionalInterface]:
+        controls = self._get_controls(type_info, icon=WxPythonContainerView.icon)
 
-        view = WxPythonContainerView(name_and_tag, controls, self._window)
+        view = WxPythonContainerView(type_info, controls, self._window)
 
-        return view, view if optional else None
+        return view, view if type_info.optional else None
 
-    def get_list_view(self, name_and_tag: Tuple[str, str], minimum: int, maximum: int, optional: bool) -> Tuple[ListView, ValueInterface, OptionalInterface]:
-        controls = self._get_controls(name_and_tag, optional, icon=WxPythonListView.icon)
+    def get_list_view(self, type_info: TypeInfo, minimum: int, maximum: int) -> Tuple[ListView, ValueInterface, OptionalInterface]:
+        controls = self._get_controls(type_info, icon=WxPythonListView.icon)
 
         num_elements = wx.SpinCtrl(self._window)
         if minimum is not None:
@@ -66,13 +68,13 @@ class WxPythonViewFactory(AbstractViewFactory):
         controls['num_elements'] = wx.StaticText(self._window, wx.ID_ANY, "Elements:")
         self._apply_style(controls)
 
-        view = WxPythonListView(name_and_tag, controls, self._window)
+        view = WxPythonListView(type_info, controls, self._window)
 
-        return view, view, view if optional else None
+        return view, view, view if type_info.optional else None
 
-    def get_number_view(self, name_and_tag: Tuple[str, str], optional: bool, minimum: Optional[Union[int, float]],
+    def get_number_view(self, type_info: TypeInfo, minimum: Optional[Union[int, float]],
                         maximum: Optional[Union[int, float]], float_: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
-        controls = self._get_controls(name_and_tag, optional, ':', 'float' if float_ else 'integer')
+        controls = self._get_controls(type_info, ':', 'float' if float_ else 'integer')
 
         edit = wx.lib.masked.numctrl.NumCtrl(self._window)
         tool_tip = []
@@ -91,20 +93,20 @@ class WxPythonViewFactory(AbstractViewFactory):
         controls['value'] = edit
         self._apply_style(controls)
 
-        view = WxPythonValueView(name_and_tag, controls)
-        return view, view, view if optional else None
+        view = WxPythonValueView(type_info, controls)
+        return view, view, view if type_info.optional else None
 
-    def get_boolean_view(self, name_and_tag: Tuple[str, str], optional: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
-        controls = self._get_controls(name_and_tag, optional, ':', 'bool')
+    def get_boolean_view(self, type_info: TypeInfo) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
+        controls = self._get_controls(type_info, ':', 'bool')
 
         controls['value'] = wx.CheckBox(self._window)
         self._apply_style(controls)
 
-        view = WxPythonBooleanView(name_and_tag, controls)
-        return view, view, view if optional else None
+        view = WxPythonBooleanView(type_info, controls)
+        return view, view, view if type_info.optional else None
 
-    def get_string_view(self, name_and_tag: Tuple[str, str], string_type: str, optional: bool, minimum: Optional[int], maximum: Optional[int]):
-        controls = self._get_controls(name_and_tag, optional, ':', 'string', string_type)
+    def get_string_view(self, type_info: TypeInfo, string_type: str, minimum: Optional[int], maximum: Optional[int]):
+        controls = self._get_controls(type_info, ':', 'string', string_type)
 
         edit = wx.TextCtrl(self._window)
         if maximum:
@@ -118,36 +120,36 @@ class WxPythonViewFactory(AbstractViewFactory):
         controls['value'] = edit
         self._apply_style(controls)
 
-        view = WxPythonValueView(name_and_tag, controls)
-        return view, view, view if optional else None
+        view = WxPythonValueView(type_info, controls)
+        return view, view, view if type_info.optional else None
 
-    def get_hex_string_view(self, name_and_tag: Tuple[str, str], optional: bool, minimum: Optional[int], maximum: Optional[int]):
-        controls = self._get_controls(name_and_tag, optional, ':', 'string', 'OCTET STRING')
+    def get_hex_string_view(self, type_info: TypeInfo, minimum: Optional[int], maximum: Optional[int]):
+        controls = self._get_controls(type_info, ':', 'string', 'OCTET STRING')
 
         controls['selector'] = wx.CheckBox(self._window, label='Hex')
         controls['value'] = wx.TextCtrl(self._window)
         self._apply_style(controls)
 
-        view = WxPythonHexStringView(name_and_tag, controls, minimum, maximum)
-        return view, view, view if optional else None
+        view = WxPythonHexStringView(type_info, controls, minimum, maximum)
+        return view, view, view if type_info.optional else None
 
-    def get_choice_view(self, name_and_tag: Tuple[str, str], choices: List[str], optional: bool) -> Tuple[ChoiceView, ValueInterface, OptionalInterface]:
-        controls = self._get_controls(name_and_tag, optional, icon=WxPythonChoiceView.icon)
+    def get_choice_view(self, type_info: TypeInfo, choices: List[str]) -> Tuple[ChoiceView, ValueInterface, OptionalInterface]:
+        controls = self._get_controls(type_info, icon=WxPythonChoiceView.icon)
 
         controls['value'] = wx.ComboBox(self._window, choices=choices, style=wx.CB_READONLY)
         self._apply_style(controls)
 
-        view = WxPythonChoiceView(name_and_tag, controls)
+        view = WxPythonChoiceView(type_info, controls)
 
-        return view, view, view if optional else None
+        return view, view, view if type_info.optional else None
 
-    def get_bitstring_view(self, name_and_tag: Tuple[str, str], number_of_bits: int, named_bits: List[Tuple[str, int]], optional: bool) -> \
+    def get_bitstring_view(self, type_info: TypeInfo, number_of_bits: int, named_bits: List[Tuple[str, int]]) -> \
             Tuple[AbstractView, BitstringInterface, OptionalInterface]:
-        controls = self._get_controls(name_and_tag, optional, icon='bitstring')
+        controls = self._get_controls(type_info, icon='bitstring')
 
         checkboxes: List[Tuple[int, wx.CheckBox]] = []
 
-        style = self._styler.get_style(name_and_tag[0])
+        style = self._styler.get_style(type_info.name)
 
         if named_bits:
             for name, bit in named_bits:
@@ -164,54 +166,57 @@ class WxPythonViewFactory(AbstractViewFactory):
 
         controls['checkboxes'] = checkboxes
 
-        view = WxPythonBitstringView(name_and_tag, controls, self._window)
+        view = WxPythonBitstringView(type_info, controls, self._window)
 
-        return view, view, view if optional else None
+        return view, view, view if type_info.optional else None
 
-    def get_date_view(self, name_and_tag: Tuple[str, str], optional: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
-        controls = self._get_controls(name_and_tag, optional, ':', 'date')
+    def get_date_view(self, type_info: TypeInfo) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
+        controls = self._get_controls(type_info, ':', 'date')
 
         controls['value'] = wx.adv.DatePickerCtrl(self._window)
         self._apply_style(controls)
 
-        view = WxPythonDateView(name_and_tag, controls)
-        return view, view, view if optional else None
+        view = WxPythonDateView(type_info, controls)
+        return view, view, view if type_info.optional else None
 
-    def get_time_view(self, name_and_tag: Tuple[str, str], optional: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
-        controls = self._get_controls(name_and_tag, optional, ':', 'date')
+    def get_time_view(self, type_info: TypeInfo) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
+        controls = self._get_controls(type_info, ':', 'date')
 
         controls['value'] = wx.adv.TimePickerCtrl(self._window)
         self._apply_style(controls)
 
-        view = WxPythonTimeView(name_and_tag, controls)
-        return view, view, view if optional else None
+        view = WxPythonTimeView(type_info, controls)
+        return view, view, view if type_info.optional else None
 
-    def get_datetime_view(self, name_and_tag: Tuple[str, str], optional: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
-        controls = self._get_controls(name_and_tag, optional, ':', 'date')
+    def get_datetime_view(self, type_info: TypeInfo) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
+        controls = self._get_controls(type_info, ':', 'date')
 
         controls['value'] = wx.adv.DatePickerCtrl(self._window)
         controls['time'] = wx.adv.TimePickerCtrl(self._window)
         self._apply_style(controls)
 
-        view = WxPythonDateTimeView(name_and_tag, controls)
-        return view, view, view if optional else None
+        view = WxPythonDateTimeView(type_info, controls)
+        return view, view, view if type_info.optional else None
 
-    def _get_controls(self, name_and_tag: Tuple[str, str], optional: bool, suffix: str = '', icon: str = None, icon_tooltip: str = None) -> \
+    def _get_controls(self, type_info: TypeInfo, suffix: str = '', icon: str = None, icon_tooltip: str = None) -> \
             ControlList:
         controls = {}
-        if optional:
-            control = wx.CheckBox(self._window, wx.ID_ANY, name_and_tag[0] + suffix)
-            control.SetToolTip(f'Tag: {name_and_tag[1]}\nOptional element')
+
+        label = self._labels.get_label(type_info, suffix)
+        tooltip = self._labels.get_tooltip(type_info)
+
+        if type_info.optional:
+            control = wx.CheckBox(self._window, wx.ID_ANY, label)
             controls['optional'] = control
-            controls['name'] = control
         else:
-            control = wx.StaticText(self._window, wx.ID_ANY, name_and_tag[0] + suffix)
-            control.SetToolTip(f'Tag: {name_and_tag[1]}')
-            controls['name'] = control
+            control = wx.StaticText(self._window, wx.ID_ANY, label)
+
+        controls['name'] = control
+        control.SetToolTip(tooltip)
         if icon is not None:
             controls['icon'] = self._get_svg(icon, icon_tooltip)
 
-        style = self._styler.get_style(name_and_tag[0])
+        style = self._styler.get_style(type_info.name)
         if style is not None:
             controls['style'] = style
 
