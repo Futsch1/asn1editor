@@ -36,15 +36,14 @@ class AbstractViewFactory:  # pragma: no cover
             Tuple[ChoiceView, ValueInterface, OptionalInterface]:
         raise NotImplementedError
 
-    def get_string_view(self, type_info: TypeInfo, string_type: str, minimum: int, maximum: int) -> Tuple[
-        ChoiceView, ValueInterface, OptionalInterface]:
+    def get_string_view(self, type_info: TypeInfo, string_type: str, minimum: int, maximum: int) -> Tuple[ChoiceView, ValueInterface, OptionalInterface]:
         raise NotImplementedError
 
     def get_choice_view(self, type_info: TypeInfo, choices: List[str]) -> Tuple[ChoiceView, ValueInterface, OptionalInterface]:
         raise NotImplementedError
 
-    def get_bitstring_view(self, type_info: TypeInfo, number_of_bits: int, named_bits: List[Tuple[int, str]]) -> Tuple[
-        ChoiceView, BitstringInterface, OptionalInterface]:
+    def get_bitstring_view(self, type_info: TypeInfo, number_of_bits: int, named_bits: List[Tuple[int, str]]) -> Tuple[ChoiceView, BitstringInterface,
+                                                                                                                       OptionalInterface]:
         raise NotImplementedError
 
     def get_date_view(self, type_info: TypeInfo) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
