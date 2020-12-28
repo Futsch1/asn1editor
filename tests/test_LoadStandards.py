@@ -17,7 +17,7 @@ class LoadStandardsTest(TestCase):
             asn1_handler = ASN1SpecHandler(file)
             types = asn1_handler.get_types()
             if os.getenv('ASN1EDITOR_QUICK_TESTS') is not None:
-                types = random.sample(types, 5)
+                types = random.sample(types, min(5, len(types)))
             for type_ in types:
                 if type_ in tested_types:
                     continue
