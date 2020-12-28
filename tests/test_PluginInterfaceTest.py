@@ -6,7 +6,7 @@ import wx
 
 import asn1editor
 from asn1editor.wxPython.MainWindow import MainWindow
-from tests import testHelper
+from tests import TestHelper
 
 
 class TestPlugin(asn1editor.Plugin):
@@ -34,7 +34,7 @@ class TestPlugin(asn1editor.Plugin):
 
 class PluginInterfaceTest(TestCase):
     def test_dialogs(self):
-        app = testHelper.get_wx_app()
+        app = TestHelper.get_wx_app()
 
         plugin = TestPlugin()
         main_window = MainWindow([plugin], enable_load_last=False)
@@ -123,7 +123,7 @@ class PluginInterfaceTest(TestCase):
         app.GetTopWindow().Close()
 
     def test_multiple_plugins(self):
-        app = testHelper.get_wx_app()
+        app = TestHelper.get_wx_app()
 
         plugin1 = TestPlugin()
         plugin2 = TestPlugin()
@@ -141,7 +141,7 @@ class PluginInterfaceTest(TestCase):
         app.GetTopWindow().Close()
 
     def test_spec_interfaces(self):
-        app = testHelper.get_wx_app()
+        app = TestHelper.get_wx_app()
 
         plugin = TestPlugin()
         main_window = MainWindow([plugin], enable_load_last=False)
@@ -157,7 +157,7 @@ class PluginInterfaceTest(TestCase):
         app.GetTopWindow().Close()
 
     def test_encoding_decoding(self):
-        app = testHelper.get_wx_app()
+        app = TestHelper.get_wx_app()
 
         plugin = TestPlugin()
         main_window = MainWindow([plugin], enable_load_last=False)
@@ -172,7 +172,7 @@ class PluginInterfaceTest(TestCase):
         app.GetTopWindow().Close()
 
     def test_settings(self):
-        app = testHelper.get_wx_app()
+        app = TestHelper.get_wx_app()
 
         plugin = TestPlugin()
         MainWindow([plugin], enable_load_last=False)

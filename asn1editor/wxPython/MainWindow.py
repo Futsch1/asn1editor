@@ -48,9 +48,12 @@ class MainWindow(wx.Frame, PluginInterface):
         center = screen_rect.GetTopLeft() + (screen_rect.GetWidth() // 2, screen_rect.GetHeight() // 2)
         if wx.Display.GetFromPoint(center) == wx.NOT_FOUND:
             self.SetPosition(wx.Point(0, 0))
-        self._menu_handler.view_select.view_type = ViewType(Environment.settings.get('view', ViewType.TREE.value))
+        try:
+            self._menu_handler.view_select.view_type = ViewType(Environment.settings.get('view', ViewType.TREE.value))
+            self._menu_handler.view_select.tag_info = TagInfo(Environment.settings.get('tag_info', TagInfo.TOOLTIPS.value))
+        except ValueError:
+            pass
         self._menu_handler.view_select.dark_mode = Environment.settings.get('dark_mode', False)
-        self._menu_handler.view_select.tag_info = TagInfo(Environment.settings.get('tag_info', TagInfo.NONE.value))
         self._menu_handler.recent = Environment.settings.get('recent', [])
         self._menu_handler.load_last = Environment.settings.get('load_last', True)
 
@@ -316,9 +319,10 @@ class MainWindow(wx.Frame, PluginInterface):
     def get_settings(self) -> dict:
         return Environment.settings.setdefault('Plugin', {})
 
-    def select_view(self, view: ViewType):
+    def select_view_and_tag_info(self, view: ViewType, tag_info: TagInfo):
         self._menu_handler.view_select.view_type = view
-        self._structure_changed()
+        self._menu_handler.view_select.tag_info = tag_info
+        self._structure_changed(True)
 
     def __exception_handler(self, exc_type, value, trace):
         import traceback

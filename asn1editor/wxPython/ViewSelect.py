@@ -10,9 +10,8 @@ class ViewType(Enum):
 
 
 class TagInfo(Enum):
-    NONE = 0
-    TOOLTIPS = 1
-    LABELS = 2
+    TOOLTIPS = 0
+    LABELS = 1
 
 
 class RadioHandler:
@@ -44,7 +43,7 @@ class RadioHandler:
 class ViewSelect:
     def __init__(self, frame: wx.Frame, change_callback: typing.Callable):
         self.__view_select_radio = RadioHandler([('Groups', ViewType.GROUPS.value), ('Tree', ViewType.TREE.value)])
-        self.__tag_info_radio = RadioHandler([('None', TagInfo.NONE.value), ('Tooltips', TagInfo.TOOLTIPS.value), ('Labels', TagInfo.LABELS.value)])
+        self.__tag_info_radio = RadioHandler([('Tooltips', TagInfo.TOOLTIPS.value), ('Labels', TagInfo.LABELS.value)])
 
         self.__view_menu = wx.Menu()
         self.__view_select_radio.append_menu_items(self.__view_menu, ViewType.TREE)
@@ -52,7 +51,7 @@ class ViewSelect:
         self.__dark_mode: wx.MenuItem = self.__view_menu.Append(wx.ID_ANY, 'Dark mode', kind=wx.ITEM_CHECK)
         self.__view_menu.AppendSeparator()
         tag_info_sub = wx.Menu()
-        self.__tag_info_radio.append_menu_items(tag_info_sub, TagInfo.NONE)
+        self.__tag_info_radio.append_menu_items(tag_info_sub, TagInfo.TOOLTIPS)
         self.__view_menu.AppendSubMenu(tag_info_sub, 'Tag information')
 
         self.__change_callback = change_callback

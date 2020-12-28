@@ -4,7 +4,7 @@ from unittest import TestCase
 
 import asn1editor
 from asn1editor.ASN1SpecHandler import ASN1SpecHandler
-from tests import testHelper
+from tests import TestHelper
 
 
 class LoadStandardsTest(TestCase):
@@ -27,6 +27,6 @@ class LoadStandardsTest(TestCase):
 
     def test_load_standards(self):
         # noinspection PyUnusedLocal
-        app = testHelper.get_wx_app()
+        app = TestHelper.get_wx_app()
         main_window = asn1editor.wxPython.MainWindow()
         self.__load_standards(main_window)
