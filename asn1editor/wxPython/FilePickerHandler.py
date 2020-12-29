@@ -28,7 +28,11 @@ class FilePickerHandler:
                 filenames = [file_dialog.GetPath()]
             except TypeError:
                 filenames = [file_dialog.GetPath()]
-            Environment.settings[file_dialog.GetMessage()] = os.path.dirname(filenames[0])
+            if os.path.isdir(filenames[0]):
+                path = filenames[0]
+            else:
+                path = os.path.dirname(filenames[0])
+            Environment.settings[file_dialog.GetMessage()] = path
             filenames = filenames if len(filenames) > 1 else filenames[0]
             self.file_selected(filenames, file_dialog.GetParent())
 
