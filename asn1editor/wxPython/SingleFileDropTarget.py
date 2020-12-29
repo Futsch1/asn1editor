@@ -11,6 +11,6 @@ class SingleFileDropTarget(wx.FileDropTarget):
 
     def OnDropFiles(self, _, __, filenames):
         if len(filenames) == 1:
-            self.__callback(filenames[0])
+            wx.CallAfter(self.__callback, filenames[0])
             return True
         return False
