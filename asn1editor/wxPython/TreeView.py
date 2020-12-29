@@ -121,6 +121,8 @@ class TreeView:
                 self.collapse = self.Append(wx.NewId(), 'Collapse')
                 self.collapse_all = self.Append(wx.NewId(), 'Collapse all')
 
+        self.item_selected(e)
+
         menu = RightClickMenu(self.__tree_ctrl.GetTopLevelParent())
         menu.Bind(wx.EVT_MENU, lambda _: self.__tree_ctrl.ExpandAllChildren(e.GetItem()), menu.expand)
         menu.Bind(wx.EVT_MENU, lambda _: self.__tree_ctrl.ExpandAll(), menu.expand_all)
