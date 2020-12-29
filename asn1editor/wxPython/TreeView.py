@@ -126,7 +126,8 @@ class TreeView:
         menu = RightClickMenu(self.__tree_ctrl.GetTopLevelParent())
         menu.Bind(wx.EVT_MENU, lambda _: self.__tree_ctrl.ExpandAllChildren(e.GetItem()), menu.expand)
         menu.Bind(wx.EVT_MENU, lambda _: self.__tree_ctrl.ExpandAll(), menu.expand_all)
-        menu.Bind(wx.EVT_MENU, lambda _: self.__tree_ctrl.CollapseAllChildren(e.GetItem()), menu.collapse)
+        menu.Bind(wx.EVT_MENU, lambda _: (self.__tree_ctrl.CollapseAllChildren(e.GetItem()),
+                                          self.__show_view(self.__tree_ctrl.GetItemData(self.__tree_ctrl.GetSelection()))), menu.collapse)
         menu.Bind(wx.EVT_MENU, lambda _: (self.__tree_ctrl.CollapseAll(), self.__show_view(None)), menu.collapse_all)
         self.__tree_ctrl.GetTopLevelParent().PopupMenu(menu, e.GetPoint())
 
