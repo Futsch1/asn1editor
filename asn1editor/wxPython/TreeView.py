@@ -125,7 +125,7 @@ class TreeView:
         menu.Bind(wx.EVT_MENU, lambda _: self.__tree_ctrl.ExpandAllChildren(e.GetItem()), menu.expand)
         menu.Bind(wx.EVT_MENU, lambda _: self.__tree_ctrl.ExpandAll(), menu.expand_all)
         menu.Bind(wx.EVT_MENU, lambda _: self.__tree_ctrl.CollapseAllChildren(e.GetItem()), menu.collapse)
-        menu.Bind(wx.EVT_MENU, lambda _: self.__tree_ctrl.CollapseAll(), menu.collapse_all)
+        menu.Bind(wx.EVT_MENU, lambda _: (self.__tree_ctrl.CollapseAll(), self.__show_view(None)), menu.collapse_all)
         self.__tree_ctrl.GetTopLevelParent().PopupMenu(menu, e.GetPoint())
 
     def __show_view(self, view: typing.Optional[WxPythonView]):
