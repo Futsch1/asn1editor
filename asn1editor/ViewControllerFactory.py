@@ -183,7 +183,7 @@ class ViewControllerFactory(object):
 
     @staticmethod
     def __get_limit(limit: typing.Any) -> typing.Optional[int]:
-        return None if limit in ['MIN', 'MAX'] else limit
+        return None if limit in ['MIN', 'MAX'] or not isinstance(limit, int) else limit
 
     @staticmethod
     def __get_type_info(type_: oer.Type) -> TypeInfo:

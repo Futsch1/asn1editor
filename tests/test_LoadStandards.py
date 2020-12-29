@@ -12,7 +12,9 @@ from tests import TestHelper
 class LoadStandardsTest(TestCase):
     def __load_standards(self, main_window):
         tested_types = set()
-        for file in glob.glob('tests/standards/*'):
+        for file in glob.glob('tests/standards/pkix1/*'):
+            if os.path.isdir(file):
+                continue
             print(f'Loading types from {file}')
             asn1_handler = ASN1SpecHandler(file)
             types = asn1_handler.get_types()
