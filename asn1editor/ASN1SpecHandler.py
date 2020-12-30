@@ -16,7 +16,7 @@ from asn1editor.view.AbstractViewFactory import AbstractViewFactory
 
 class ASN1SpecHandler:
     IMPORTS_REGEX_OUTER = re.compile(r'IMPORTS([\s\S]*);', flags=re.MULTILINE)
-    IMPORTS_REGEX_INNER = re.compile(r'FROM\s*(\S)*', flags=re.MULTILINE)
+    IMPORTS_REGEX_INNER = re.compile(r'FROM\s*(\S*)', flags=re.MULTILINE)
 
     def __init__(self, file_name: Union[str, List[str]]):
         # This is necessary to enable parsing of stored dates
