@@ -57,6 +57,7 @@ class ASN1SpecHandler:
     def get_types(self, ) -> List[str]:
         types = []
         compiled = self.get_compiled('oer')
+        # TODO: Only include those types that are in the originally loaded file
         for module_name, module in compiled.modules.items():
             for type_name, compiled_type in module.items():
                 types.append(module_name + '.' + type_name)
