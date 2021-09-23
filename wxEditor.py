@@ -2,6 +2,7 @@ import argparse
 
 import wx
 
+import tests.TestAugmenter
 import tests.TestPlugin
 from asn1editor import WxPythonMainWindow
 
@@ -17,9 +18,9 @@ if __name__ == "__main__":
     app = wx.App()
 
     if args.test:
-        frame = WxPythonMainWindow([tests.TestPlugin.TestPlugin(), tests.TestPlugin.TestPlugin(" 2")])
+        frame = WxPythonMainWindow([tests.TestPlugin.TestPlugin(), tests.TestPlugin.TestPlugin(" 2")], tests.TestAugmenter.TestAugmenter('Help'))
     else:
-        frame = WxPythonMainWindow()
+        frame = WxPythonMainWindow(type_augmenter=tests.TestAugmenter.TestAugmenter(None))
     if args.asn1spec is not None:
         frame.load_spec(args.asn1spec, args.type)
     if args.data is not None:

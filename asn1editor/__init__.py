@@ -1,4 +1,4 @@
-__version__ = "0.6.1"
+__version__ = "0.7.0"
 # noinspection SpellCheckingInspection
 __author__ = "Florian Fetz"
 
@@ -8,9 +8,10 @@ import wx
 
 from .Plugin import Plugin
 from .PluginInterface import PluginInterface
+from .TypeAugmenter import TypeAugmenter
 from .wxPython import MainWindow as WxPythonMainWindow
 
-__all__ = ['WxPythonMainWindow', 'Plugin', 'PluginInterface']
+__all__ = ['WxPythonMainWindow', 'Plugin', 'PluginInterface', 'TypeAugmenter']
 
 
 def _wx_python_editor():

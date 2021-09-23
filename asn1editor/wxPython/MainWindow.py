@@ -9,6 +9,7 @@ import asn1editor
 from asn1editor.ASN1SpecHandler import ASN1SpecHandler
 from asn1editor.Plugin import Plugin
 from asn1editor.PluginInterface import PluginInterface
+from asn1editor.TypeAugmenter import TypeAugmenter
 from asn1editor.wxPython import Environment, Resources
 from asn1editor.wxPython import WxPythonViewFactory
 from asn1editor.wxPython.FilePickerHandler import FilePickerHandler
@@ -16,14 +17,15 @@ from asn1editor.wxPython.ImageList import ImageList
 from asn1editor.wxPython.Labels import Labels
 from asn1editor.wxPython.MenuHandler import MenuHandler
 from asn1editor.wxPython.SingleFileDropTarget import SingleFileDropTarget
-from asn1editor.wxPython.Styler import Styler
 from asn1editor.wxPython.TreeView import TreeView
 from asn1editor.wxPython.ViewSelect import ViewType, TagInfo
 from asn1editor.wxPython.WxPythonViews import WxPythonView
 
 
 class MainWindow(wx.Frame, PluginInterface):
-    def __init__(self, plugins: typing.Optional[typing.List[Plugin]] = None, title=f'ASN.1 editor {asn1editor.__version__}', enable_load_last=True):
+    def __init__(self, plugins: typing.Optional[typing.List[Plugin]] = None, type_augmenter: typing.Optional[TypeAugmenter] = None,
+                 title=f'ASN.1 editor {asn1editor.__version__}',
+                 enable_load_last=True):
         super(MainWindow, self).__init__(None, title=title)
         self.__title = title
 
@@ -33,6 +35,7 @@ class MainWindow(wx.Frame, PluginInterface):
         if plugins is not None:
             for plugin in plugins:
                 plugin.connect(self)
+        self._type_augmenter = type_augmenter
 
         self._status_bar = self.CreateStatusBar()
 
@@ -135,14 +138,14 @@ class MainWindow(wx.Frame, PluginInterface):
             self._status_bar.SetStatusText(f'Loaded {file_name}')
             self.SetTitle(f'{self.__title} - {file_name}')
             self.__file_name = file_name
+            if self._type_augmenter:
+                self._type_augmenter.set_spec_filename(file_name)
 
             if self.__view is not None:
                 self.__view.realize().destroy()
                 self.__content_panel.Destroy()
             if self.__tree_view is not None:
                 self.__tree_view.destroy()
-
-            styler = Styler(os.path.splitext(file_name)[0] + '.style')
 
             WxPythonView.structure_changed = lambda x: None
 
@@ -152,11 +155,11 @@ class MainWindow(wx.Frame, PluginInterface):
             self.__content_panel.SetSizer(wx.BoxSizer(wx.VERTICAL))
             labels = Labels(self._menu_handler.view_select)
 
-            view_factory = WxPythonViewFactory.WxPythonViewFactory(self.__content_panel, styler, labels)
+            view_factory = WxPythonViewFactory.WxPythonViewFactory(self.__content_panel, labels)
 
             self.Freeze()
 
-            self.__view, self.__controller = self.__asn1_handler.create_mvc_for_type(self.__type_name, view_factory)
+            self.__view, self.__controller = self.__asn1_handler.create_mvc_for_type(self.__type_name, view_factory, self._type_augmenter)
             self.__tree_view = TreeView(self, self.__content_panel, self.__type_name, labels)
 
             self.Thaw()

@@ -9,10 +9,9 @@ from asn1editor.interfaces.BitstringInterface import BitstringInterface
 from asn1editor.interfaces.OptionalInterface import OptionalInterface
 from asn1editor.interfaces.ValueInterface import ValueInterface
 from asn1editor.view.AbstractView import AbstractView, ContainerView, ListView, ChoiceView
-from asn1editor.view.AbstractViewFactory import AbstractViewFactory, TypeInfo
+from asn1editor.view.AbstractViewFactory import AbstractViewFactory, TypeInfo, Styles
 from asn1editor.wxPython import Resources
 from asn1editor.wxPython.Labels import Labels
-from asn1editor.wxPython.Styler import Styler
 from asn1editor.wxPython.WxPythonComplexViews import WxPythonContainerView, WxPythonListView, WxPythonChoiceView
 from asn1editor.wxPython.WxPythonDateTimeViews import WxPythonDateView, WxPythonTimeView, WxPythonDateTimeView
 from asn1editor.wxPython.WxPythonViews import WxPythonValueView, WxPythonBooleanView, \
@@ -20,9 +19,8 @@ from asn1editor.wxPython.WxPythonViews import WxPythonValueView, WxPythonBoolean
 
 
 class WxPythonViewFactory(AbstractViewFactory):
-    def __init__(self, window: wx.ScrolledWindow, styler: Styler, labels: Labels):
+    def __init__(self, window: wx.ScrolledWindow, labels: Labels):
         self._window = window
-        self._styler = styler
         self._labels = labels
 
     def get_enumerated_view(self, type_info: TypeInfo, choices: List[str]) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
@@ -149,18 +147,18 @@ class WxPythonViewFactory(AbstractViewFactory):
 
         checkboxes: List[Tuple[int, wx.CheckBox]] = []
 
-        style = self._styler.get_style(type_info.name)
+        style = type_info.style
 
         if named_bits:
             for name, bit in named_bits:
                 bit_checkbox = wx.CheckBox(self._window, label=f"{bit}: {name}")
-                if style == 'read_only':
+                if style & Styles.READ_ONLY:
                     bit_checkbox.Enable(False)
                 checkboxes.append((bit, bit_checkbox))
         else:
             for bit in range(number_of_bits):
                 bit_checkbox = wx.CheckBox(self._window, label=str(bit))
-                if style == 'read_only':
+                if style & Styles.READ_ONLY:
                     bit_checkbox.Enable(False)
                 checkboxes.append((bit, bit_checkbox))
 
@@ -215,9 +213,10 @@ class WxPythonViewFactory(AbstractViewFactory):
         if icon is not None:
             controls['icon'] = self._get_svg(icon, tooltip)
 
-        style = self._styler.get_style(type_info.name)
-        if style is not None:
-            controls['style'] = style
+        if type_info.style is not None:
+            controls['style'] = type_info.style
+        else:
+            controls['style'] = 0
 
         return controls
 
@@ -233,5 +232,5 @@ class WxPythonViewFactory(AbstractViewFactory):
 
     @staticmethod
     def _apply_style(controls: ControlList):
-        if controls.get('style') == 'read_only' and 'value' in controls:
+        if controls.get('style') & Styles.READ_ONLY and 'value' in controls:
             controls['value'].Enable(False)

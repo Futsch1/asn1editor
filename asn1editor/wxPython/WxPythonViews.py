@@ -3,14 +3,16 @@ import typing
 import wx
 import wx.adv
 
+import asn1editor.view.AbstractViewFactory
 from asn1editor.interfaces.BitstringInterface import BitstringInterface
 from asn1editor.interfaces.OptionalInterface import OptionalInterface
 from asn1editor.interfaces.ValueInterface import ValueInterface
 from asn1editor.view.AbstractView import AbstractView
-from asn1editor.view.AbstractViewFactory import TypeInfo
+from asn1editor.view.AbstractViewFactory import TypeInfo, Styles
 
 ControlList = typing.Dict[str, typing.Union[wx.TextCtrl, wx.CheckBox, wx.StaticBitmap, wx.ComboBox, wx.StaticText, wx.SpinCtrl,
-                                            typing.List[typing.Tuple[int, wx.CheckBox]], str, wx.adv.DatePickerCtrl, wx.adv.TimePickerCtrl]]
+                                            typing.List[typing.Tuple[int, wx.CheckBox]], asn1editor.view.AbstractViewFactory.Styles,
+                                            wx.adv.DatePickerCtrl, wx.adv.TimePickerCtrl]]
 
 
 class WxPythonView(AbstractView, OptionalInterface):
@@ -97,7 +99,7 @@ class WxPythonValueView(WxPythonView, ValueInterface):
         sizer = self._create_sizer()
         sizer.Add(self._controls['value'], proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
 
-        if self._controls.get('style') == 'hidden':
+        if self._controls.get('style') & Styles.HIDDEN:
             sizer.ShowItems(False)
         return sizer
 

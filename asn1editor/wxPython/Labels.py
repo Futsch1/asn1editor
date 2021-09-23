@@ -19,4 +19,6 @@ class Labels:
             tooltip += [f'Tag: {type_info.tag}']
         if type_info.optional:
             tooltip += ['Optional element']
+        if type_info.help and len(type_info.help):
+            tooltip += [f'Help: {type_info.help}']
         return '\n'.join(tooltip)

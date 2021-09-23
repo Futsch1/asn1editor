@@ -3,6 +3,7 @@ import typing
 from asn1tools.codecs import constraints_checker
 from asn1tools.compiler import oer
 
+from asn1editor.TypeAugmenter import TypeAugmenter
 from asn1editor.controller.ChoiceInstanceFactory import ChoiceInstanceFactory
 from asn1editor.controller.Controller import Controller, RootController
 from asn1editor.controller.ControllerFactory import ControllerFactory
@@ -12,8 +13,9 @@ from asn1editor.view.AbstractViewFactory import AbstractViewFactory, TypeInfo
 
 
 class ViewControllerFactory(object):
-    def __init__(self, view_factory: AbstractViewFactory):
+    def __init__(self, view_factory: AbstractViewFactory, type_augmenter: typing.Optional[TypeAugmenter]):
         self._view_factory = view_factory
+        self._type_augmenter = type_augmenter
 
     def create(self, asn1_type: oer.CompiledType) -> typing.Tuple[AbstractView, Controller]:
         controller = RootController('root')
@@ -63,14 +65,14 @@ class ViewControllerFactory(object):
             return self._text(type_, f'ASN.1 type {type_.name} {type_.type_name} not supported')
 
     def _text(self, type_: oer.Type, text: str) -> AbstractView:
-        return self._view_factory.get_text_view(self.__get_type_info(type_), text)
+        return self._view_factory.get_text_view(self.__get_type_info(type_, '?'), text)
 
     def _null(self, type_: oer.Type, controller: Controller) -> AbstractView:
         ControllerFactory(controller).create_null_controller(type_)
-        return self._view_factory.get_text_view(self.__get_type_info(type_), "NULL")
+        return self._view_factory.get_text_view(self.__get_type_info(type_, controller.get_path()), "NULL")
 
     def _number(self, type_: typing.Union[oer.Integer, oer.Real], checker: constraints_checker.Type, controller: Controller) -> AbstractView:
-        view, value_interface, optional_interface = self._view_factory.get_number_view(self.__get_type_info(type_),
+        view, value_interface, optional_interface = self._view_factory.get_number_view(self.__get_type_info(type_, controller.get_path()),
                                                                                        self.__get_limit(checker.minimum), self.__get_limit(checker.maximum),
                                                                                        isinstance(type_, oer.Real))
 
@@ -79,7 +81,7 @@ class ViewControllerFactory(object):
         return view
 
     def _sequence(self, type_: oer.Sequence, checker: constraints_checker.Dict, controller: Controller) -> AbstractView:
-        view, optional_interface = self._view_factory.get_container_view(self.__get_type_info(type_))
+        view, optional_interface = self._view_factory.get_container_view(self.__get_type_info(type_, controller.get_path()))
 
         sub_controller = ControllerFactory(controller).create_container_controller(type_, optional_interface)
 
@@ -89,10 +91,11 @@ class ViewControllerFactory(object):
         return view
 
     def _sequence_of(self, type_: oer.SequenceOf, checker: constraints_checker.List, controller: Controller) -> AbstractView:
-        view, value_interface, optional_interface = self._view_factory.get_list_view(self.__get_type_info(type_), self.__get_limit(checker.minimum),
+        view, value_interface, optional_interface = self._view_factory.get_list_view(self.__get_type_info(type_, controller.get_path()),
+                                                                                     self.__get_limit(checker.minimum),
                                                                                      self.__get_limit(checker.maximum))
 
-        list_instance_factory = ListInstanceFactory(self._view_factory, view, type_.element_type, checker.element_type)
+        list_instance_factory = ListInstanceFactory(self._view_factory, self._type_augmenter, view, type_.element_type, checker.element_type)
         ControllerFactory(controller).create_list_controller(type_, value_interface, optional_interface, list_instance_factory,
                                                              self.__get_limit(checker.minimum))
 
@@ -100,21 +103,21 @@ class ViewControllerFactory(object):
 
     def _enumerated(self, type_: oer.Enumerated, controller: Controller) -> AbstractView:
         choices = [str(value) for value in type_.value_to_data.values()]
-        view, value_interface, optional_interface = self._view_factory.get_enumerated_view(self.__get_type_info(type_), choices)
+        view, value_interface, optional_interface = self._view_factory.get_enumerated_view(self.__get_type_info(type_, controller.get_path()), choices)
 
         ControllerFactory(controller).create_value_controller(type_, value_interface, optional_interface)
 
         return view
 
     def _bool(self, type_: oer.Boolean, controller: Controller):
-        view, value_interface, optional_interface = self._view_factory.get_boolean_view(self.__get_type_info(type_))
+        view, value_interface, optional_interface = self._view_factory.get_boolean_view(self.__get_type_info(type_, controller.get_path()))
 
         ControllerFactory(controller).create_bool_controller(type_, value_interface, optional_interface)
 
         return view
 
     def _string(self, type_: oer.VisibleString, checker: constraints_checker.String, controller: Controller):
-        view, value_interface, optional_interface = self._view_factory.get_string_view(self.__get_type_info(type_),
+        view, value_interface, optional_interface = self._view_factory.get_string_view(self.__get_type_info(type_, controller.get_path()),
                                                                                        self.__get_limit(checker.minimum), self.__get_limit(checker.maximum))
 
         ControllerFactory(controller).create_value_controller(type_, value_interface, optional_interface, self.__get_limit(checker.minimum))
@@ -122,7 +125,7 @@ class ViewControllerFactory(object):
         return view
 
     def _hex_string(self, type_: oer.OctetString, checker: constraints_checker.String, controller: Controller):
-        view, value_interface, optional_interface = self._view_factory.get_hex_string_view(self.__get_type_info(type_),
+        view, value_interface, optional_interface = self._view_factory.get_hex_string_view(self.__get_type_info(type_, controller.get_path()),
                                                                                            self.__get_limit(checker.minimum), self.__get_limit(checker.maximum))
 
         ControllerFactory(controller).create_value_controller(type_, value_interface, optional_interface, self.__get_limit(checker.minimum))
@@ -131,12 +134,12 @@ class ViewControllerFactory(object):
 
     def _bitstring(self, type_: oer.BitString, controller: Controller):
         if type_.number_of_bits is None:
-            view, value_interface, optional_interface = self._view_factory.get_hex_string_view(self.__get_type_info(type_), None, None)
+            view, value_interface, optional_interface = self._view_factory.get_hex_string_view(self.__get_type_info(type_, controller.get_path()), None, None)
 
             ControllerFactory(controller).create_value_controller(type_, value_interface, optional_interface, None)
         else:
-            view, value_interface, optional_interface = self._view_factory.get_bitstring_view(self.__get_type_info(type_), type_.number_of_bits,
-                                                                                              type_.named_bits)
+            view, value_interface, optional_interface = self._view_factory.get_bitstring_view(self.__get_type_info(type_, controller.get_path()),
+                                                                                              type_.number_of_bits, type_.named_bits)
 
             ControllerFactory(controller).create_bitstring_controller(type_, value_interface, optional_interface)
 
@@ -144,32 +147,32 @@ class ViewControllerFactory(object):
 
     def _choice(self, type_: oer.Choice, checker: constraints_checker.Choice, controller: Controller):
         choices = [member.name for member in type_.members]
-        view, value_interface, optional_interface = self._view_factory.get_choice_view(self.__get_type_info(type_), choices)
+        view, value_interface, optional_interface = self._view_factory.get_choice_view(self.__get_type_info(type_, controller.get_path()), choices)
 
         members = {member.name: member for member in type_.members}
         checkers = {member.name: member for member in checker.members}
 
-        choice_instance_factory = ChoiceInstanceFactory(self._view_factory, view, members, checkers)
+        choice_instance_factory = ChoiceInstanceFactory(self._view_factory, self._type_augmenter, view, members, checkers)
         ControllerFactory(controller).create_choice_controller(type_, value_interface, optional_interface, choice_instance_factory)
 
         return view
 
     def _date(self, type_: oer.Date, controller: Controller):
-        view, value_interface, optional_interface = self._view_factory.get_date_view(self.__get_type_info(type_))
+        view, value_interface, optional_interface = self._view_factory.get_date_view(self.__get_type_info(type_, controller.get_path()))
 
         ControllerFactory(controller).create_value_controller(type_, value_interface, optional_interface)
 
         return view
 
     def _time(self, type_: oer.TimeOfDay, controller: Controller):
-        view, value_interface, optional_interface = self._view_factory.get_time_view(self.__get_type_info(type_))
+        view, value_interface, optional_interface = self._view_factory.get_time_view(self.__get_type_info(type_, controller.get_path()))
 
         ControllerFactory(controller).create_value_controller(type_, value_interface, optional_interface)
 
         return view
 
     def _datetime(self, type_: typing.Union[oer.DateTime, oer.UTCTime, oer.GeneralizedTime], controller: Controller):
-        view, value_interface, optional_interface = self._view_factory.get_datetime_view(self.__get_type_info(type_))
+        view, value_interface, optional_interface = self._view_factory.get_datetime_view(self.__get_type_info(type_, controller.get_path()))
 
         ControllerFactory(controller).create_value_controller(type_, value_interface, optional_interface)
 
@@ -185,12 +188,17 @@ class ViewControllerFactory(object):
     def __get_limit(limit: typing.Any) -> typing.Optional[int]:
         return None if limit in ['MIN', 'MAX'] or not isinstance(limit, int) else limit
 
-    @staticmethod
-    def __get_type_info(type_: oer.Type) -> TypeInfo:
+    def __get_type_info(self, type_: oer.Type, path: str) -> TypeInfo:
         type_info = TypeInfo()
         type_info.name = type_.name
         type_info.optional = type_.optional
         type_info.tag = f'0x{type_.tag.hex()}' if type_.tag is not None else ''
+        if self._type_augmenter:
+            if len(path):
+                path += '.'
+            path += f'{type_.name}'
+            type_info.style = self._type_augmenter.get_style(path)
+            type_info.help = self._type_augmenter.get_help(path)
         type_to_str = {oer.Integer: 'INTEGER', oer.Real: 'REAL', oer.Enumerated: 'ENUMERATED', oer.Boolean: 'BOOLEAN', oer.OctetString: 'OCTET STRING',
                        oer.VisibleString: 'VisibleString', oer.UTF8String: 'UTF8String', oer.GeneralString: 'GeneralString', oer.IA5String: 'IA5String',
                        oer.ObjectIdentifier: 'OBJECT IDENTIFIER', oer.BitString: 'BIT STRING', oer.Sequence: 'SEQUENCE', oer.Set: 'SET',
