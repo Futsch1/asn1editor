@@ -23,7 +23,7 @@ from asn1editor.wxPython.WxPythonViews import WxPythonView
 
 
 class MainWindow(wx.Frame, PluginInterface):
-    def __init__(self, plugins: typing.Optional[typing.List[Plugin]] = None, type_augmenter=typing.Optional[TypeAugmenter],
+    def __init__(self, plugins: typing.Optional[typing.List[Plugin]] = None, type_augmenter: typing.Optional[TypeAugmenter] = None,
                  title=f'ASN.1 editor {asn1editor.__version__}',
                  enable_load_last=True):
         super(MainWindow, self).__init__(None, title=title)
