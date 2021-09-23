@@ -3,11 +3,13 @@ import json
 import locale
 import os
 import re
+import typing
 import xml.dom.minidom
 from typing import List, Tuple, Dict, Union
 
 import asn1tools
 
+from asn1editor.TypeAugmenter import TypeAugmenter
 from asn1editor.ViewControllerFactory import ViewControllerFactory
 from asn1editor.controller.Controller import Controller
 from asn1editor.view.AbstractView import AbstractView
@@ -68,13 +70,14 @@ class ASN1SpecHandler:
             self.__compiled[codec] = asn1tools.compile_files(self.__file_names, codec)
         return self.__compiled[codec]
 
-    def create_mvc_for_type(self, load_type: str, view_factory: AbstractViewFactory) -> Tuple[AbstractView, Controller]:
+    def create_mvc_for_type(self, load_type: str, view_factory: AbstractViewFactory,
+                            type_augmenter: typing.Optional[TypeAugmenter]) -> Tuple[AbstractView, Controller]:
         compiled = self.get_compiled('oer')
         for module_name, module in compiled.modules.items():
             for type_name, compiled_type in module.items():
 
                 if module_name + '.' + type_name == load_type:
-                    mvc_factory = ViewControllerFactory(view_factory)
+                    mvc_factory = ViewControllerFactory(view_factory, type_augmenter)
                     self._type_name = type_name
                     return mvc_factory.create(compiled_type)
 

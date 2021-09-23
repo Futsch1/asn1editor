@@ -4,7 +4,7 @@ import typing
 import wx
 
 from asn1editor.interfaces.ValueInterface import ValueInterface
-from asn1editor.view.AbstractViewFactory import TypeInfo
+from asn1editor.view.AbstractViewFactory import TypeInfo, Styles
 from asn1editor.wxPython.WxPythonViews import WxPythonValueView, ControlList, WxPythonView
 
 
@@ -41,7 +41,7 @@ class WxPythonDateTimeView(WxPythonView, ValueInterface):
         sizer.Add(self._controls['value'], proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
         sizer.Add(self._controls['time'], proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
 
-        if self._controls.get('style') == 'hidden':
+        if self._controls.get('style') & Styles.HIDDEN:
             sizer.ShowItems(False)
         return sizer
 

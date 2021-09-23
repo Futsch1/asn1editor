@@ -42,6 +42,12 @@ class Controller:
     def _view_to_model_optional(self):
         return not self._optional_interface or self._optional_interface.get_has_value()
 
+    def get_path(self) -> str:
+        path = self._name
+        if self._parent is not None:
+            path = self._parent.get_path() + '.' + path
+        return path
+
     def __repr__(self):
         return self._name
 

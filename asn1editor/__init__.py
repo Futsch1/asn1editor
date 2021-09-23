@@ -8,6 +8,7 @@ import wx
 
 from .Plugin import Plugin
 from .PluginInterface import PluginInterface
+from .TypeAugmenter import TypeAugmenter
 from .wxPython import MainWindow as WxPythonMainWindow
 
 __all__ = ['WxPythonMainWindow', 'Plugin', 'PluginInterface']

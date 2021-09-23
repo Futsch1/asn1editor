@@ -1,15 +1,19 @@
+import typing
 from typing import Dict
 
 from asn1tools.codecs import oer, constraints_checker
 
+from asn1editor.TypeAugmenter import TypeAugmenter
 from asn1editor.controller.Controller import Controller
 from asn1editor.view.AbstractView import ListView, AbstractView
 from asn1editor.view.AbstractViewFactory import AbstractViewFactory
 
 
 class ListInstanceFactory:
-    def __init__(self, view_factory: AbstractViewFactory, list_view: ListView, _type: oer.Type, checker: constraints_checker.Type):
+    def __init__(self, view_factory: AbstractViewFactory, type_augmenter: typing.Optional[TypeAugmenter], list_view: ListView, _type: oer.Type,
+                 checker: constraints_checker.Type):
         self._view_factory = view_factory
+        self._type_augmenter = type_augmenter
         self._list_view = list_view
         self._type = _type
         self._checker = checker
@@ -19,7 +23,7 @@ class ListInstanceFactory:
     def create(self, instance: int, parent: Controller):
         from asn1editor.ViewControllerFactory import ViewControllerFactory
 
-        view_factory = ViewControllerFactory(self._view_factory)
+        view_factory = ViewControllerFactory(self._view_factory, self._type_augmenter)
         self._type.name = f'Element {instance}'
         self.content_views[instance] = view_factory.create_view_and_controller(self._type, self._checker, parent)
 
