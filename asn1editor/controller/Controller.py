@@ -13,8 +13,14 @@ class Controller:
         self._optional_interface = optional_interface
         if self._optional_interface:
             self._optional_interface.set_has_value(False)
+        self.path = ''
         if parent is not None:
             parent.add_controller(name, self)
+
+            parent_path = self._parent.get_path()
+            self.path = self._name
+            if len(parent_path):
+                self.path = self._parent.get_path() + '.' + self.path
 
     def add_controller(self, name: str, other: 'Controller'):
         raise NotImplementedError()
@@ -43,14 +49,7 @@ class Controller:
         return not self._optional_interface or self._optional_interface.get_has_value()
 
     def get_path(self) -> str:
-        path = ''
-        if self._parent is not None:
-            parent_path = self._parent.get_path()
-            path = self._name
-            if len(parent_path):
-                path = self._parent.get_path() + '.' + path
-
-        return path
+        return self.path
 
     def __repr__(self):
         return self._name
