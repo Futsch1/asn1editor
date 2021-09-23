@@ -1,5 +1,5 @@
 import typing
-from enum import Enum
+from enum import IntFlag
 from typing import Tuple, List, Optional
 
 from asn1editor.interfaces.BitstringInterface import BitstringInterface
@@ -8,7 +8,7 @@ from asn1editor.interfaces.ValueInterface import ValueInterface
 from asn1editor.view.AbstractView import AbstractView, ContainerView, ListView, ChoiceView
 
 
-class Styles(Enum.IntFlag):
+class Styles(IntFlag):
     READ_ONLY = 1
     HIDDEN = 2
 

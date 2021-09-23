@@ -138,6 +138,8 @@ class MainWindow(wx.Frame, PluginInterface):
             self._status_bar.SetStatusText(f'Loaded {file_name}')
             self.SetTitle(f'{self.__title} - {file_name}')
             self.__file_name = file_name
+            if self._type_augmenter:
+                self._type_augmenter.set_spec_filename(file_name)
 
             if self.__view is not None:
                 self.__view.realize().destroy()

@@ -9,3 +9,6 @@ class TypeAugmenter:  # pragma: no cover
 
     def get_help(self, path: str) -> typing.Optional[str]:
         raise NotImplementedError
+
+    def set_spec_filename(self, spec_filename: str):
+        raise NotImplementedError

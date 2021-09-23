@@ -194,6 +194,7 @@ class ViewControllerFactory(object):
         type_info.optional = type_.optional
         type_info.tag = f'0x{type_.tag.hex()}' if type_.tag is not None else ''
         if self._type_augmenter:
+            path += f'.{type_.name}'
             type_info.style = self._type_augmenter.get_style(path)
             type_info.help = self._type_augmenter.get_help(path)
         type_to_str = {oer.Integer: 'INTEGER', oer.Real: 'REAL', oer.Enumerated: 'ENUMERATED', oer.Boolean: 'BOOLEAN', oer.OctetString: 'OCTET STRING',

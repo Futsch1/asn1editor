@@ -215,6 +215,8 @@ class WxPythonViewFactory(AbstractViewFactory):
 
         if type_info.style is not None:
             controls['style'] = type_info.style
+        else:
+            controls['style'] = 0
 
         return controls
 

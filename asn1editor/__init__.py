@@ -11,7 +11,7 @@ from .PluginInterface import PluginInterface
 from .TypeAugmenter import TypeAugmenter
 from .wxPython import MainWindow as WxPythonMainWindow
 
-__all__ = ['WxPythonMainWindow', 'Plugin', 'PluginInterface']
+__all__ = ['WxPythonMainWindow', 'Plugin', 'PluginInterface', 'TypeAugmenter']
 
 
 def _wx_python_editor():
