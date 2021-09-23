@@ -24,7 +24,6 @@ class TestAugmenter(TypeAugmenter):
         last_path_part = path.split('.')[-1]
         style = Styles(0)
         style_str = self.__styles.get(last_path_part)
-        print(path)
         if style_str:
             style = {'read_only': Styles.READ_ONLY, 'hidden': Styles.HIDDEN}[style_str]
         return style
