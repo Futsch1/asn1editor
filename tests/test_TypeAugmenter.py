@@ -15,5 +15,7 @@ class TypeAugmenterTest(TestCase):
         self.assertTrue(main_window.load_spec('example/example.asn', 'EXAMPLE.Sequence'))
 
         type_augmenter.set_spec_filename.assert_called_with('example/example.asn')
-        type_augmenter.get_help.assert_called()
-        type_augmenter.get_style.assert_called()
+        type_augmenter.get_help.assert_any_call('Sequence.choiceExample.exampleList')
+        type_augmenter.get_help.assert_any_call('Sequence.example1.member1')
+        type_augmenter.get_style.assert_any_call('Sequence.choiceExample.exampleList')
+        type_augmenter.get_style.assert_any_call('Sequence.example1.member1')

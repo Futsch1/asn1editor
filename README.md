@@ -59,17 +59,6 @@ The following encodings are supported for reading and writing data:
 - Edit octet strings as ASCII or hex
 - List of recently opened specifications for quick access
 - Optional dark mode
-- Use a .style file to customize the way fields are displayed in asn1editor
-
-  If an ASN.1 file is opened, asn1editor looks for an equally named file with a .style extension in the same directory. If it is found, it is loaded and used to
-  refine the layout of the specification. A style file is JSON formatted and contains the name of the ASN.1 field as a key, and the layout specifier as value.
-  The specifiers "read_only" and
-  "hidden" are supported.
-
-  Example:
-  ```json
-  { "firstField": "read_only", "secondField": "hidden"}
-  ```
 
 ### IMPORTS
 IMPORT references are automatically resolved if the ASN1 files containing the imported types 
@@ -92,7 +81,7 @@ class MyPlugin(Plugin):
 
 app = wx.App()
 
-frame = WxPythonMainWindow(MyPlugin)
+frame = WxPythonMainWindow([MyPlugin()])
 
 frame.Show()
 
@@ -107,6 +96,28 @@ then automatically embedded in the application.
 
 An example application is if a custom header is added to an ASN.1 encoded data. Then the plugin can decode the header, choose the appropriate ASN.1
 specification, load it, decode the data and display it.
+
+## Type augmenter
+
+The editor can be customized to modify the display of certain fields. This customization is provided via a class that implements the TypeAugmenter interface.
+The editor will query additional information for every field via this interface. Currently, a field can be augmented by providing a help text and a style
+IntEnum. The help text will be shown in the tooltip of each field and the style flag modifes the way how a field is displayed. A field can be hidden or be
+declared as read-only.
+
+The editor comes with a default implementation of this augmenter that uses a .style file to customize the way fields are displayed in asn1editor.
+
+If an ASN.1 file is opened, asn1editor looks for an equally named file with a .style extension in the same directory. If it is found, it is loaded and used to
+refine the layout of the specification. A style file is in JSON format and contains the name of the ASN.1 field as a key, and the layout specifier as value. The
+specifiers are named "read_only" and "hidden".
+
+Example:
+
+  ```json
+  {
+  "firstField": "read_only",
+  "secondField": "hidden"
+}
+  ```
 
 ## Tests
 

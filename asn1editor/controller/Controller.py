@@ -43,9 +43,13 @@ class Controller:
         return not self._optional_interface or self._optional_interface.get_has_value()
 
     def get_path(self) -> str:
-        path = self._name
+        path = ''
         if self._parent is not None:
-            path = self._parent.get_path() + '.' + path
+            parent_path = self._parent.get_path()
+            path = self._name
+            if len(parent_path):
+                path = self._parent.get_path() + '.' + path
+
         return path
 
     def __repr__(self):
