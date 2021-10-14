@@ -60,42 +60,7 @@ class MenuHandler:
         toolbar: typing.Optional[wx.ToolBar] = None
 
         if self.__plugins is not None:
-            for plugin_index, plugin in enumerate(self.__plugins):
-                plugin_menu = wx.Menu()
-                menus = plugin.get_menus()
-                for i, menu in enumerate(menus):
-                    if not len(menu[0]):
-                        plugin_menu.AppendSeparator()
-                    else:
-                        menu_item: wx.MenuItem = plugin_menu.Append(plugin_index * 1000 + i, menu[0])
-                        if menu[1] is not None:
-                            self.__frame.Bind(wx.EVT_MENU, self.__plugin_menu_event, menu_item)
-                        else:
-                            menu_item.Enable(False)
-
-                menu_bar.Append(plugin_menu, plugin.get_name())
-
-                tools = plugin.get_tools()
-                if len(tools):
-                    if toolbar is None:
-                        toolbar = self.__frame.CreateToolBar()
-                        toolbar.SetToolSeparation(8)
-                        toolbar.Bind(wx.EVT_TOOL, self.__tb_menu_event)
-                    else:
-                        toolbar.AddSeparator()
-
-                    labels = False
-
-                    for i, tool in enumerate(tools):
-                        if not len(tool):
-                            toolbar.AddSeparator()
-                        else:
-                            bitmap = wx.Bitmap(plugin_resource_path(tool[2]))
-                            labels |= len(tool[0]) > 0
-                            toolbar.AddTool(toolId=plugin_index * 1000 + i, label=tool[0], bitmap=bitmap, shortHelp=tool[1])
-                    if labels:
-                        toolbar.SetWindowStyle(wx.TB_TEXT | wx.TB_HORIZONTAL)
-                        pass
+            self.__build_plugins(menu_bar, toolbar)
 
         if toolbar is not None:
             toolbar.Realize()
@@ -131,6 +96,44 @@ class MenuHandler:
 
         picker = FilePickerHandler(data_save_dialog_constructor, save_data_to_file, True)
         self.__frame.Bind(wx.EVT_MENU, picker.on_menu_click, self.__save_data_item)
+
+    def __build_plugins(self, menu_bar, toolbar):
+        for plugin_index, plugin in enumerate(self.__plugins):
+            plugin_menu = wx.Menu()
+            menus = plugin.get_menus()
+            for i, menu in enumerate(menus):
+                if not len(menu[0]):
+                    plugin_menu.AppendSeparator()
+                else:
+                    menu_item: wx.MenuItem = plugin_menu.Append(plugin_index * 1000 + i, menu[0])
+                    if menu[1] is not None:
+                        self.__frame.Bind(wx.EVT_MENU, self.__plugin_menu_event, menu_item)
+                    else:
+                        menu_item.Enable(False)
+
+            menu_bar.Append(plugin_menu, plugin.get_name())
+
+            tools = plugin.get_tools()
+            if len(tools):
+                if toolbar is None:
+                    toolbar = self.__frame.CreateToolBar()
+                    toolbar.SetToolSeparation(8)
+                    toolbar.Bind(wx.EVT_TOOL, self.__tb_menu_event)
+                else:
+                    toolbar.AddSeparator()
+
+            labels = False
+
+            for i, tool in enumerate(tools):
+                if not len(tool):
+                    toolbar.AddSeparator()
+                else:
+                    bitmap = wx.Bitmap(plugin_resource_path(tool[2]))
+                    labels |= len(tool[0]) > 0
+                    toolbar.AddTool(toolId=plugin_index * 1000 + i, label=tool[0], bitmap=bitmap, shortHelp=tool[1])
+            if labels:
+                toolbar.SetWindowStyle(wx.TB_TEXT | wx.TB_HORIZONTAL)
+                pass
 
     def enable(self, enable: bool = True):
         self.__load_data_item.Enable(enable)

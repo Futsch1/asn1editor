@@ -33,22 +33,27 @@ class ASN1SpecHandler:
             my_path = os.path.split(os.path.abspath(file_name))[0]
             with open(file_name, 'r', encoding='utf-8') as f:
                 content = f.read()
-                match = re.search(self.IMPORTS_REGEX_OUTER, content)
-                if match is not None:
-                    inner = match.group(1)
-                    matches = re.finditer(self.IMPORTS_REGEX_INNER, inner)
-                    for match in matches:
-                        import_type = match.group(1).lower()
-                        dir_files = glob.glob(os.path.join(my_path, '*.asn'))
-                        for dir_file in dir_files:
-                            dir_file_name = os.path.splitext(os.path.basename(dir_file))[0].lower()
-                            if import_type in dir_file_name or dir_file_name in import_type:
-                                import_names.append(dir_file)
+                matches = self.__get_imports_matches(content)
+                for match in matches:
+                    import_type = match.group(1).lower()
+                    dir_files = glob.glob(os.path.join(my_path, '*.asn'))
+                    for dir_file in dir_files:
+                        dir_file_name = os.path.splitext(os.path.basename(dir_file))[0].lower()
+                        if import_type in dir_file_name or dir_file_name in import_type:
+                            import_names.append(dir_file)
                 self.__file_names = [os.path.abspath(file_name)] + import_names
         else:
             self.__file_names = [os.path.abspath(f) for f in file_name]
         self.__compiled = {}
         self._type_name = None
+
+    def __get_imports_matches(self, content: str) -> typing.Iterator[re.Match]:
+        match = re.search(self.IMPORTS_REGEX_OUTER, content)
+        if match is not None:
+            inner = match.group(1)
+            return re.finditer(self.IMPORTS_REGEX_INNER, inner)
+        else:
+            return []
 
     def get_filenames(self) -> List[str]:
         return self.__file_names

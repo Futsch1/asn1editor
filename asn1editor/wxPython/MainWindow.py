@@ -35,6 +35,7 @@ class MainWindow(wx.Frame, PluginInterface):
         if plugins is not None:
             for plugin in plugins:
                 plugin.connect(self)
+
         self._type_augmenter = type_augmenter
 
         self._status_bar = self.CreateStatusBar()
@@ -44,13 +45,8 @@ class MainWindow(wx.Frame, PluginInterface):
         self._menu_handler.build(self.load_spec, self.load_data_from_file, self.save_data_to_file, self._structure_changed)
         self.Bind(wx.EVT_CLOSE, self.close)
 
-        self.SetSize(wx.Size(Environment.settings.get('size', (500, 800))))
-        self.Maximize(Environment.settings.get('maximized', True))
-        self.SetPosition(wx.Point(Environment.settings.get('position', (0, 0))))
-        screen_rect: wx.Rect = self.GetScreenRect()
-        center = screen_rect.GetTopLeft() + (screen_rect.GetWidth() // 2, screen_rect.GetHeight() // 2)
-        if wx.Display.GetFromPoint(center) == wx.NOT_FOUND:
-            self.SetPosition(wx.Point(0, 0))
+        self.__restore_size()
+
         try:
             self._menu_handler.view_select.view_type = ViewType(Environment.settings.get('view', ViewType.TREE.value))
             self._menu_handler.view_select.tag_info = TagInfo(Environment.settings.get('tag_info', TagInfo.TOOLTIPS.value))
@@ -73,6 +69,7 @@ class MainWindow(wx.Frame, PluginInterface):
         self.__progress_window: typing.Optional[wx.ProgressDialog] = None
 
         self.SetDropTarget(SingleFileDropTarget(self.__file_dropped))
+
         self.SetSizer(wx.GridSizer(1))
 
         self.__default_excepthook = sys.excepthook
@@ -89,6 +86,15 @@ class MainWindow(wx.Frame, PluginInterface):
             except Exception:
                 pass
 
+    def __restore_size(self):
+        self.SetSize(wx.Size(Environment.settings.get('size', (500, 800))))
+        self.Maximize(Environment.settings.get('maximized', True))
+        self.SetPosition(wx.Point(Environment.settings.get('position', (0, 0))))
+        screen_rect: wx.Rect = self.GetScreenRect()
+        center = screen_rect.GetTopLeft() + (screen_rect.GetWidth() // 2, screen_rect.GetHeight() // 2)
+        if wx.Display.GetFromPoint(center) == wx.NOT_FOUND:
+            self.SetPosition(wx.Point(0, 0))
+
     def __file_dropped(self, file_name: str):
         if self.__asn1_handler is not None:
             self.load_data_from_file(file_name)
@@ -99,18 +105,7 @@ class MainWindow(wx.Frame, PluginInterface):
         wx.App.Get().ProcessPendingEvents()
         if file_name is None:
             # Close spec
-            self.__asn1_handler = None
-            self.__type_name = None
-            self.__file_name = None
-
-            if self.__view is not None:
-                self.__view.realize().destroy()
-                self.__content_panel.Destroy()
-                self.__view = None
-            if self.__tree_view is not None:
-                self.__tree_view.destroy()
-                self.__tree_view = None
-            self.SetTitle(self.__title)
+            self.__close_spec()
             return True
 
         # Spec file loaded, compile it to show a selection of type names
@@ -133,43 +128,60 @@ class MainWindow(wx.Frame, PluginInterface):
             self.__type_name = type_name
 
         if self.__type_name is not None:
-            self._menu_handler.add_recent(os.path.abspath(file_name), self.__type_name)
-
-            self._status_bar.SetStatusText(f'Loaded {file_name}')
-            self.SetTitle(f'{self.__title} - {file_name}')
-            self.__file_name = file_name
-            if self._type_augmenter:
-                self._type_augmenter.set_spec_filename(file_name)
-
-            if self.__view is not None:
-                self.__view.realize().destroy()
-                self.__content_panel.Destroy()
-            if self.__tree_view is not None:
-                self.__tree_view.destroy()
-
-            WxPythonView.structure_changed = lambda x: None
-
-            self.__content_panel = wx.ScrolledWindow(self, style=wx.HSCROLL | wx.VSCROLL)
-            self.__content_panel.SetScrollbars(15, 15, 50, 50)
-            self.__content_panel.SetAutoLayout(True)
-            self.__content_panel.SetSizer(wx.BoxSizer(wx.VERTICAL))
-            labels = Labels(self._menu_handler.view_select)
-
-            view_factory = WxPythonViewFactory.WxPythonViewFactory(self.__content_panel, labels)
-
-            self.Freeze()
-
-            self.__view, self.__controller = self.__asn1_handler.create_mvc_for_type(self.__type_name, view_factory, self._type_augmenter)
-            self.__tree_view = TreeView(self, self.__content_panel, self.__type_name, labels)
-
-            self.Thaw()
-
-            WxPythonView.structure_changed = self._structure_changed
-            self._structure_changed()
-
-            self._menu_handler.enable()
+            self.__load_spec(file_name)
 
         return self.__type_name is not None
+
+    def __load_spec(self, file_name):
+        self._menu_handler.add_recent(os.path.abspath(file_name), self.__type_name)
+
+        self._status_bar.SetStatusText(f'Loaded {file_name}')
+        self.SetTitle(f'{self.__title} - {file_name}')
+        self.__file_name = file_name
+        if self._type_augmenter:
+            self._type_augmenter.set_spec_filename(file_name)
+
+        if self.__view is not None:
+            self.__view.realize().destroy()
+            self.__content_panel.Destroy()
+        if self.__tree_view is not None:
+            self.__tree_view.destroy()
+
+        WxPythonView.structure_changed = lambda x: None
+
+        self.__content_panel = wx.ScrolledWindow(self, style=wx.HSCROLL | wx.VSCROLL)
+        self.__content_panel.SetScrollbars(15, 15, 50, 50)
+        self.__content_panel.SetAutoLayout(True)
+        self.__content_panel.SetSizer(wx.BoxSizer(wx.VERTICAL))
+        labels = Labels(self._menu_handler.view_select)
+
+        view_factory = WxPythonViewFactory.WxPythonViewFactory(self.__content_panel, labels)
+
+        self.Freeze()
+
+        self.__view, self.__controller = self.__asn1_handler.create_mvc_for_type(self.__type_name, view_factory, self._type_augmenter)
+        self.__tree_view = TreeView(self, self.__content_panel, self.__type_name, labels)
+
+        self.Thaw()
+
+        WxPythonView.structure_changed = self._structure_changed
+        self._structure_changed()
+
+        self._menu_handler.enable()
+
+    def __close_spec(self):
+        self.__asn1_handler = None
+        self.__type_name = None
+        self.__file_name = None
+
+        if self.__view is not None:
+            self.__view.realize().destroy()
+            self.__content_panel.Destroy()
+            self.__view = None
+        if self.__tree_view is not None:
+            self.__tree_view.destroy()
+            self.__tree_view = None
+        self.SetTitle(self.__title)
 
     def _get_all_children(self):
         items = [self]
