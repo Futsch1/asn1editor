@@ -24,12 +24,10 @@ class ViewControllerFactory(object):
         return view, controller
 
     def create_view_and_controller(self, type_: oer.Type, checker: constraints_checker.Type, controller: Controller) -> AbstractView:
-        if isinstance(type_, oer.Integer):
+        if isinstance(type_, oer.Integer) or isinstance(type_, oer.Real):
             view = self._number(type_, checker, controller)
         elif isinstance(type_, oer.Boolean):
             view = self._bool(type_, controller)
-        elif isinstance(type_, oer.Real):
-            view = self._number(type_, checker, controller)
         elif isinstance(type_, oer.Sequence) or isinstance(type_, oer.Set):
             # noinspection PyTypeChecker
             view = self._sequence(type_, checker, controller)
