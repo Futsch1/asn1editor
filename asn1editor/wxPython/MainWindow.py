@@ -227,6 +227,14 @@ class MainWindow(wx.Frame, PluginInterface):
 
         self.SetSizer(sizer, deleteOld=True)
 
+        self.__recolor_children()
+
+        self.Refresh()
+        self.PostSizeEvent()
+
+        self.Thaw()
+
+    def __recolor_children(self):
         for child in self._get_all_children():
             if self._menu_handler.view_select.dark_mode:
                 child.SetBackgroundColour(wx.Colour(60, 60, 60))
@@ -238,11 +246,6 @@ class MainWindow(wx.Frame, PluginInterface):
                 else:
                     child.SetBackgroundColour(wx.NullColour)
                     child.SetForegroundColour(wx.BLACK)
-
-        self.Refresh()
-        self.PostSizeEvent()
-
-        self.Thaw()
 
     def load_data_from_file(self, file_name: str):
         self.__controller.model_to_view(self.__asn1_handler.load_data_file(file_name))
