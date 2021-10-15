@@ -125,6 +125,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         controls = self._get_controls(type_info, ':', 'string')
 
         controls['selector'] = wx.CheckBox(self._window, label='Hex')
+        controls['selector'].SetValue(True)
         controls['value'] = wx.TextCtrl(self._window)
         self._apply_style(controls)
 
