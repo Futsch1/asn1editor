@@ -1,6 +1,7 @@
 from typing import Optional, Any, Dict, List, Tuple, Union
 
 from asn1editor.controller import Converter
+from asn1editor.controller.ListInstanceFactory import ListInstanceFactory
 from asn1editor.interfaces.BitstringInterface import BitstringInterface
 from asn1editor.interfaces.OptionalInterface import OptionalInterface
 from asn1editor.interfaces.ValueInterface import ValueInterface
@@ -105,8 +106,8 @@ class BoolController(Controller):
 
 
 class ListController(Controller):
-    def __init__(self, name: str, parent: Controller, value_interface: ValueInterface, optional_interface: Optional[OptionalInterface], list_instance_factory,
-                 default: int):
+    def __init__(self, name: str, parent: Controller, value_interface: ValueInterface, optional_interface: Optional[OptionalInterface],
+                 list_instance_factory: ListInstanceFactory, default: int):
         super().__init__(name, parent, optional_interface)
         self._value_interface = value_interface
         self._controllers = []
