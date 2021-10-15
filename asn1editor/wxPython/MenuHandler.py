@@ -102,14 +102,7 @@ class MenuHandler:
             plugin_menu = wx.Menu()
             menus = plugin.get_menus()
             for i, menu in enumerate(menus):
-                if not len(menu[0]):
-                    plugin_menu.AppendSeparator()
-                else:
-                    menu_item: wx.MenuItem = plugin_menu.Append(plugin_index * 1000 + i, menu[0])
-                    if menu[1] is not None:
-                        self.__frame.Bind(wx.EVT_MENU, self.__plugin_menu_event, menu_item)
-                    else:
-                        menu_item.Enable(False)
+                self.__build_plugin_menu(menu, plugin_menu, plugin_index * 1000 + i)
 
             menu_bar.Append(plugin_menu, plugin.get_name())
 
@@ -125,15 +118,32 @@ class MenuHandler:
             labels = False
 
             for i, tool in enumerate(tools):
-                if not len(tool):
-                    toolbar.AddSeparator()
-                else:
-                    bitmap = wx.Bitmap(plugin_resource_path(tool[2]))
-                    labels |= len(tool[0]) > 0
-                    toolbar.AddTool(toolId=plugin_index * 1000 + i, label=tool[0], bitmap=bitmap, shortHelp=tool[1])
+                labels |= self.__build_toolbar(tool, toolbar, plugin_index * 1000 + i)
+
             if labels:
                 toolbar.SetWindowStyle(wx.TB_TEXT | wx.TB_HORIZONTAL)
                 pass
+
+    def __build_plugin_menu(self, menu, plugin_menu, identification):
+        if not len(menu[0]):
+            plugin_menu.AppendSeparator()
+        else:
+            menu_item: wx.MenuItem = plugin_menu.Append(identification, menu[0])
+            if menu[1] is not None:
+                self.__frame.Bind(wx.EVT_MENU, self.__plugin_menu_event, menu_item)
+            else:
+                menu_item.Enable(False)
+
+    @staticmethod
+    def __build_toolbar(tool, toolbar, identification) -> bool:
+        if not len(tool):
+            toolbar.AddSeparator()
+            return False
+        else:
+            bitmap = wx.Bitmap(plugin_resource_path(tool[2]))
+
+            toolbar.AddTool(toolId=identification, label=tool[0], bitmap=bitmap, shortHelp=tool[1])
+            return len(tool[0]) > 0
 
     def enable(self, enable: bool = True):
         self.__load_data_item.Enable(enable)
