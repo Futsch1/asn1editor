@@ -33,22 +33,32 @@ class ASN1SpecHandler:
             my_path = os.path.split(os.path.abspath(file_name))[0]
             with open(file_name, 'r', encoding='utf-8') as f:
                 content = f.read()
-                match = re.search(self.IMPORTS_REGEX_OUTER, content)
-                if match is not None:
-                    inner = match.group(1)
-                    matches = re.finditer(self.IMPORTS_REGEX_INNER, inner)
-                    for match in matches:
-                        import_type = match.group(1).lower()
-                        dir_files = glob.glob(os.path.join(my_path, '*.asn'))
-                        for dir_file in dir_files:
-                            dir_file_name = os.path.splitext(os.path.basename(dir_file))[0].lower()
-                            if import_type in dir_file_name or dir_file_name in import_type:
-                                import_names.append(dir_file)
+                imports = self.__get_imports(content)
+                for imported_type in imports:
+                    import_names.extend(self.__search_files_for_imported_type(my_path, imported_type))
                 self.__file_names = [os.path.abspath(file_name)] + import_names
         else:
             self.__file_names = [os.path.abspath(f) for f in file_name]
         self.__compiled = {}
         self._type_name = None
+
+    def __get_imports(self, content: str) -> typing.List[str]:
+        match = re.search(self.IMPORTS_REGEX_OUTER, content)
+        if match is not None:
+            inner = match.group(1)
+            return [i.group(1).lower() for i in re.finditer(self.IMPORTS_REGEX_INNER, inner)]
+        else:
+            return []
+
+    @staticmethod
+    def __search_files_for_imported_type(search_path: str, imported_type: str) -> typing.List[str]:
+        import_names = []
+        dir_files = glob.glob(os.path.join(search_path, '*.asn'))
+        for dir_file in dir_files:
+            dir_file_name = os.path.splitext(os.path.basename(dir_file))[0].lower()
+            if imported_type in dir_file_name or dir_file_name in imported_type:
+                import_names.append(dir_file)
+        return import_names
 
     def get_filenames(self) -> List[str]:
         return self.__file_names

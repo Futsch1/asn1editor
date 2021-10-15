@@ -67,21 +67,22 @@ class ControllerFactory:
         else:
             raise Exception(f"Unknown type for ControllerFactory: {type_}")
 
+    @staticmethod
+    def __has_no_recursive_member(m):
+        if isinstance(m, oer.Recursive):
+            return False
+        elif type(m) in [oer.Set, oer.Sequence]:
+            return not any(isinstance(m, oer.Recursive) for m in m.root_members)
+        elif type(m) in [oer.SequenceOf, oer.SetOf]:
+            return not isinstance(m.element_type, oer.Recursive)
+        return True
+
     def create_choice_controller(self, type_: oer.Type, value_interface: ValueInterface, optional_interface: Optional[OptionalInterface],
                                  choice_instance_factory):
-        def has_no_recursive_member(m):
-            if isinstance(m, oer.Recursive):
-                return False
-            elif type(m) in [oer.Set, oer.Sequence]:
-                return not any(isinstance(m, oer.Recursive) for m in m.root_members)
-            elif type(m) in [oer.SequenceOf, oer.SetOf]:
-                return not isinstance(m.element_type, oer.Recursive)
-            return True
-
         if isinstance(type_, oer.Choice):
             if type_.default is None:
                 # Do not use recursive types as default
-                candidates = list(filter(has_no_recursive_member, type_.members))
+                candidates = list(filter(self.__has_no_recursive_member, type_.members))
                 default = sorted([member.name for member in candidates])[0]
             else:
                 default = type_.default

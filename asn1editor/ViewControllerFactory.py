@@ -24,45 +24,45 @@ class ViewControllerFactory(object):
         return view, controller
 
     def create_view_and_controller(self, type_: oer.Type, checker: constraints_checker.Type, controller: Controller) -> AbstractView:
-        if isinstance(type_, oer.Integer):
-            return self._number(type_, checker, controller)
+        if isinstance(type_, oer.Integer) or isinstance(type_, oer.Real):
+            view = self._number(type_, checker, controller)
         elif isinstance(type_, oer.Boolean):
-            return self._bool(type_, controller)
-        elif isinstance(type_, oer.Real):
-            return self._number(type_, checker, controller)
+            view = self._bool(type_, controller)
         elif isinstance(type_, oer.Sequence) or isinstance(type_, oer.Set):
             # noinspection PyTypeChecker
-            return self._sequence(type_, checker, controller)
+            view = self._sequence(type_, checker, controller)
         elif isinstance(type_, oer.SequenceOf) or isinstance(type_, oer.SetOf):
             # noinspection PyTypeChecker
-            return self._sequence_of(type_, checker, controller)
+            view = self._sequence_of(type_, checker, controller)
         elif isinstance(type_, oer.Choice):
             # noinspection PyTypeChecker
-            return self._choice(type_, checker, controller)
+            view = self._choice(type_, checker, controller)
         elif isinstance(type_, oer.OctetString):
             # noinspection PyTypeChecker
-            return self._hex_string(type_, checker, controller)
+            view = self._hex_string(type_, checker, controller)
         elif type(type_) in [oer.UTF8String, oer.VisibleString, oer.GeneralString, oer.IA5String, oer.ObjectIdentifier]:
             # noinspection PyTypeChecker
-            return self._string(type_, checker, controller)
+            view = self._string(type_, checker, controller)
         elif isinstance(type_, oer.Enumerated):
-            return self._enumerated(type_, controller)
+            view = self._enumerated(type_, controller)
         elif isinstance(type_, oer.BitString):
             # noinspection PyTypeChecker
-            return self._bitstring(type_, controller)
+            view = self._bitstring(type_, controller)
         elif isinstance(type_, oer.Null):
-            return self._null(type_, controller)
+            view = self._null(type_, controller)
         elif isinstance(type_, oer.Recursive):
             # noinspection PyUnresolvedReferences
-            return self.create_view_and_controller(type_.inner, checker.inner, controller)
+            view = self.create_view_and_controller(type_.inner, checker.inner, controller)
         elif isinstance(type_, oer.Date):
-            return self._date(type_, controller)
+            view = self._date(type_, controller)
         elif isinstance(type_, oer.TimeOfDay):
-            return self._time(type_, controller)
+            view = self._time(type_, controller)
         elif isinstance(type_, oer.DateTime) or isinstance(type_, oer.UTCTime) or isinstance(type_, oer.GeneralizedTime):
-            return self._datetime(type_, controller)
+            view = self._datetime(type_, controller)
         else:
-            return self._text(type_, f'ASN.1 type {type_.name} {type_.type_name} not supported')
+            view = self._text(type_, f'ASN.1 type {type_.name} {type_.type_name} not supported')
+
+        return view
 
     def _text(self, type_: oer.Type, text: str) -> AbstractView:
         return self._view_factory.get_text_view(self.__get_type_info(type_, '?'), text)
