@@ -60,7 +60,7 @@ class MenuHandler:
         toolbar: typing.Optional[wx.ToolBar] = None
 
         if self.__plugins is not None:
-            self.__build_plugins(menu_bar, toolbar)
+            toolbar = self.__build_plugins(menu_bar)
 
         if toolbar is not None:
             toolbar.Realize()
@@ -97,7 +97,8 @@ class MenuHandler:
         picker = FilePickerHandler(data_save_dialog_constructor, save_data_to_file, True)
         self.__frame.Bind(wx.EVT_MENU, picker.on_menu_click, self.__save_data_item)
 
-    def __build_plugins(self, menu_bar, toolbar):
+    def __build_plugins(self, menu_bar) -> typing.Optional[wx.ToolBar]:
+        toolbar = None
         for plugin_index, plugin in enumerate(self.__plugins):
             plugin_menu = wx.Menu()
             menus = plugin.get_menus()
@@ -122,7 +123,8 @@ class MenuHandler:
 
             if labels:
                 toolbar.SetWindowStyle(wx.TB_TEXT | wx.TB_HORIZONTAL)
-                pass
+
+        return toolbar
 
     def __build_plugin_menu(self, menu, plugin_menu, identification):
         if not len(menu[0]):
