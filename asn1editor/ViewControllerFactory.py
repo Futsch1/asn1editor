@@ -85,7 +85,12 @@ class ViewControllerFactory(object):
 
         sub_controller = ControllerFactory(controller).create_container_controller(type_, optional_interface)
 
-        for sub_type in type_.root_members + ([] if type_.additions is None else type_.additions):
+        # Additions are always optional
+        additions = [] if type_.additions is None else type_.additions
+        for sub_type in additions:
+            sub_type.optional = True
+
+        for sub_type in type_.root_members + additions:
             view.add_child(self.create_view_and_controller(sub_type, self.__get_member_checker(checker, sub_type.name), sub_controller))
 
         return view
