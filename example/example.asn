@@ -29,7 +29,11 @@ Sequence ::= SEQUENCE
     optionalChoice      CHOICE {
         exampleInt1         INTEGER (0..255),
         exampleInt2         INTEGER (0..255)
-    } OPTIONAL
+    } OPTIONAL,
+    ...,
+    additional          INTEGER (0..255),
+    additionalOptional  INTEGER (0..255) OPTIONAL,
+    ...
 }
 
 SubSequence ::= SET

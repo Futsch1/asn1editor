@@ -88,7 +88,7 @@ class ViewControllerFactory(object):
         # Additions are always optional
         additions = [] if type_.additions is None else type_.additions
         for sub_type in additions:
-            sub_type.optional = True
+            sub_type.additional = True
 
         for sub_type in type_.root_members + additions:
             view.add_child(self.create_view_and_controller(sub_type, self.__get_member_checker(checker, sub_type.name), sub_controller))
@@ -197,6 +197,7 @@ class ViewControllerFactory(object):
         type_info = TypeInfo()
         type_info.name = type_.name
         type_info.optional = type_.optional
+        type_info.additional = hasattr(type_, "additional")
         type_info.tag = f'0x{type_.tag.hex()}' if type_.tag is not None else ''
         if self._type_augmenter:
             if len(path):

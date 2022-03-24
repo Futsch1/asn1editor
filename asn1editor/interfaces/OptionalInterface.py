@@ -10,3 +10,6 @@ class OptionalInterface:  # pragma: no cover
 
     def set_has_value(self, val: bool):
         raise NotImplementedError
+
+    def get_default_has_value(self) -> bool:
+        raise NotImplementedError

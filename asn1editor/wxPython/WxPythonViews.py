@@ -39,7 +39,7 @@ class WxPythonView(AbstractView, OptionalInterface):
         pass
 
     def get_has_value(self) -> bool:
-        if 'optional' in self._controls:
+        if 'optional' in self._controls and (not self._type_info.additional or self._type_info.optional):
             return self._controls.get('optional').GetValue()
         else:
             return True
@@ -47,7 +47,11 @@ class WxPythonView(AbstractView, OptionalInterface):
     def set_has_value(self, val: bool):
         if 'optional' in self._controls:
             self._controls.get('optional').SetValue(val)
-            self.enable(val)
+            if not self._type_info.additional or self._type_info.optional:
+                self.enable(val)
+
+    def get_default_has_value(self) -> bool:
+        return not self._type_info.optional
 
     def realize(self) -> 'WxPythonView':
         return self

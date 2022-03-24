@@ -7,7 +7,7 @@ class Labels:
         self.__view_select = view_select
 
     def get_label(self, type_info: TypeInfo, suffix: str = '') -> str:
-        label = type_info.name + suffix
+        label = ('... ' if type_info.additional else '') + type_info.name + suffix
         if self.__view_select.tag_info == ViewSelect.TagInfo.LABELS and len(type_info.tag):
             label += f' [{type_info.tag}]'
 
@@ -19,6 +19,8 @@ class Labels:
             tooltip += [f'Tag: {type_info.tag}']
         if type_info.optional:
             tooltip += ['Optional element']
+        if type_info.additional:
+            tooltip += ['Additional element']
         if type_info.help and len(type_info.help):
             tooltip += [f'Help: {type_info.help}']
         return '\n'.join(tooltip)

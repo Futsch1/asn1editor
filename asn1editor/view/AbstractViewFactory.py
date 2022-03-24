@@ -18,6 +18,7 @@ class TypeInfo:
     tag: str = ''
     typename: str = ''
     optional: bool = False
+    additional: bool = False
     style: Styles = 0
     help: typing.Optional[str] = None
 

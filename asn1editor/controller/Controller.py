@@ -12,7 +12,7 @@ class Controller:
         self._parent = parent
         self._optional_interface = optional_interface
         if self._optional_interface:
-            self._optional_interface.set_has_value(False)
+            self._optional_interface.set_has_value(self._optional_interface.get_default_has_value())
         self.path = ''
         if parent is not None:
             parent.add_controller(name, self)

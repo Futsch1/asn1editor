@@ -30,7 +30,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         self._apply_style(controls)
 
         view = WxPythonValueSelectionView(type_info, controls)
-        return view, view, view if type_info.optional else None
+        return view, view, view if type_info.optional or type_info.additional else None
 
     def get_text_view(self, type_info: TypeInfo, text: str) -> AbstractView:
         controls = self._get_controls(type_info)
@@ -47,7 +47,7 @@ class WxPythonViewFactory(AbstractViewFactory):
 
         view = WxPythonContainerView(type_info, controls, self._window)
 
-        return view, view if type_info.optional else None
+        return view, view if type_info.optional or type_info.additional else None
 
     def get_list_view(self, type_info: TypeInfo, minimum: int, maximum: int) -> Tuple[ListView, ValueInterface, OptionalInterface]:
         controls = self._get_controls(type_info, icon=WxPythonListView.icon)
@@ -68,7 +68,7 @@ class WxPythonViewFactory(AbstractViewFactory):
 
         view = WxPythonListView(type_info, controls, self._window)
 
-        return view, view, view if type_info.optional else None
+        return view, view, view if type_info.optional or type_info.additional else None
 
     def get_number_view(self, type_info: TypeInfo, minimum: Optional[Union[int, float]],
                         maximum: Optional[Union[int, float]], float_: bool) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
@@ -92,7 +92,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         self._apply_style(controls)
 
         view = WxPythonValueView(type_info, controls)
-        return view, view, view if type_info.optional else None
+        return view, view, view if type_info.optional or type_info.additional else None
 
     def get_boolean_view(self, type_info: TypeInfo) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
         controls = self._get_controls(type_info, ':', 'bool')
@@ -101,7 +101,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         self._apply_style(controls)
 
         view = WxPythonBooleanView(type_info, controls)
-        return view, view, view if type_info.optional else None
+        return view, view, view if type_info.optional or type_info.additional else None
 
     def get_string_view(self, type_info: TypeInfo, minimum: Optional[int], maximum: Optional[int]):
         controls = self._get_controls(type_info, ':', 'string')
@@ -119,7 +119,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         self._apply_style(controls)
 
         view = WxPythonValueView(type_info, controls)
-        return view, view, view if type_info.optional else None
+        return view, view, view if type_info.optional or type_info.additional else None
 
     def get_hex_string_view(self, type_info: TypeInfo, minimum: Optional[int], maximum: Optional[int]):
         controls = self._get_controls(type_info, ':', 'string')
@@ -140,7 +140,7 @@ class WxPythonViewFactory(AbstractViewFactory):
 
         view = WxPythonChoiceView(type_info, controls)
 
-        return view, view, view if type_info.optional else None
+        return view, view, view if type_info.optional or type_info.additional else None
 
     def get_bitstring_view(self, type_info: TypeInfo, number_of_bits: int, named_bits: List[Tuple[str, int]]) -> \
             Tuple[AbstractView, BitstringInterface, OptionalInterface]:
@@ -167,7 +167,7 @@ class WxPythonViewFactory(AbstractViewFactory):
 
         view = WxPythonBitstringView(type_info, controls, self._window)
 
-        return view, view, view if type_info.optional else None
+        return view, view, view if type_info.optional or type_info.additional else None
 
     def get_date_view(self, type_info: TypeInfo) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
         controls = self._get_controls(type_info, ':', 'date')
@@ -176,7 +176,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         self._apply_style(controls)
 
         view = WxPythonDateView(type_info, controls)
-        return view, view, view if type_info.optional else None
+        return view, view, view if type_info.optional or type_info.additional else None
 
     def get_time_view(self, type_info: TypeInfo) -> Tuple[AbstractView, ValueInterface, OptionalInterface]:
         controls = self._get_controls(type_info, ':', 'date')
@@ -195,7 +195,7 @@ class WxPythonViewFactory(AbstractViewFactory):
         self._apply_style(controls)
 
         view = WxPythonDateTimeView(type_info, controls)
-        return view, view, view if type_info.optional else None
+        return view, view, view if type_info.optional or type_info.additional else None
 
     def _get_controls(self, type_info: TypeInfo, suffix: str = '', icon: str = None) -> ControlList:
         controls = {}
@@ -203,8 +203,10 @@ class WxPythonViewFactory(AbstractViewFactory):
         label = self._labels.get_label(type_info, suffix)
         tooltip = self._labels.get_tooltip(type_info)
 
-        if type_info.optional:
+        if type_info.optional or type_info.additional:
             control = wx.CheckBox(self._window, wx.ID_ANY, label)
+            if type_info.additional and not type_info.optional:
+                control.Enable(False)
             controls['optional'] = control
         else:
             control = wx.StaticText(self._window, wx.ID_ANY, label)
