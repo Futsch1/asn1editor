@@ -7,6 +7,7 @@ from tests import TestHelper
 
 class TypeAugmenterTest(TestCase):
     def test_augmenter(self):
+        # noinspection PyUnusedLocal
         app = TestHelper.get_wx_app()
 
         type_augmenter = MagicMock()

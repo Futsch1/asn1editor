@@ -34,6 +34,9 @@ class TestOptionalInterface(OptionalInterface):
     def set_has_value(self, val: bool):
         self.val = val
 
+    def get_default_has_value(self) -> bool:
+        return False
+
 
 class TestValueController(TestCase):
     def test_add_controller(self):

@@ -18,7 +18,7 @@ class TestASN1SpecHandler(TestCase):
     def test_invalid_type(self):
         asn1_spec_handler = ASN1SpecHandler(['example/example.asn'])
         with self.assertRaises(Exception):
-            asn1_spec_handler.create_mvc_for_type('Unknown', AbstractViewFactory())
+            asn1_spec_handler.create_mvc_for_type('Unknown', AbstractViewFactory(), None)
 
     def test_get_extension(self):
         extension = ASN1SpecHandler.get_extensions()
@@ -51,9 +51,9 @@ class TestASN1SpecHandler(TestCase):
 
         asn1_spec_handler._type_name = 'Sequence'
 
-        d = asn1_spec_handler.load_data_file('example/example.json')
+        d = asn1_spec_handler.load_data_file('example/example_with_additionals.json')
         asn1_spec_handler.save_data_file('test.jer', d)
-        self.assertTrue(filecmp.cmp('test.jer', 'example/example.json', False))
+        self.assertTrue(filecmp.cmp('test.jer', 'example/example_with_additionals.json', False))
 
         asn1_spec_handler.save_data_file('test.xml', d)
         d2 = asn1_spec_handler.load_data_file('test.xml')

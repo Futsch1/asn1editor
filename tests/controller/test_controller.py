@@ -2,6 +2,7 @@ from unittest import TestCase
 
 from asn1editor.controller import Controller
 
+
 class TestValueController(TestCase):
     def test_controller(self):
         root = Controller.RootController('root')
