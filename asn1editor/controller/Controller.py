@@ -39,7 +39,7 @@ class Controller:
 
     def _model_to_view_optional(self, model: Dict[str, Any]):
         has_value = self._name in model or isinstance(self._parent, ListController) or isinstance(self._parent, ChoiceController)
-        assert has_value or self._optional_interface
+        assert has_value or self._optional_interface, f'Value for {self.path} not in data'
         if self._optional_interface:
             # Notify view if value is there or not
             self._optional_interface.set_has_value(has_value)
