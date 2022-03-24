@@ -1,30 +1,30 @@
 {
-  "null": null,
-  "example1": {
-    "member1": 1000,
-    "member2": -100
-  },
-  "boolExample": false,
-  "realExample": 0.0,
-  "enumerated": "enum1",
-  "bitString": "000000",
-  "bitString2": "00",
-  "bitString3": "00",
-  "octetString": "61626364",
-  "octetString2": "61626364",
-  "visibleString": "",
-  "utf8String": "\u00e4\u00f6",
-  "date": "2020-11-22",
-  "time": "17:31:54",
-  "datetime": "201122173154Z",
-  "choiceExample": {
-    "exampleList": [
-      0,
-      0,
-      0,
-      0
-    ]
-  },
-  "additional": 1,
-  "additionalOptional": 2
+    "null": null,
+    "example1": {
+        "member1": 1000,
+        "member2": -100
+    },
+    "boolExample": false,
+    "realExample": 0.0,
+    "enumerated": "enum1",
+    "bitString": "000000",
+    "bitString2": "00",
+    "bitString3": "00",
+    "octetString": "61626364",
+    "octetString2": "61626364",
+    "visibleString": "",
+    "utf8String": "\u00e4\u00f6",
+    "date": "2020-11-22",
+    "time": "17:31:54",
+    "datetime": "201122173154Z",
+    "choiceExample": {
+        "exampleList": [
+            0,
+            0,
+            0,
+            0
+        ]
+    },
+    "additional": 1,
+    "additionalOptional": 2
 }
