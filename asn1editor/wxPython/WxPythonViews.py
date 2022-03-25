@@ -157,10 +157,10 @@ class WxPythonHexStringView(WxPythonView, ValueInterface):
         self._real_value = b''
         self._controls['selector'].Bind(wx.EVT_CHECKBOX, self.hex_selector_changed)
         self._hex = self._is_hex()
-        self._minimum = minimum
+        self._minimum = minimum if not self._hex else minimum * self.CHARS_PER_HEX_DIGIT
         if self._minimum is None:
             self._minimum = 0
-        self._maximum = maximum
+        self._maximum = maximum if not self._hex else maximum * self.CHARS_PER_HEX_DIGIT
         self._update_length()
 
     def get_sizer(self, recursive: bool) -> wx.Sizer:
