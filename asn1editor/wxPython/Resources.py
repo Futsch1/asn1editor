@@ -11,9 +11,14 @@ image_list: typing.Optional[ImageList] = None
 
 
 def resource_path(relative_path: str) -> str:
-    """ Get absolute path to resource required for PyInstaller """
+    """ Get absolute path to resource required for PyInstaller/py2exe """
     # noinspection SpellCheckingInspection
-    base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    if hasattr(sys, '_MEIPASS'):
+        base_path = sys._MEIPASS
+    elif hasattr(sys, 'frozen'):
+        base_path = os.path.dirname(os.path.abspath(sys.executable))
+    else:
+        base_path = os.path.dirname(os.path.abspath(__file__))
     path = os.path.join(base_path, relative_path)
     if not os.path.exists(path):
         raise FileNotFoundError(f'File {path} does not exist')
@@ -21,9 +26,14 @@ def resource_path(relative_path: str) -> str:
 
 
 def plugin_resource_path(relative_path: str) -> str:
-    """ Get absolute path to resource required for PyInstaller """
+    """ Get absolute path to resource required for PyInstaller/py2exe """
     # noinspection SpellCheckingInspection
-    base_path = getattr(sys, '_MEIPASS', os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
+    if hasattr(sys, '_MEIPASS'):
+        base_path = sys._MEIPASS
+    elif hasattr(sys, 'frozen'):
+        base_path = os.path.dirname(os.path.abspath(sys.executable))
+    else:
+        base_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
     path = os.path.join(base_path, relative_path)
     if not os.path.exists(path):
         raise FileNotFoundError(f'File {path} does not exist')
