@@ -1,8 +1,9 @@
-/error_log.txt
-/settings.json
-/.coverage
-/dist/
-/build/
-/asn1editor.egg-info/
-/test.json
-/docs/_build/
+error_log.txt
+settings.json
+.coverage
+dist/
+build/
+asn1editor.egg-info/
+test.json
+docs/_build/
+.idea/*
