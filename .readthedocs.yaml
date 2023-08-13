@@ -4,8 +4,7 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.11"
-  apt_packages:
-    - libnotify4 libsdl2-mixer-2.0-0 libsdl2-image-2.0-0 libsdl2-2.0-0
+  apt_packages: [libnotify4 libsdl2-mixer-2.0-0 libsdl2-image-2.0-0 libsdl2-2.0-0]
   jobs:
     pre_create_environment:
       - pip install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04 wxPython==4.2.1
