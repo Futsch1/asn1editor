@@ -8,29 +8,13 @@ jobs:
     runs-on: ubuntu-22.04
 
     strategy:
-      fail-fast: false
       matrix:
-        language: [ 'python' ]
+        python-version: ["3.11"]
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-
-      - uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
       - name: Install prerequisites
         run: |
-          sudo apt-get update && sudo apt-get install libgtk-3-0
+          sudo apt-get update && sudo apt-get install libgtk-3-0 libnotify4
           python -m pip install --upgrade pip
           pip install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04 wxPython==4.2.1
           pip install wheel coveralls
