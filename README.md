@@ -1,6 +1,7 @@
 ![Build](https://github.com/Futsch1/asn1editor/workflows/Build/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/Futsch1/asn1editor/badge.svg?branch=master)](https://coveralls.io/github/Futsch1/asn1editor?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/b2492b88948ace2e8a14/maintainability)](https://codeclimate.com/github/Futsch1/asn1editor/maintainability)
+[![Documentation Status](https://readthedocs.org/projects/asn1editor/badge/?version=latest)](https://asn1editor.readthedocs.io/en/latest/?badge=latest)
 # asn1editor
 Python based ASN.1 editor
 
