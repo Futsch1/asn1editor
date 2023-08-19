@@ -56,7 +56,7 @@ class TreeView:
             if child_view == view:
                 container_item_for_view = tree_child
                 found = True
-            tree_child, cookie = self.__tree_ctrl.GetNextChild(tree_child, cookie)
+            tree_child, cookie = self.__tree_ctrl.GetNextChild(tree_item, cookie)
 
         if not found:
             image = Resources.image_list.get_index(view.icon)
