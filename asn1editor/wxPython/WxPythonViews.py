@@ -121,6 +121,9 @@ class WxPythonView(AbstractView, OptionalInterface):
 
         return container_sizer
 
+    def __repr__(self):
+        return self._type_info.name
+
 
 class WxPythonValueView(WxPythonView, ValueInterface):
     def __init__(self, type_info: TypeInfo, controls: ControlList):
