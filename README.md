@@ -56,11 +56,11 @@ The following encodings are supported for reading and writing data:
 ### GUI features
 - Load and save encoded data
 - View the data in a tree view or as groups
+
 ![Screenshot](docs/screenshot_groups.png?raw=true "asn1editor group view")
 - See limits of numeric values and texts as tooltips
 - Edit octet strings as ASCII or hex
 - List of recently opened specifications for quick access
-- Optional dark mode
 
 ### IMPORTS
 IMPORT references are automatically resolved if the ASN1 files containing the imported types 
