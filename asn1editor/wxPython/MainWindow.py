@@ -182,15 +182,6 @@ class MainWindow(wx.Frame, PluginInterface):
             self.__tree_view = None
         self.SetTitle(self.__title)
 
-    def _get_all_children(self):
-        items = [self]
-        for item in self.GetChildren():
-            items.append(item)
-            if hasattr(item, "GetChildren"):
-                for child in item.GetChildren():
-                    items.append(child)
-        return items
-
     def _structure_changed(self, force_reload: bool = False):
         if self.__type_name is None:
             return
