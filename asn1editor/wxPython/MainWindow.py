@@ -213,12 +213,14 @@ class MainWindow(wx.Frame, PluginInterface):
             sizer.Add(tree_ctrl, proportion=1, flag=wx.ALL | wx.EXPAND)
             sizer.Add(self.__content_panel, proportion=2, flag=wx.ALL | wx.EXPAND)
         else:
-            sizer = wx.GridSizer(1)
             self.__tree_view.hide()
 
             self.__view.realize().set_visible(True, recursive=True)
-            content_sizer = self.__view.realize().get_sizer(recursive=True)
-            content_panel_sizer.Add(content_sizer, flag=wx.ALL | wx.EXPAND, border=5)
+            left_sizer, right_sizer = self.__view.realize().get_sizers(recursive=True)
+            sizer = wx.GridSizer(1 if right_sizer is None else 2)
+            content_panel_sizer.Add(left_sizer, flag=wx.ALL | wx.EXPAND, border=5)
+            if right_sizer is not None:
+                content_panel_sizer.Add(right_sizer, flax=wx.ALL | wx.EXPAND, border=5)
 
             self.__content_panel.SetSizer(content_panel_sizer)
 

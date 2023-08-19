@@ -21,7 +21,7 @@ class WxPythonView(AbstractView, OptionalInterface):
     def __init__(self, type_info: TypeInfo, controls: ControlList, container=False):
         self._type_info = type_info
         self._controls = controls
-        self._container = container
+        self.container = container
 
     def register_optional_event(self, callback: typing.Callable):
         # noinspection PyUnusedLocal
@@ -56,7 +56,7 @@ class WxPythonView(AbstractView, OptionalInterface):
     def realize(self) -> 'WxPythonView':
         return self
 
-    def get_sizer(self, recursive: bool) -> wx.Sizer:
+    def get_sizers(self, recursive: bool) -> typing.Tuple[wx.Sizer, typing.Optional[wx.Sizer]]:
         raise NotImplementedError()
 
     def enable(self, enabled: bool):
@@ -94,18 +94,48 @@ class WxPythonView(AbstractView, OptionalInterface):
 
         return sizer
 
+    @staticmethod
+    def _get_container_sizer(recursive: bool, children: typing.List['WxPythonView']) -> wx.GridBagSizer:
+        container_sizer = wx.GridBagSizer(5, 15)
+
+        children = list(filter(lambda c: recursive or not c.container, children))
+
+        for index, child in enumerate(children):
+            left_column = index < len(children) // 2
+            column = 0 if left_column else 2
+            row = index if left_column else index - len(children) // 2
+
+            left_column_sizer, right_column_sizer = child.get_sizers(recursive)
+            gb_left_pos = wx.GBPosition(row, column)
+            # If no right column present, span over two columns
+            if right_column_sizer is None:
+                gb_left_span = wx.GBSpan(1, 2)
+            else:
+                gb_left_span = wx.GBSpan()
+
+            container_sizer.Add(left_column_sizer, gb_left_pos, gb_left_span, flag=wx.EXPAND | wx.ALIGN_CENTER_VERTICAL, border=5)
+
+            if right_column_sizer is not None:
+                gb_right_pos = wx.GBPosition(row, column + 1)
+                container_sizer.Add(right_column_sizer, gb_right_pos, flag=wx.ALIGN_CENTER_VERTICAL, border=5)
+
+        return container_sizer
+
 
 class WxPythonValueView(WxPythonView, ValueInterface):
     def __init__(self, type_info: TypeInfo, controls: ControlList):
         super(WxPythonValueView, self).__init__(type_info, controls)
 
-    def get_sizer(self, recursive: bool) -> wx.Sizer:
+    def get_sizers(self, recursive: bool) -> typing.Tuple[wx.Sizer, typing.Optional[wx.Sizer]]:
         sizer = self._create_sizer()
-        sizer.Add(self._controls['value'], proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
+        value_sizer = wx.BoxSizer()
+        value_sizer.Add(self._controls['value'], proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
 
         if self._controls.get('style') & Styles.HIDDEN:
             sizer.ShowItems(False)
-        return sizer
+            value_sizer.ShowItems(False)
+
+        return sizer, value_sizer
 
     def register_change_event(self, callback: typing.Callable):
         # noinspection PyUnusedLocal
@@ -163,11 +193,12 @@ class WxPythonHexStringView(WxPythonView, ValueInterface):
         self._maximum = maximum if not self._hex or maximum is None else maximum * self.CHARS_PER_HEX_DIGIT
         self._update_length()
 
-    def get_sizer(self, recursive: bool) -> wx.Sizer:
+    def get_sizers(self, recursive: bool) -> typing.Tuple[wx.Sizer, typing.Optional[wx.Sizer]]:
         sizer = self._create_sizer()
-        sizer.Add(self._controls['selector'], flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL, border=5)
-        sizer.Add(self._controls['value'], proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
-        return sizer
+        value_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        value_sizer.Add(self._controls['selector'], flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL, border=5)
+        value_sizer.Add(self._controls['value'], proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
+        return sizer, value_sizer
 
     def register_change_event(self, callback: typing.Callable):
         # noinspection PyUnusedLocal
@@ -269,10 +300,11 @@ class WxPythonBooleanView(WxPythonView, ValueInterface):
     def enable(self, enabled: bool):
         self._controls['value'].Enable(enabled)
 
-    def get_sizer(self, recursive: bool) -> wx.Sizer:
+    def get_sizers(self, recursive: bool) -> typing.Tuple[wx.Sizer, typing.Optional[wx.Sizer]]:
         sizer = self._create_sizer()
-        sizer.Add(self._controls['value'], proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
-        return sizer
+        value_sizer = wx.BoxSizer()
+        value_sizer.Add(self._controls['value'], proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
+        return sizer, value_sizer
 
 
 class WxPythonBitstringView(WxPythonView, BitstringInterface):
@@ -295,7 +327,7 @@ class WxPythonBitstringView(WxPythonView, BitstringInterface):
         for bit, checkbox in self._controls['checkboxes']:
             checkbox.SetValue(bit in values)
 
-    def get_sizer(self, recursive: bool) -> wx.Sizer:
+    def get_sizers(self, recursive: bool) -> typing.Tuple[wx.Sizer, typing.Optional[wx.Sizer]]:
         sizer = self._create_sizer()
         if self._controls['name'].IsShown():
             bits_sizer = wx.StaticBoxSizer(wx.VERTICAL, self._parent, "Bits")
@@ -303,10 +335,9 @@ class WxPythonBitstringView(WxPythonView, BitstringInterface):
             bits_sizer = wx.BoxSizer(wx.VERTICAL)
 
         for _, checkbox in self._controls['checkboxes']:
-            bits_sizer.Add(checkbox)
-        sizer.Add(bits_sizer)
+            bits_sizer.Add(checkbox, border=5)
 
-        return sizer
+        return sizer, bits_sizer
 
     def destroy(self):
         super(WxPythonBitstringView, self).destroy()
