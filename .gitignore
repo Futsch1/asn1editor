@@ -7,3 +7,5 @@ asn1editor.egg-info/
 test.json
 docs/_build/
 .idea/*
+/test.jer
+/test.xml

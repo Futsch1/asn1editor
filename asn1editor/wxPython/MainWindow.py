@@ -220,7 +220,7 @@ class MainWindow(wx.Frame, PluginInterface):
             sizer = wx.GridSizer(1 if right_sizer is None else 2)
             content_panel_sizer.Add(left_sizer, flag=wx.ALL | wx.EXPAND, border=5)
             if right_sizer is not None:
-                content_panel_sizer.Add(right_sizer, flax=wx.ALL | wx.EXPAND, border=5)
+                content_panel_sizer.Add(right_sizer, flag=wx.ALL | wx.EXPAND, border=5)
 
             self.__content_panel.SetSizer(content_panel_sizer)
 
