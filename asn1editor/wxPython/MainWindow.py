@@ -52,7 +52,6 @@ class MainWindow(wx.Frame, PluginInterface):
             self._menu_handler.view_select.tag_info = TagInfo(Environment.settings.get('tag_info', TagInfo.TOOLTIPS.value))
         except ValueError:
             pass
-        self._menu_handler.view_select.dark_mode = Environment.settings.get('dark_mode', False)
         self._menu_handler.recent = Environment.settings.get('recent', [])
         self._menu_handler.load_last = Environment.settings.get('load_last', True)
 
@@ -227,25 +226,10 @@ class MainWindow(wx.Frame, PluginInterface):
 
         self.SetSizer(sizer, deleteOld=True)
 
-        self.__recolor_children()
-
         self.Refresh()
         self.PostSizeEvent()
 
         self.Thaw()
-
-    def __recolor_children(self):
-        for child in self._get_all_children():
-            if self._menu_handler.view_select.dark_mode:
-                child.SetBackgroundColour(wx.Colour(60, 60, 60))
-                child.SetForegroundColour(wx.WHITE)
-            else:
-                if isinstance(child, wx.TreeCtrl):
-                    child.SetBackgroundColour(wx.WHITE)
-                    child.SetForegroundColour(wx.BLACK)
-                else:
-                    child.SetBackgroundColour(wx.NullColour)
-                    child.SetForegroundColour(wx.BLACK)
 
     def load_data_from_file(self, file_name: str):
         self.__controller.model_to_view(self.__asn1_handler.load_data_file(file_name))
@@ -359,7 +343,6 @@ class MainWindow(wx.Frame, PluginInterface):
         Environment.settings['maximized'] = self.IsMaximized()
         Environment.settings['position'] = self.GetPosition().Get()
         Environment.settings['view'] = self._menu_handler.view_select.view_type.value
-        Environment.settings['dark_mode'] = self._menu_handler.view_select.dark_mode
         Environment.settings['tag_info'] = self._menu_handler.view_select.tag_info.value
         Environment.settings['recent'] = self._menu_handler.recent[:10]
         Environment.settings['load_last'] = self._menu_handler.load_last
