@@ -103,7 +103,7 @@ specification, load it, decode the data and display it.
 
 The editor can be customized to modify the display of certain fields. This customization is provided via a class that implements the TypeAugmenter interface.
 The editor will query additional information for every field via this interface. Currently, a field can be augmented by providing a help text and a style
-IntEnum. The help text will be shown in the tooltip of each field and the style flag modifes the way how a field is displayed. A field can be hidden or be
+IntEnum. The help text will be shown in the tooltip of each field and the style flag modifies the way how a field is displayed. A field can be hidden or be
 declared as read-only.
 
 The editor comes with a default implementation of this augmenter that uses a .style file to customize the way fields are displayed in asn1editor.
