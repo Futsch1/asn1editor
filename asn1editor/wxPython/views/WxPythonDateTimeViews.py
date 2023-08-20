@@ -5,7 +5,8 @@ import wx
 
 from asn1editor.interfaces.ValueInterface import ValueInterface
 from asn1editor.view.AbstractViewFactory import TypeInfo, Styles
-from asn1editor.wxPython.WxPythonViews import WxPythonValueView, ControlList, WxPythonView
+from asn1editor.wxPython.views.WxPythonValueView import WxPythonValueView
+from asn1editor.wxPython.views.WxPythonView import WxPythonView, ControlList
 
 
 class WxPythonDateView(WxPythonValueView):

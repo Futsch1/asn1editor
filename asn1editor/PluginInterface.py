@@ -5,8 +5,14 @@ import asn1tools
 
 
 class PluginInterface:  # pragma: no cover
+    """
+    Interface for a plugin to access data and means of interaction from asn1editor.
+    """
 
     class MessageType(enum.Enum):
+        """
+        Type of popup message
+        """
         INFO = 1
         WARNING = 2
         ERROR = 3
@@ -16,10 +22,10 @@ class PluginInterface:  # pragma: no cover
         """
         Loads an ASN.1 specification in the editor.
 
-        :param file_name: File name of the ASN.1 specification
-        :param type_name: Optional type name indication. Format: [Module name].[Type name]
+        @param file_name: File name of the ASN.1 specification
+        @param type_name: Optional type name indication. Format: [Module name].[Type name]
 
-        :return: True if data was loaded successfully
+        @return: True if data was loaded successfully
         """
         raise NotImplementedError
 
@@ -27,8 +33,8 @@ class PluginInterface:  # pragma: no cover
         """
         Decodes and shows data from an ASN.1 encoded byte stream in the editor.
 
-        :param data: Byte stream with ASN.1 encoded data
-        :param codec: Codec to use for decoding (reference asn1tools which ones are supported)
+        @param data: Byte stream with ASN.1 encoded data
+        @param codec: Codec to use for decoding (reference asn1tools which ones are supported)
         """
         raise NotImplementedError
 
@@ -36,29 +42,29 @@ class PluginInterface:  # pragma: no cover
         """
         Encodes the data currently edited in the editor window with an ASN.1 codec.
 
-        :param codec: Codec to use for encoding (reference asn1tools which ones are supported)
+        @param codec: Codec to use for encoding (reference asn1tools which ones are supported)
 
-        :return: Encoded data
+        @return: Encoded data
         """
         raise NotImplementedError
 
     def get_spec_filename(self) -> typing.Optional[str]:
         """
-        :return: The file name of the ASN.1 specification file currently loaded.
+        @return: The file name of the ASN.1 specification file currently loaded.
         """
         raise NotImplementedError
 
     def get_spec(self, codec: str) -> asn1tools.compiler.Specification:
         """
-        :param codec: Codec to use (reference asn1tools which ones are supported)
+        @param codec: Codec to use (reference asn1tools which ones are supported)
 
-        :return: The compiled ASN.1 specification as an object defined by asn1tools.
+        @return: The compiled ASN.1 specification as an object defined by asn1tools.
         """
         raise NotImplementedError
 
     def get_typename(self) -> typing.Optional[str]:
         """
-        :return: The name of the currently used type name in the editor.
+        @return: The name of the currently used type name in the editor.
         """
         raise NotImplementedError
 
@@ -66,11 +72,11 @@ class PluginInterface:  # pragma: no cover
         """
         Opens a file picker where the user can choose a file name and returns this chosen name.
 
-        :param message: Message to show in the file picker
-        :param wildcard: Wildcards to offer the user in order to help him choose the correct file types
-        :param open_: Flag if the dialog shall be an open dialog (True) or a save dialog (false)
+        @param message: Message to show in the file picker
+        @param wildcard: Wildcards to offer the user in order to help him choose the correct file types
+        @param open_: Flag if the dialog shall be an open dialog (True) or a save dialog (false)
 
-        :return: Selected file, None if cancelled
+        @return: Selected file, None if cancelled
         """
         raise NotImplementedError
 
@@ -78,9 +84,9 @@ class PluginInterface:  # pragma: no cover
         """
         Opens a dir picker where the user can choose a directory name and returns this chosen name.
 
-        :param message: Message to show in the dir picker
+        @param message: Message to show in the dir picker
 
-        :return: Selected directory, None if cancelled
+        @return: Selected directory, None if cancelled
         """
         raise NotImplementedError
 
@@ -88,10 +94,10 @@ class PluginInterface:  # pragma: no cover
         """
         Queries a text from the user.
 
-        :param message: Message to show to the user
-        :param default: Default value for the text entry
+        @param message: Message to show to the user
+        @param default: Default value for the text entry
 
-        :return: Entered text, None if cancelled
+        @return: Entered text, None if cancelled
         """
         raise NotImplementedError
 
@@ -99,12 +105,12 @@ class PluginInterface:  # pragma: no cover
         """
         Queries the user for a choice of values.
 
-        :param message: Message to show to the user
-        :param caption: Message box caption
-        :param choices: List of strings for the user to choose from
-        :param default: Default selection
+        @param message: Message to show to the user
+        @param caption: Message box caption
+        @param choices: List of strings for the user to choose from
+        @param default: Default selection
 
-        :return: Selected string, None if cancelled
+        @return: Selected string, None if cancelled
         """
         raise NotImplementedError
 
@@ -112,11 +118,11 @@ class PluginInterface:  # pragma: no cover
         """
         Shows a status message.
 
-        :param message: Message to show to the user
-        :param caption: Message box caption
-        :param message_type: Type of message box
+        @param message: Message to show to the user
+        @param caption: Message box caption
+        @param message_type: Type of message box
 
-        :return: If type is a question, True means yes and False means No
+        @return: If type is a question, True means yes and False means No
         """
         raise NotImplementedError
 
@@ -124,7 +130,7 @@ class PluginInterface:  # pragma: no cover
         """
         Shows a status message.
 
-        :param message: Message to show to the user
+        @param message: Message to show to the user
         """
         raise NotImplementedError
 
@@ -132,7 +138,7 @@ class PluginInterface:  # pragma: no cover
         """
         Get a settings dictionary for a plugin to store persistent data
 
-        :return: Settings dict
+        @return: Settings dict
         """
         raise NotImplementedError
 
@@ -140,9 +146,9 @@ class PluginInterface:  # pragma: no cover
         """
         Shows a progress window
 
-        :param message: Message to show to the user
-        :param caption: Message box caption
-        :param max_progress: Maximum progress value
+        @param message: Message to show to the user
+        @param caption: Message box caption
+        @param max_progress: Maximum progress value
         """
         raise NotImplementedError
 
@@ -150,10 +156,10 @@ class PluginInterface:  # pragma: no cover
         """
         Updates a shown progress window
 
-        :param message: Updated message to show to the user, optional
-        :param close: If set, window is closed, optional
-        :param progress: Progress to show, if none, an indeterminate process is shown, optional
+        @param message: Updated message to show to the user, optional
+        @param close: If set, window is closed, optional
+        @param progress: Progress to show, if none, an indeterminate process is shown, optional
 
-        :return: False if progress window has been canceled, otherwise True
+        @return: False if progress window has been canceled, otherwise True
         """
         raise NotImplementedError

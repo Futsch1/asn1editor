@@ -10,6 +10,10 @@ from asn1editor.interfaces.ValueInterface import ValueInterface
 
 
 class ControllerFactory:
+    """
+    Creates controllers for an ASN.1 type as children for a given controller.
+    """
+
     def __init__(self, parent: Controller):
         self._parent = parent
 

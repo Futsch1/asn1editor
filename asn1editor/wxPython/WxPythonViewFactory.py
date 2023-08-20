@@ -12,10 +12,15 @@ from asn1editor.view.AbstractView import AbstractView, ContainerView, ListView, 
 from asn1editor.view.AbstractViewFactory import AbstractViewFactory, TypeInfo, Styles
 from asn1editor.wxPython import Resources
 from asn1editor.wxPython.Labels import Labels
-from asn1editor.wxPython.WxPythonComplexViews import WxPythonContainerView, WxPythonListView, WxPythonChoiceView
-from asn1editor.wxPython.WxPythonDateTimeViews import WxPythonDateView, WxPythonTimeView, WxPythonDateTimeView
-from asn1editor.wxPython.WxPythonViews import WxPythonValueView, WxPythonBooleanView, \
-    WxPythonBitstringView, WxPythonHexStringView, WxPythonValueSelectionView, ControlList
+from asn1editor.wxPython.views.WxPythonBitstringView import WxPythonBitstringView
+from asn1editor.wxPython.views.WxPythonBooleanView import WxPythonBooleanView
+from asn1editor.wxPython.views.WxPythonChoiceView import WxPythonChoiceView
+from asn1editor.wxPython.views.WxPythonContainerView import WxPythonContainerView
+from asn1editor.wxPython.views.WxPythonDateTimeViews import WxPythonDateView, WxPythonTimeView, WxPythonDateTimeView
+from asn1editor.wxPython.views.WxPythonHexStringView import WxPythonHexStringView
+from asn1editor.wxPython.views.WxPythonListView import WxPythonListView
+from asn1editor.wxPython.views.WxPythonValueView import WxPythonValueView, WxPythonValueSelectionView
+from asn1editor.wxPython.views.WxPythonView import ControlList
 
 
 class WxPythonViewFactory(AbstractViewFactory):

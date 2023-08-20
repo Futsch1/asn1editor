@@ -4,8 +4,9 @@ import wx
 
 from asn1editor.wxPython import Resources
 from asn1editor.wxPython.Labels import Labels
-from asn1editor.wxPython.WxPythonComplexViews import WxPythonContainerView, WxPythonChoiceView
-from asn1editor.wxPython.WxPythonViews import WxPythonView
+from asn1editor.wxPython.views.WxPythonChoiceView import WxPythonChoiceView
+from asn1editor.wxPython.views.WxPythonContainerView import WxPythonContainerView
+from asn1editor.wxPython.views.WxPythonView import WxPythonView
 
 
 class TreeView:

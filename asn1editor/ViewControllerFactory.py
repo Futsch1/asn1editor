@@ -12,18 +12,45 @@ from asn1editor.view.AbstractView import AbstractView
 from asn1editor.view.AbstractViewFactory import AbstractViewFactory, TypeInfo
 
 
-class ViewControllerFactory(object):
+class ViewControllerFactory:
+    """
+    Creates views and corresponding controllers.
+
+    The class requires a view factory for the GUI implementation and an optional type augmenter that provides additional information about
+    a given type.
+    """
+
     def __init__(self, view_factory: AbstractViewFactory, type_augmenter: typing.Optional[TypeAugmenter]):
         self._view_factory = view_factory
         self._type_augmenter = type_augmenter
 
     def create(self, asn1_type: oer.CompiledType) -> typing.Tuple[AbstractView, Controller]:
+        """
+        Creates the root view and root controller for a loaded ASN.1 specification.
+
+        Needs to be called after loading a specification
+        @param asn1_type: Compiled ASN.1 specification
+        @return: Root view and root controller
+        """
         controller = RootController('root')
         view = self.create_view_and_controller(asn1_type.type, asn1_type.constraints_checker.type, controller)
 
         return view, controller
 
     def create_view_and_controller(self, type_: oer.Type, checker: constraints_checker.Type, controller: Controller) -> AbstractView:
+        """
+        Creates the view and controller for a given ASN.1 type.
+
+        The function only returns the view because the controller will register automatically with its parent, while the views are connected via
+        return types.
+
+        The reason here is that the controllers are all in the context of asn1editor and cannot be changed, while the views are interchangeable.
+
+        @param type_: Compiled ASN.1 type
+        @param checker: Constraints checker object to provide constraints info about the type
+        @param controller: Parent controller
+        @return: View for the type
+        """
         if isinstance(type_, oer.Integer) or isinstance(type_, oer.Real):
             view = self._number(type_, checker, controller)
         elif isinstance(type_, oer.Boolean):

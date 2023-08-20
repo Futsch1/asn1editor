@@ -10,6 +10,12 @@ from asn1editor.view.AbstractViewFactory import AbstractViewFactory
 
 
 class ListInstanceFactory:
+    """
+    Create or removes list instances.
+
+    This class stores the connection between views and controllers after initialization of the GUI to be able to create list elements on demand.
+    """
+
     def __init__(self, view_factory: AbstractViewFactory, type_augmenter: typing.Optional[TypeAugmenter], list_view: ListView, _type: oer.Type,
                  checker: constraints_checker.Type):
         self._view_factory = view_factory

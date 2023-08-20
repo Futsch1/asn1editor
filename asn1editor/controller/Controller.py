@@ -7,6 +7,12 @@ from asn1editor.interfaces.ValueInterface import ValueInterface
 
 
 class Controller:
+    """
+    The controller serves to connect the GUI representation with the data model.
+
+    It manages the path of elements to be able to access elements by a dot separated name.
+    """
+
     def __init__(self, name: str, parent: 'Controller', optional_interface: Optional[OptionalInterface]):
         self._name = name
         self._parent = parent
@@ -23,18 +29,36 @@ class Controller:
                 self.path = self._parent.get_path() + '.' + self.path
 
     def add_controller(self, name: str, other: 'Controller'):
+        """
+        Adds a controller with a given name. This is used when an element supports dynamic instantiation of sub-elements (like lists or choices).
+        The function is called by child controllers to tell their parents about their existence.
+        """
         raise NotImplementedError()
 
     def model_to_view(self, model: Dict[str, Any]):
+        """
+        Sets the values from the model to the views
+        """
         raise NotImplementedError()
 
     def view_to_model(self) -> Optional[Dict[str, Any]]:
+        """
+        Gets the values from the view and puts them in a model
+        """
         raise NotImplementedError()
 
     def event_handler(self):
+        """
+        Handles an event that involves creation or removal of sub-controllers like changing the number of list elements or changing a choice.
+
+        Is called when the value of the element changes.
+        """
         pass
 
     def optional_handler(self):
+        """
+        Handles the change of the optional status of an element.
+        """
         pass
 
     def _model_to_view_optional(self, model: Dict[str, Any]):
@@ -56,6 +80,12 @@ class Controller:
 
 
 class ValueController(Controller):
+    """
+    Controller for plain value fields.
+
+    A value controller uses a data converter to perform the mapping between values provided from a view and those expected in the model.
+    """
+
     def __init__(self, name: str, parent: Controller, value_interface: ValueInterface, optional_interface: Optional[OptionalInterface],
                  data_converter: Converter.Converter):
         super().__init__(name, parent, optional_interface)
@@ -83,6 +113,10 @@ class ValueController(Controller):
 
 
 class BoolController(Controller):
+    """
+    A bool controller manages a single boolean element.
+    """
+
     def __init__(self, name: str, parent: Controller, value_interface: ValueInterface, optional_interface: Optional[OptionalInterface], default: bool):
         super().__init__(name, parent, optional_interface)
         self._value_interface = value_interface
@@ -105,6 +139,11 @@ class BoolController(Controller):
 
 
 class ListController(Controller):
+    """
+    A list controller manages a list of elements with the same type. The number of elements may be dynamic and a factory is provided to create or destroy new
+    instances of the list. This factory creates both the views and the controllers for a new element.
+    """
+
     def __init__(self, name: str, parent: Controller, value_interface: ValueInterface, optional_interface: Optional[OptionalInterface], list_instance_factory,
                  default: int):
         super().__init__(name, parent, optional_interface)
@@ -161,6 +200,10 @@ class ListController(Controller):
 
 
 class ChoiceController(Controller):
+    """
+    A choice may contain a selection of different sub-elements. The controller creates the
+    """
+
     def __init__(self, name: str, parent: Controller, value_interface: ValueInterface, optional_interface: Optional[OptionalInterface], choice_instance_factory,
                  default: str):
         super().__init__(name, parent, optional_interface)

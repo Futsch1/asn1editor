@@ -10,6 +10,12 @@ from asn1editor.view.AbstractViewFactory import AbstractViewFactory
 
 
 class ChoiceInstanceFactory:
+    """
+    Changes the element selected by a choice.
+
+    This class stores the connection between views and controllers after initialization of the GUI to be able to create the choice element on demand.
+    """
+
     def __init__(self, view_factory: AbstractViewFactory, type_augmenter: typing.Optional[TypeAugmenter], choice_view: ChoiceView,
                  members: Dict[str, oer.Type], checkers: Dict[str, constraints_checker.Type]):
         self._view_factory = view_factory
