@@ -83,10 +83,10 @@ class PluginInterfaceTest(TestCase):
             instance.ShowModal.return_value = wx.ID_OK
             self.assertEqual('example3/example', plugin.plugin_interface.dir_picker("Test my entry"))
 
-            instance.SetDirectory.reset_mock()
+            instance.SetPath.reset_mock()
             instance.ShowModal.return_value = wx.ID_CANCEL
             self.assertIsNone(plugin.plugin_interface.dir_picker("Test my entry"))
-            instance.SetDirectory.assert_called_once_with('example3/')
+            instance.SetPath.assert_called_once_with('example3/')
 
         plugin.plugin_interface.show_status("Test status bar")
         self.assertEqual(main_window._status_bar.GetStatusText(), 'Test status bar')
