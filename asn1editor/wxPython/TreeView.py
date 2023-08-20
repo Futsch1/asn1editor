@@ -74,7 +74,7 @@ class TreeView:
 
         while tree_child.IsOk():
             current_child_views_in_tree.append((self.__tree_ctrl.GetItemData(tree_child), tree_child))
-            tree_child, cookie = self.__tree_ctrl.GetNextChild(tree_child, cookie)
+            tree_child, cookie = self.__tree_ctrl.GetNextChild(container_item_for_view, cookie)
 
         for current_child, current_treeitem in current_child_views_in_tree:
             if current_child not in views:
