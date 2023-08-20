@@ -4,6 +4,15 @@ from asn1editor import PluginInterface
 
 
 class Plugin:  # pragma: no cover
+    """
+    Base class for all plugins.
+
+    The methods in this class are used by the UI to display the menus and toolbar items the plugin provides and to perform given callbacks
+    when the user interacts with these menu items.
+
+    Additionally, the function connect is called during startup and serves to register the PluginInterface to enable the plugin to access data in
+    the loaded ASN.1 specification and to further interact with the user.
+    """
     def get_name(self) -> str:
         """
         Returns the name of a plugin - used to name the menu item folder
@@ -31,8 +40,9 @@ class Plugin:  # pragma: no cover
 
     def get_about(self) -> typing.Optional[str]:
         """
-        Gets s string of the plugin to be added to the about box
+        Gets an optional about-box string.
 
+        Returns an optional about-box string that will be displayed in the about-box of the plugin.
         """
         raise NotImplementedError
 
@@ -42,6 +52,6 @@ class Plugin:  # pragma: no cover
 
         The function will be called during startup and serves to register the PluginInterface.
 
-        :param plugin_interface: Object that implements the PluginInterface.
+        @param plugin_interface: Object that implements the PluginInterface.
         """
         raise NotImplementedError

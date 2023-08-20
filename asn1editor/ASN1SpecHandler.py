@@ -17,6 +17,10 @@ from asn1editor.view.AbstractViewFactory import AbstractViewFactory
 
 
 class ASN1SpecHandler:
+    """
+    Represents a loaded ASN.1 spec and creates views and controllers for this specification
+    """
+
     IMPORTS_REGEX_OUTER = re.compile(r'IMPORTS([\s\S]*);', flags=re.MULTILINE)
     IMPORTS_REGEX_INNER = re.compile(r'FROM\s*(\S*)', flags=re.MULTILINE)
 
@@ -29,7 +33,7 @@ class ASN1SpecHandler:
 
         if isinstance(file_name, str):
             import_names = []
-            # Pre process for import statements to automatically resolve other files
+            # Preprocess for import statements to automatically resolve other files
             my_path = os.path.split(os.path.abspath(file_name))[0]
             with open(file_name, 'r', encoding='utf-8') as f:
                 content = f.read()
@@ -61,12 +65,21 @@ class ASN1SpecHandler:
         return import_names
 
     def get_filenames(self) -> List[str]:
+        """
+        Returns the file name of the ASN.1 spec loaded and names of dependent ASN.1 spec files
+        """
         return self.__file_names
 
     def is_loaded(self, file_name: str):
+        """
+        Returns true if a given file name is loaded
+        """
         return os.path.abspath(file_name) in self.__file_names
 
     def get_types(self, ) -> List[str]:
+        """
+        Returns a list of all type names that are defined in the loaded ASN.1 spec
+        """
         types = []
         compiled = self.get_compiled('oer')
         # TODO: Only include those types that are in the originally loaded file
@@ -76,12 +89,27 @@ class ASN1SpecHandler:
         return sorted(types)
 
     def get_compiled(self, codec: str) -> asn1tools.compiler.Specification:
+        """
+        Returns the compiled ASN.1 specification (using asn1tools)
+
+        @param codec: ASN.1 coded, see asn1tools.compile_files for a list of valid codecs
+        """
         if codec not in self.__compiled:
             self.__compiled[codec] = asn1tools.compile_files(self.__file_names, codec)
         return self.__compiled[codec]
 
     def create_mvc_for_type(self, load_type: str, view_factory: AbstractViewFactory,
                             type_augmenter: typing.Optional[TypeAugmenter]) -> Tuple[AbstractView, Controller]:
+        """
+        Creates a model-view-controller for a given type name.
+        The type name must be a full type name, e.g. 'my_module.my_type', including the module name of the loaded ASN.1 spec.
+        If the type name is not found in the loaded ASN.1 spec, a ValueError is raised.
+
+        @param load_type: The type name to create a model-view-controller for
+        @param view_factory: The view factory to use for creating the view, performs the connection to a view implementation
+        @param type_augmenter: The type augmenter to use for creating the view
+        @return: A tuple of the root view and the controller
+        """
         compiled = self.get_compiled('oer')
         for module_name, module in compiled.modules.items():
             for type_name, compiled_type in module.items():
@@ -91,10 +119,13 @@ class ASN1SpecHandler:
                     self._type_name = type_name
                     return mvc_factory.create(compiled_type)
 
-        raise Exception(f'Requested type {load_type} not found in ASN.1 spec')
+        raise ValueError(f'Requested type {load_type} not found in ASN.1 spec')
 
     @staticmethod
     def get_extensions() -> List[str]:
+        """
+        Returns the list of file extensions that are supported to load data from or save data to
+        """""
         return ['*.json', '*.jer', '*.oer', '*.xml', '*.xer', '*.der', '*.ber', '*.per', '*.uper']
 
     @staticmethod
@@ -107,12 +138,18 @@ class ASN1SpecHandler:
         return extension_to_codec[extension]
 
     def load_data_file(self, file_name: str) -> Dict:
+        """
+        Loads data according to the current specification from a given file and returns the model as a dictionary.
+        """
         assert self._type_name is not None
 
         with open(file_name, 'rb') as f:
             return self.get_model_from_data(f.read(), self.__get_codec(file_name))
 
     def save_data_file(self, file_name: str, model: Dict):
+        """
+        Saves the data from a passed model to a file using the loaded specification.
+        """
         assert self._type_name is not None
 
         codec = self.__get_codec(file_name)
@@ -127,9 +164,15 @@ class ASN1SpecHandler:
             f.write(data)
 
     def get_data_from_model(self, model: Dict, codec: str) -> bytes:
+        """
+        Converts a model to a byte sequence according to the loaded specification.
+        """
         compiled = self.get_compiled(codec)
         return compiled.encode(self._type_name, model[self._type_name], check_constraints=True)
 
     def get_model_from_data(self, data: bytes, codec: str) -> Dict:
+        """
+        Decodes a byte sequence to a model according to the loaded specification.
+        """
         compiled = self.get_compiled(codec)
         return {self._type_name: compiled.decode(self._type_name, data)}

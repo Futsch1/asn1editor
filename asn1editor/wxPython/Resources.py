@@ -14,6 +14,7 @@ def resource_path(relative_path: str) -> str:
     """ Get absolute path to resource required for PyInstaller/py2exe """
     # noinspection SpellCheckingInspection
     if hasattr(sys, '_MEIPASS'):
+        # noinspection PyProtectedMember
         base_path = sys._MEIPASS
     elif hasattr(sys, 'frozen'):
         base_path = os.path.dirname(os.path.abspath(sys.executable))
@@ -29,6 +30,7 @@ def plugin_resource_path(relative_path: str) -> str:
     """ Get absolute path to resource required for PyInstaller/py2exe """
     # noinspection SpellCheckingInspection
     if hasattr(sys, '_MEIPASS'):
+        # noinspection PyProtectedMember
         base_path = sys._MEIPASS
     elif hasattr(sys, 'frozen'):
         base_path = os.path.dirname(os.path.abspath(sys.executable))

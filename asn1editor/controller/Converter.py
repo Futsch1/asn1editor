@@ -3,6 +3,10 @@ from datetime import date, time
 
 
 class Converter:
+    """
+    Converts values from view to model and vice versa. GUI implementations usually work with strings, while the ASN.1 model requires numeric data types.
+    """
+
     def __init__(self, minimum: typing.Optional[typing.Union[int, float]], default: typing.Optional[typing.Union[str, bytes, int, float, date, time]]):
         self._default = default
         self._minimum = minimum
