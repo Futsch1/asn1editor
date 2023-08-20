@@ -19,7 +19,12 @@ class FilePickerHandler:
         with self.__file_dialog_factory() as file_dialog:
             initial_dir = Environment.settings.get(file_dialog.GetMessage())
             if initial_dir is not None:
-                if isinstance(file_dialog, wx.FileDialog):
+                try:
+                    is_file_dialog = isinstance(file_dialog, wx.FileDialog)
+                except TypeError:
+                    is_file_dialog = True
+
+                if is_file_dialog:
                     file_dialog.SetDirectory(initial_dir + '/')
                 else:
                     file_dialog.SetPath(initial_dir + '/')
