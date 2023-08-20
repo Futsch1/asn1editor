@@ -56,11 +56,11 @@ The following encodings are supported for reading and writing data:
 ### GUI features
 - Load and save encoded data
 - View the data in a tree view or as groups
+
 ![Screenshot](docs/screenshot_groups.png?raw=true "asn1editor group view")
 - See limits of numeric values and texts as tooltips
 - Edit octet strings as ASCII or hex
 - List of recently opened specifications for quick access
-- Optional dark mode
 
 ### IMPORTS
 IMPORT references are automatically resolved if the ASN1 files containing the imported types 
@@ -103,7 +103,7 @@ specification, load it, decode the data and display it.
 
 The editor can be customized to modify the display of certain fields. This customization is provided via a class that implements the TypeAugmenter interface.
 The editor will query additional information for every field via this interface. Currently, a field can be augmented by providing a help text and a style
-IntEnum. The help text will be shown in the tooltip of each field and the style flag modifes the way how a field is displayed. A field can be hidden or be
+IntEnum. The help text will be shown in the tooltip of each field and the style flag modifies the way how a field is displayed. A field can be hidden or be
 declared as read-only.
 
 The editor comes with a default implementation of this augmenter that uses a .style file to customize the way fields are displayed in asn1editor.

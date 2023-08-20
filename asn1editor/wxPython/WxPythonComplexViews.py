@@ -1,3 +1,4 @@
+import typing
 from typing import Optional, List, Callable
 
 import wx
@@ -16,7 +17,7 @@ class WxPythonContainerView(WxPythonView, ContainerView):
         self._children: List[WxPythonView] = []
         self._parent = parent
 
-    def get_sizer(self, recursive: bool) -> wx.Sizer:
+    def get_sizers(self, recursive: bool) -> typing.Tuple[wx.Sizer, typing.Optional[wx.Sizer]]:
         if recursive and self.get_has_value() and self._controls['name'].IsShown():
             sizer = wx.StaticBoxSizer(wx.VERTICAL, self._parent, self._type_info.name)
         else:
@@ -31,18 +32,9 @@ class WxPythonContainerView(WxPythonView, ContainerView):
             name_sizer.Add(self._controls['name'], flag=wx.ALL, border=5)
             sizer.Add(name_sizer)
 
-        if recursive:
-            columns = 2 if len(self._children) >= 4 else 1
-            container_sizer = wx.FlexGridSizer(cols=columns, vgap=8, hgap=8)
-            sizer.Add(container_sizer)
-        else:
-            container_sizer = sizer
+        sizer.Add(self._get_container_sizer(recursive, self._children))
 
-        for child in self._children:
-            if recursive or not child._container:
-                container_sizer.Add(child.get_sizer(recursive))
-
-        return sizer
+        return sizer, None
 
     def add_child(self, view: WxPythonView):
         self._children.append(view)
@@ -66,7 +58,7 @@ class WxPythonContainerView(WxPythonView, ContainerView):
     def set_visible(self, visible, recursive=True):
         super(WxPythonContainerView, self).set_visible(visible, recursive)
         for child in self._children:
-            if recursive or not child._container:
+            if recursive or not child.container:
                 child.set_visible(visible and self.get_has_value(), recursive)
 
 
@@ -106,24 +98,16 @@ class WxPythonListView(WxPythonContainerView, ListView, ValueInterface):
         view.destroy()
         self.structure_changed()
 
-    def get_sizer(self, recursive: bool) -> wx.Sizer:
+    def get_sizers(self, recursive: bool) -> typing.Tuple[wx.Sizer, typing.Optional[wx.Sizer]]:
         sizer = self._create_sizer(wx.VERTICAL)
         sub_sizer = wx.BoxSizer(wx.HORIZONTAL)
         sub_sizer.Add(self._controls['num_elements'], border=5, flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL)
         sub_sizer.Add(self._controls['value'], border=5, flag=wx.ALL)
         sizer.Add(sub_sizer)
 
-        if recursive and self.get_has_value() and self._controls['name'].IsShown():
-            content = wx.StaticBoxSizer(wx.VERTICAL, self._parent, self._type_info.name)
-        else:
-            content = wx.BoxSizer(wx.VERTICAL)
-        for child in self._children:
-            if recursive or not child._container:
-                child_sizer = child.get_sizer(recursive)
-                content.Add(child_sizer)
-        sizer.Add(content)
+        sizer.Add(self._get_container_sizer(recursive, self._children))
 
-        return sizer
+        return sizer, None
 
 
 class WxPythonChoiceView(WxPythonView, ChoiceView, ValueInterface):
@@ -168,20 +152,25 @@ class WxPythonChoiceView(WxPythonView, ChoiceView, ValueInterface):
     def get_view(self) -> WxPythonView:
         return self._view
 
-    def get_sizer(self, recursive: bool) -> wx.Sizer:
-        outer_sizer = wx.BoxSizer(wx.HORIZONTAL)
+    def get_sizers(self, recursive: bool) -> typing.Tuple[wx.Sizer, typing.Optional[wx.Sizer]]:
         sizer = self._create_sizer(wx.VERTICAL)
         sizer.Add(self._controls['value'], border=5)
-        outer_sizer.Add(sizer)
-        if recursive or not self._view._container:
-            content_sizer = wx.BoxSizer(wx.VERTICAL)
-            view_sizer = self._view.get_sizer(recursive)
-            content_sizer.Add(view_sizer)
-            if not self.get_has_value():
-                content_sizer.Hide(view_sizer)
-            outer_sizer.Add(content_sizer)
 
-        return outer_sizer
+        if recursive or not self._view.container:
+            content_sizer = wx.BoxSizer(wx.VERTICAL)
+            left_sizer, right_sizer = self._view.get_sizers(recursive)
+            content_sizer.Add(left_sizer, border=5, flag=wx.EXPAND)
+            if right_sizer is not None:
+                content_sizer.Add(right_sizer, border=5, flag=wx.EXPAND)
+
+            if not self.get_has_value():
+                content_sizer.Hide(left_sizer)
+                if right_sizer is not None:
+                    content_sizer.Hide(right_sizer)
+
+            sizer.Add(content_sizer)
+
+        return sizer, None
 
     def destroy(self):
         super(WxPythonChoiceView, self).destroy()
@@ -190,5 +179,5 @@ class WxPythonChoiceView(WxPythonView, ChoiceView, ValueInterface):
 
     def set_visible(self, visible, recursive=True):
         super(WxPythonChoiceView, self).set_visible(visible, recursive)
-        if recursive or not self._view._container:
+        if recursive or not self._view.container:
             self._view.set_visible(visible and self.get_has_value(), recursive)

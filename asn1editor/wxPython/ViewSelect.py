@@ -48,23 +48,16 @@ class ViewSelect:
         self.__view_menu = wx.Menu()
         self.__view_select_radio.append_menu_items(self.__view_menu, ViewType.TREE)
         self.__view_menu.AppendSeparator()
-        self.__dark_mode: wx.MenuItem = self.__view_menu.Append(wx.ID_ANY, 'Dark mode', kind=wx.ITEM_CHECK)
         self.__view_menu.AppendSeparator()
         tag_info_sub = wx.Menu()
         self.__tag_info_radio.append_menu_items(tag_info_sub, TagInfo.TOOLTIPS)
         self.__view_menu.AppendSubMenu(tag_info_sub, 'Tag information')
-
-        self.__change_callback = change_callback
-        frame.Bind(wx.EVT_MENU, self.event_dark_mode, self.__dark_mode)
 
         self.__view_select_radio.bind(frame, change_callback)
         self.__tag_info_radio.bind(frame, lambda: change_callback(True))
 
     def get_menu(self) -> wx.Menu:
         return self.__view_menu
-
-    def event_dark_mode(self, _):
-        self.__change_callback()
 
     @property
     def view_type(self) -> ViewType:
@@ -73,14 +66,6 @@ class ViewSelect:
     @view_type.setter
     def view_type(self, selected: ViewType):
         self.__view_select_radio.value = selected.value
-
-    @property
-    def dark_mode(self) -> bool:
-        return self.__dark_mode.IsChecked()
-
-    @dark_mode.setter
-    def dark_mode(self, dark_mode: bool):
-        self.__dark_mode.Check(dark_mode)
 
     @property
     def tag_info(self) -> TagInfo:

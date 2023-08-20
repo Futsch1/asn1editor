@@ -36,14 +36,18 @@ class WxPythonDateTimeView(WxPythonView, ValueInterface):
     def __init__(self, type_info: TypeInfo, controls: ControlList):
         super(WxPythonDateTimeView, self).__init__(type_info, controls)
 
-    def get_sizer(self, recursive: bool) -> wx.Sizer:
+    def get_sizers(self, recursive: bool) -> typing.Tuple[wx.Sizer, typing.Optional[wx.Sizer]]:
         sizer = self._create_sizer()
-        sizer.Add(self._controls['value'], proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
-        sizer.Add(self._controls['time'], proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
+
+        value_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        value_sizer.Add(self._controls['value'], proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
+        value_sizer.Add(self._controls['time'], proportion=1, flag=wx.ALL | wx.EXPAND, border=5)
 
         if self._controls.get('style') & Styles.HIDDEN:
             sizer.ShowItems(False)
-        return sizer
+            value_sizer.ShowItems(False)
+
+        return sizer, value_sizer
 
     def register_change_event(self, callback: typing.Callable):
         # noinspection PyUnusedLocal

@@ -56,7 +56,7 @@ class TreeView:
             if child_view == view:
                 container_item_for_view = tree_child
                 found = True
-            tree_child, cookie = self.__tree_ctrl.GetNextChild(tree_child, cookie)
+            tree_child, cookie = self.__tree_ctrl.GetNextChild(tree_item, cookie)
 
         if not found:
             image = Resources.image_list.get_index(view.icon)
@@ -145,7 +145,10 @@ class TreeView:
         sizer.Clear()
 
         if view is not None:
-            sizer.Add(view.realize().get_sizer(recursive=False), 0, wx.ALL | wx.EXPAND, 5)
+            left_sizer, right_sizer = view.realize().get_sizers(recursive=False)
+            sizer.Add(left_sizer, 0, wx.ALL | wx.EXPAND, 5)
+            if right_sizer is not None:
+                sizer.Add(right_sizer, 0, wx.ALL | wx.EXPAND, 5)
 
         sizer.Layout()
 
