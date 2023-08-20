@@ -82,7 +82,7 @@ class ASN1SpecHandler:
         """
         types = []
         compiled = self.get_compiled('oer')
-        # TODO: Only include those types that are in the originally loaded file
+
         for module_name, module in compiled.modules.items():
             for type_name, compiled_type in module.items():
                 types.append(module_name + '.' + type_name)
@@ -98,10 +98,10 @@ class ASN1SpecHandler:
             self.__compiled[codec] = asn1tools.compile_files(self.__file_names, codec)
         return self.__compiled[codec]
 
-    def create_mvc_for_type(self, load_type: str, view_factory: AbstractViewFactory,
-                            type_augmenter: typing.Optional[TypeAugmenter]) -> Tuple[AbstractView, Controller]:
+    def create_view_controller_for_type(self, load_type: str, view_factory: AbstractViewFactory,
+                                        type_augmenter: typing.Optional[TypeAugmenter]) -> Tuple[AbstractView, Controller]:
         """
-        Creates a model-view-controller for a given type name.
+        Creates a view and a controller for a given type name.
         The type name must be a full type name, e.g. 'my_module.my_type', including the module name of the loaded ASN.1 spec.
         If the type name is not found in the loaded ASN.1 spec, a ValueError is raised.
 
@@ -115,9 +115,9 @@ class ASN1SpecHandler:
             for type_name, compiled_type in module.items():
 
                 if module_name + '.' + type_name == load_type:
-                    mvc_factory = ViewControllerFactory(view_factory, type_augmenter)
+                    vc_factory = ViewControllerFactory(view_factory, type_augmenter)
                     self._type_name = type_name
-                    return mvc_factory.create(compiled_type)
+                    return vc_factory.create(compiled_type)
 
         raise ValueError(f'Requested type {load_type} not found in ASN.1 spec')
 

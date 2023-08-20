@@ -18,7 +18,7 @@ class TestASN1SpecHandler(TestCase):
     def test_invalid_type(self):
         asn1_spec_handler = ASN1SpecHandler(['example/example.asn'])
         with self.assertRaises(Exception):
-            asn1_spec_handler.create_mvc_for_type('Unknown', AbstractViewFactory(), None)
+            asn1_spec_handler.create_view_controller_for_type('Unknown', AbstractViewFactory(), None)
 
     def test_get_extension(self):
         extension = ASN1SpecHandler.get_extensions()

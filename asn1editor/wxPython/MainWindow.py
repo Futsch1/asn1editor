@@ -19,7 +19,7 @@ from asn1editor.wxPython.MenuHandler import MenuHandler
 from asn1editor.wxPython.SingleFileDropTarget import SingleFileDropTarget
 from asn1editor.wxPython.TreeView import TreeView
 from asn1editor.wxPython.ViewSelect import ViewType, TagInfo
-from asn1editor.wxPython.WxPythonViews import WxPythonView
+from asn1editor.wxPython.views.WxPythonView import WxPythonView
 
 
 class MainWindow(wx.Frame, PluginInterface):
@@ -41,8 +41,8 @@ class MainWindow(wx.Frame, PluginInterface):
         self._status_bar = self.CreateStatusBar()
 
         self._menu_handler = MenuHandler(self, plugins, self.__about_box_content(title, plugins))
-
         self._menu_handler.build(self.load_spec, self.load_data_from_file, self.save_data_to_file, self._structure_changed)
+
         self.Bind(wx.EVT_CLOSE, self.close)
 
         self.__restore_size()
@@ -158,7 +158,7 @@ class MainWindow(wx.Frame, PluginInterface):
 
         self.Freeze()
 
-        self.__view, self.__controller = self.__asn1_handler.create_mvc_for_type(self.__type_name, view_factory, self._type_augmenter)
+        self.__view, self.__controller = self.__asn1_handler.create_view_controller_for_type(self.__type_name, view_factory, self._type_augmenter)
         self.__tree_view = TreeView(self, self.__content_panel, self.__type_name, labels)
 
         self.Thaw()
