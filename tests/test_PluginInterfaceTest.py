@@ -69,10 +69,10 @@ class PluginInterfaceTest(TestCase):
             instance.ShowModal.return_value = wx.ID_OK
             self.assertEqual('example2/example.asn', plugin.plugin_interface.file_picker("Test my entry", "Test", True))
 
-            instance.SetPath.reset_mock()
+            instance.SetDirectory.reset_mock()
             instance.ShowModal.return_value = wx.ID_CANCEL
             self.assertIsNone(plugin.plugin_interface.file_picker("Test my entry", "Test", False))
-            instance.SetPath.assert_called_once_with('example2/')
+            instance.SetDirectory.assert_called_once_with('example2/')
 
         with patch('wx.DirDialog') as DirDialogMock:
             instance = DirDialogMock.return_value
@@ -83,10 +83,10 @@ class PluginInterfaceTest(TestCase):
             instance.ShowModal.return_value = wx.ID_OK
             self.assertEqual('example3/example', plugin.plugin_interface.dir_picker("Test my entry"))
 
-            instance.SetPath.reset_mock()
+            instance.SetDirectory.reset_mock()
             instance.ShowModal.return_value = wx.ID_CANCEL
             self.assertIsNone(plugin.plugin_interface.dir_picker("Test my entry"))
-            instance.SetPath.assert_called_once_with('example3/')
+            instance.SetDirectory.assert_called_once_with('example3/')
 
         plugin.plugin_interface.show_status("Test status bar")
         self.assertEqual(main_window._status_bar.GetStatusText(), 'Test status bar')
